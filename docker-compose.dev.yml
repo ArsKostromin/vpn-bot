@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  aiogram:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - .:/app
+    command: ["python", "main.py"]
