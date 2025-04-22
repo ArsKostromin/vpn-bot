@@ -1,7 +1,7 @@
 from aiogram import Router, F
 from aiogram.types import CallbackQuery
 from aiogram.exceptions import TelegramBadRequest
-from bot.keyboards.main_menu import inline_buyvpn_menu, inline_time_menu, inline_country_menu
+from bot.keyboards.vpn_menu import inline_buyvpn_menu, inline_time_menu, inline_country_menu
 from .start import process_start 
 
 router = Router()
@@ -12,6 +12,11 @@ async def back_to_main(callback: CallbackQuery):
     await process_start(callback.from_user.id, callback.from_user.username, callback.message)
     await callback.answer()
 
+    
+@router.callback_query(F.data.in_({"buy_vpn", "back"}))
+async def show_buy_vpn(callback: CallbackQuery):
+    await buy_vpn_screen(callback)    
+    
     
 async def buy_vpn_screen(callback: CallbackQuery):
     """Отображает стартовый экран выбора VPN."""
@@ -29,11 +34,6 @@ async def buy_vpn_screen(callback: CallbackQuery):
         )
     except TelegramBadRequest:
         await callback.message.answer("Произошла ошибка при обработке запроса.")
-
-
-@router.callback_query(F.data.in_({"buy_vpn", "back"}))
-async def show_buy_vpn(callback: CallbackQuery):
-    await buy_vpn_screen(callback)
 
 
 @router.callback_query(F.data == "for_youtube")

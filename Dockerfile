@@ -2,8 +2,9 @@ FROM python:3.11
 
 WORKDIR /app
 
-# Устанавливаем зависимости
-COPY requirements.txt .
+# Копируем всё содержимое vpn-bot внутрь контейнера
+COPY . .
+
 RUN pip install --no-cache-dir -r requirements.txt
 
-# всё, код копировать не надо — он монтируется
+CMD ["python", "main.py"]

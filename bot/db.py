@@ -26,3 +26,8 @@ async def create_user(tg_id, username, vless_link):
             (tg_id, username, vless_link)
         )
         await db.commit()
+        
+        
+async def init_db(db_url: str):
+    # тут ты можешь логиниться в PostgreSQL, SQLite и т.д.
+    pass

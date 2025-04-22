@@ -2,26 +2,34 @@ import asyncio
 import logging
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
+from aiogram.client.default import DefaultBotProperties
 from aiogram.fsm.storage.memory import MemoryStorage
-from dotenv import load_dotenv
-import os
 
-from bot.handlers import start, menu
+from bot.handlers import start, vpn, proxy
+from bot.config import load_config
 from bot.db import init_db
 
-
-
-load_dotenv()
+# Настройка логгера
 logging.basicConfig(level=logging.INFO)
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-bot = Bot(token=BOT_TOKEN, parse_mode=ParseMode.HTML)
+# Конфигурация
+config = load_config()
+
+# Создание бота
+bot = Bot(
+    token=config.bot.token,
+    default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+)
+
+# Создание диспетчера
 dp = Dispatcher(storage=MemoryStorage())
 dp.include_router(start.router)
-dp.include_router(menu.router)
+dp.include_router(vpn.router)
+dp.include_router(proxy.router)
+
 
 async def main():
-    await init_db()
+    await init_db(config.db.url)
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
