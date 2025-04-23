@@ -3,6 +3,7 @@ from aiogram.types import CallbackQuery
 from aiogram.exceptions import TelegramBadRequest
 from bot.keyboards.vpn_menu import inline_buyvpn_menu, inline_time_menu, inline_country_menu
 from .start import process_start 
+from services.buy_vpn import create_subscription
 
 router = Router()
 
