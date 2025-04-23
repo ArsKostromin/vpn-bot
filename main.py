@@ -5,7 +5,7 @@ from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 from aiogram.fsm.storage.memory import MemoryStorage
 
-from bot.handlers import start, vpn, proxy
+from bot.handlers import start, vpn, proxy, my_services
 from bot.config import load_config
 from bot.db import init_db
 
@@ -26,6 +26,7 @@ dp = Dispatcher(storage=MemoryStorage())
 dp.include_router(start.router)
 dp.include_router(vpn.router)
 dp.include_router(proxy.router)
+dp.include_router(my_services.router)
 
 
 async def main():

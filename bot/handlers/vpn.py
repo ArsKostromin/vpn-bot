@@ -99,24 +99,20 @@ async def vpn_by_country(callback: CallbackQuery):
         await callback.message.answer("Произошла ошибка при обработке запроса.")
 
 
-@router.callback_query(F.data == "my_services")
-async def my_services(callback: CallbackQuery):
-    await callback.message.answer("📦 Здесь будут ваши услуги")
-    await callback.answer()
 
 @router.callback_query(F.data == "account")
 async def account(callback: CallbackQuery):
-    await callback.message.answer("📦 Здесь будут ваши услуги")
+    await callback.message.answer("📦 Здесь будут наши услуги")
     await callback.answer()
 
 @router.callback_query(F.data == "top_up")
 async def top_up(callback: CallbackQuery):
-    await callback.message.answer("📦 Здесь будут ваши услуги")
+    await callback.message.answer("📦 Здесь будут наши услуги")
     await callback.answer()
 
 @router.callback_query(F.data == "help")
 async def help_handler(callback: CallbackQuery):
-    await callback.message.answer("📦 Здесь будут ваши услуги")
+    await callback.message.answer("📦 Здесь будут наши услуги")
     await callback.answer()
 
 @router.callback_query(F.data == "reviews")
@@ -126,20 +122,20 @@ async def reviews(callback: CallbackQuery):
 
 @router.callback_query(F.data == "about_us")
 async def about_us(callback: CallbackQuery):
-    await callback.message.answer("📦 Здесь будут ваши услуги")
+    await callback.message.answer("📦 Здесь будут наши услуги")
     await callback.answer()
 
 @router.callback_query(F.data == "gift_friend")
 async def gift_friend(callback: CallbackQuery):
-    await callback.message.answer("📦 Здесь будут ваши услуги")
+    await callback.message.answer("📦 Здесь будут наши услуги")
     await callback.answer()
 
 @router.callback_query(F.data == "partners")
 async def partners(callback: CallbackQuery):
-    await callback.message.answer("📦 Здесь будут ваши услуги")
+    await callback.message.answer("📦 Здесь будут наши услуги")
     await callback.answer()
 
 @router.callback_query(F.data == "other_services")
 async def other_services(callback: CallbackQuery):
-    await callback.message.answer("📦 Здесь будут ваши услуги")
+    await callback.message.answer("📦 Здесь будут наши услуги")
     await callback.answer()
