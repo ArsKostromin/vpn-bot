@@ -1,42 +1,43 @@
-import aiohttp
+# services/buy_vpn.py
 
-API_BASE_URL = "http://backend:8000/api/vpn"
+import httpx
 
+API_URL = "http://backend:8000/vpn"  # заменишь на свой адрес
 
-async def select_vpn_type(telegram_id: int, vpn_type: str) -> str:
-    async with aiohttp.ClientSession() as session:
-        async with session.post(
-            f"{API_BASE_URL}/select-type/",
-            json={"vpn_type": vpn_type},
-            headers={"X-Telegram-ID": str(telegram_id)},
-        ) as resp:
-            data = await resp.json()
-            if resp.status == 200:
-                return data["vpn_type"]
-            raise Exception(data.get("detail", "Ошибка при выборе типа VPN"))
+async def get_vpn_types_from_api() -> list[str]:
+    async with httpx.AsyncClient() as client:
+        response = await client.get(f"{API_URL}/plans/")
+        response.raise_for_status()
+        plans = response.json()
+        return list(set(plan['vpn_type'] for plan in plans))
 
+async def get_durations_by_type_from_api(vpn_type: str) -> list[str]:
+    async with httpx.AsyncClient() as client:
+        response = await client.get(f"{API_URL}/plans/")
+        response.raise_for_status()
+        plans = response.json()
+        return [p['duration'] for p in plans if p['vpn_type'] == vpn_type]
 
-async def select_duration(telegram_id: int, vpn_type: str, duration: str) -> str:
-    async with aiohttp.ClientSession() as session:
-        async with session.post(
-            f"{API_BASE_URL}/select-duration/",
-            json={"vpn_type": vpn_type, "duration": duration},
-            headers={"X-Telegram-ID": str(telegram_id)},
-        ) as resp:
-            data = await resp.json()
-            if resp.status == 200:
-                return data["duration"]
-            raise Exception(data.get("detail", "Ошибка при выборе длительности"))
+async def buy_subscription_api(telegram_id: int, vpn_type: str, duration: str) -> tuple[bool, str]:
+    async with httpx.AsyncClient() as client:
+        # Получаем список тарифов
+        response = await client.get(f"{API_URL}/plans/")
+        response.raise_for_status()
+        plans = response.json()
 
+        # Находим подходящий тариф
+        matching = [p for p in plans if p['vpn_type'] == vpn_type and p['duration'] == duration]
+        if not matching:
+            return False, "Такого тарифа не существует."
+        
+        plan_id = matching[0]['id']
+        buy_resp = await client.post(
+            f"{API_URL}/buy/",
+            json={"plan_id": plan_id, "telegram_id": telegram_id}  # 👈 Добавили telegram_id
+        )
 
-async def purchase_subscription(telegram_id: int, vpn_type: str, duration: str) -> dict:
-    async with aiohttp.ClientSession() as session:
-        async with session.post(
-            f"{API_BASE_URL}/purchase/",
-            json={"vpn_type": vpn_type, "duration": duration},
-            headers={"X-Telegram-ID": str(telegram_id)},
-        ) as resp:
-            data = await resp.json()
-            if resp.status == 201:
-                return data
-            raise Exception(data.get("detail", "Ошибка при покупке VPN"))
+        if buy_resp.status_code == 201:
+            return True, buy_resp.json()['message']
+        else:
+            # Если ошибка — пробуем показать её, иначе выводим общее сообщение
+            return False, buy_resp.json().get("error") or buy_resp.json().get("detail", "Ошибка при покупке.")

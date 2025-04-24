@@ -1,52 +1,18 @@
+# keyboards/vpn_menu.py
+
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
+def get_vpn_type_kb(types: list[str]) -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    for vpn_type in types:
+        kb.button(text=vpn_type, callback_data=f"vpn_type:{vpn_type}")
+    kb.adjust(2)  # или 1, 2, 3 — зависит от того, как хочешь выводить кнопки
+    return kb.as_markup()
 
-inline_buyvpn_menu = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(text="🛡 для ютуба и соцсетей", callback_data="for_youtube"),
-        ],
-        [
-            InlineKeyboardButton(text="📦для торрентов", callback_data="for_torrent"),
-        ],
-        [
-            InlineKeyboardButton(text="💳 выбор по стране", callback_data="by_country"),
-        ],
-        [
-            InlineKeyboardButton(text="🔙 назад", callback_data="back_to_main"),
-        ],
-    ]
-)
-
-
-inline_time_menu = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(text="1 мес", callback_data="for_youtube"),
-            InlineKeyboardButton(text="2 мес", callback_data="for_youtube"),
-        ],
-        [
-            InlineKeyboardButton(text="1 год", callback_data="for_youtube"),
-            InlineKeyboardButton(text="3 года", callback_data="for_youtube"),        
-        ],
-        [
-            InlineKeyboardButton(text="назад", callback_data="back"),
-        ],
-    ]
-)
-
-inline_country_menu = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(text="1 страна", callback_data="for_youtube"),
-            InlineKeyboardButton(text="2 страна", callback_data="for_youtube"),
-        ],
-        [
-            InlineKeyboardButton(text="1 страна", callback_data="for_youtube"),
-            InlineKeyboardButton(text="3 страна", callback_data="for_youtube"),        
-        ],
-        [
-            InlineKeyboardButton(text="назад", callback_data="back"),
-        ],
-    ]
-)
+def get_duration_kb(durations: list[str]) -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+    for duration in durations:
+        kb.button(text=duration, callback_data=f"duration:{duration}")
+    kb.adjust(2)
+    return kb.as_markup()

@@ -1,6 +1,8 @@
 import aiohttp
+from typing import Optional, Tuple
 
-async def register_user_via_api(telegram_id: int) -> str | None:
+
+async def register_user_via_api(telegram_id: int) -> Optional[Tuple[str, bool]]:
     url = "http://backend:8000/user/api/register/"
 
     async with aiohttp.ClientSession() as session:
@@ -9,9 +11,9 @@ async def register_user_via_api(telegram_id: int) -> str | None:
             if resp.status == 201:
                 try:
                     data = await resp.json()
-                    vpn_key = data.get("vpn_key")
+                    link_code = data.get("link_code")
                     created = data.get("created")
-                    return vpn_key, created
+                    return link_code, created
                 except Exception as e:
                     print(f"Ошибка парсинга JSON: {e}, ответ: {text}")
                     return None

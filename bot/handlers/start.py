@@ -27,7 +27,7 @@ async def process_start(user_id: int, username: str, respond_to: Message):
     result = await register_user_via_api(user_id)
 
     if result:
-        vpn_key, created = result
+        link_code, created = result
 
         if created:
             await respond_to.answer(
@@ -40,7 +40,7 @@ async def process_start(user_id: int, username: str, respond_to: Message):
                     "🖥️ Windows: [neroVPN](https://)\n"
                     "🍏 MacOS: [neroVPN](https://)\n\n"
                     "🔗 Подключите VPN ключ в приложение (нажмите на текст ниже, чтобы скопировать):\n\n"
-                    f"`{vpn_key}`\n\n"
+                    f"`{link_code}`\n\n"
                     "-----------------------------\n"
                     "💰 Наши цены после истечения пробной версии:\n"
                     "├ 1 мес: $5\n"
