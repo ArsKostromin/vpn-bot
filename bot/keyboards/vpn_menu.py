@@ -10,9 +10,10 @@ def get_vpn_type_kb(types: list[str]) -> InlineKeyboardMarkup:
     kb.adjust(2)  # или 1, 2, 3 — зависит от того, как хочешь выводить кнопки
     return kb.as_markup()
 
-def get_duration_kb(durations: list[str]) -> InlineKeyboardMarkup:
-    kb = InlineKeyboardBuilder()
-    for duration in durations:
-        kb.button(text=duration, callback_data=f"duration:{duration}")
-    kb.adjust(2)
-    return kb.as_markup()
+
+def get_duration_kb(durations_with_price: list[tuple[str, str]]) -> InlineKeyboardMarkup:
+    buttons = [
+        [InlineKeyboardButton(text=f"{duration} — ${price}", callback_data=f"duration:{duration}")]
+        for duration, price in durations_with_price
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=buttons)

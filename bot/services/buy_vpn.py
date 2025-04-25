@@ -11,12 +11,13 @@ async def get_vpn_types_from_api() -> list[str]:
         plans = response.json()
         return list(set(plan['vpn_type'] for plan in plans))
 
-async def get_durations_by_type_from_api(vpn_type: str) -> list[str]:
+async def get_durations_by_type_from_api(vpn_type: str) -> list[tuple[str, str]]:
     async with httpx.AsyncClient() as client:
         response = await client.get(f"{API_URL}/plans/")
         response.raise_for_status()
         plans = response.json()
-        return [p['duration'] for p in plans if p['vpn_type'] == vpn_type]
+        return [(p['duration'], p['price']) for p in plans if p['vpn_type'] == vpn_type]
+
 
 async def buy_subscription_api(telegram_id: int, vpn_type: str, duration: str) -> tuple[bool, str]:
     async with httpx.AsyncClient() as client:
@@ -41,3 +42,11 @@ async def buy_subscription_api(telegram_id: int, vpn_type: str, duration: str) -
         else:
             # Если ошибка — пробуем показать её, иначе выводим общее сообщение
             return False, buy_resp.json().get("error") or buy_resp.json().get("detail", "Ошибка при покупке.")
+        
+        
+# async def get_price_by_plan(vpn_type: str) -> list[str]:
+#     async with httpx.AsyncClient() as client:
+#         response = await client.get(f"{API_URL}/plans/")
+#         response.raise_for_status()
+#         plans = response.json()
+#         return [p['price'] for p in plans if p['vpn_type'] == vpn_type]

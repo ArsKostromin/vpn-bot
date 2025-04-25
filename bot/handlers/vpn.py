@@ -24,10 +24,20 @@ async def select_duration(callback: CallbackQuery, state: FSMContext):
     vpn_type = callback.data.split(":")[1]
     await state.update_data(vpn_type=vpn_type)
 
-    durations = await get_durations_by_type_from_api(vpn_type)
-    await callback.message.answer("Выберите длительность:", reply_markup=get_duration_kb(durations))
+    durations_with_price = await get_durations_by_type_from_api(vpn_type)
+
+    if not durations_with_price:
+        await callback.message.answer("❌ Нет доступных подписок для этого типа VPN.")
+        await callback.answer()
+        return
+
+    await callback.message.answer(
+        text="Выберите длительность подписки:",
+        reply_markup=get_duration_kb(durations_with_price)
+    )
     await state.set_state(BuyVPN.duration)
     await callback.answer()
+
 
 @router.callback_query(F.data.startswith("duration:"))
 async def complete_subscription(callback: CallbackQuery, state: FSMContext):
