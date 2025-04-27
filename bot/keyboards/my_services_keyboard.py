@@ -3,11 +3,22 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 my_services_menu = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="🧦 мои ВПН", callback_data="my_vpn"),
-            InlineKeyboardButton(text="📎 Мои прокси", callback_data="my_proxies"),
+            InlineKeyboardButton(text="продлить", callback_data="my_vpn"),
         ],
         [
-            InlineKeyboardButton(text="⬅️ Назад", callback_data="back_to_main"),
+            InlineKeyboardButton(text="⬅️ Назад", callback_data="start_from_button"),
+        ]
+    ]
+)
+
+
+not_subscription = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="Купить", callback_data="buy_vpn"),
+        ],
+        [
+            InlineKeyboardButton(text="⬅️ Назад", callback_data="start_from_button"),
         ]
     ]
 )

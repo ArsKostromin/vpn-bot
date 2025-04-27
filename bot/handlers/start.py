@@ -1,8 +1,6 @@
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 from bot.db import get_user, create_user
-from bot.services.vless import generate_vless_link
-import uuid
 from aiogram.filters import Command
 from bot.keyboards.main_menu import inline_main_menu
 from bot.keyboards.start_menu import inline_instruction_buttons
@@ -21,7 +19,6 @@ async def cmd_start(message: Message):
 async def callback_start(callback: CallbackQuery):
     await process_start(callback.from_user.id, callback.from_user.username, callback.message)
     await callback.answer()
-
 
 async def process_start(user_id: int, username: str, respond_to: Message):
     result = await register_user_via_api(user_id)
