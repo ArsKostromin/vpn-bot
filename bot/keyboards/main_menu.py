@@ -12,7 +12,7 @@ inline_main_menu = InlineKeyboardMarkup(
             InlineKeyboardButton(text="⚙️ Аккаунт", callback_data="account"),
         ],
         [
-            InlineKeyboardButton(text="💳 Пополнить", callback_data="top_up"),
+            InlineKeyboardButton(text="💳 Пополнить", callback_data="balance_up"),
         ],
     ]
 )
