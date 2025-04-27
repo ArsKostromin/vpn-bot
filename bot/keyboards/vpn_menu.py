@@ -13,7 +13,7 @@ def get_vpn_type_kb(types: list[str]) -> InlineKeyboardMarkup:
 
 def get_duration_kb(durations_with_price: list[tuple[str, str]]) -> InlineKeyboardMarkup:
     buttons = [
-        [InlineKeyboardButton(text=f"{duration} — ${price}", callback_data=f"duration:{duration}")]
+        [InlineKeyboardButton(text=f"{duration} — Р{price}", callback_data=f"duration:{duration}")]
         for duration, price in durations_with_price
     ]
     # Добавляем кнопку Назад отдельным рядом

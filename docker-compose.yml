@@ -4,7 +4,7 @@ services:
   aiogram:
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     volumes:
       - .:/app
     command: ["python", "main.py"]

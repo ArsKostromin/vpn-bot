@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)  # Можно поставить DEBUG на разработке
 
 
-API_URL = "http://backend:8000"
+API_URL = "https://vpnbot.onrender.com"
 
 async def register_user_via_api(telegram_id: int) -> Optional[Tuple[str, bool]]:
     url = f"{API_URL}/user/api/register/"
