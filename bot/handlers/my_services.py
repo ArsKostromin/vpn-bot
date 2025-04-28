@@ -34,10 +34,14 @@ async def my_services_screen(callback: CallbackQuery):
                 f"🔹 Начало: {sub['start_date'][:10]}\n"
                 f"🔹 Окончание: {sub['end_date'][:10]}\n\n"
             )
-        reply_markup=my_services_menu
-        await callback.message.answer(text)
+
+        await callback.message.answer(
+            text,
+            reply_markup=back_to_main_menu
+        )
 
     await callback.answer()
+
     
 @router.callback_query(F.data == "account")
 async def profile_handler(callback: CallbackQuery):

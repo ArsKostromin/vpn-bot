@@ -3,6 +3,8 @@
 import httpx
 
 API_URL = "https://vpnbot.onrender.com/vpn"  
+# API_URL = "http://backend:8000/vpn"
+
 
 async def get_vpn_types_from_api() -> list[str]: # типы впн
     async with httpx.AsyncClient() as client:

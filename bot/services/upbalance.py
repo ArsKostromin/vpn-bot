@@ -1,6 +1,7 @@
 import aiohttp
 
 API_URL = "https://vpnbot.onrender.com"  # У тебя в докере так
+# API_URL = "http://backend:8000"
 
 async def create_payment_link(telegram_id: int, amount: int) -> str:
     url = f"{API_URL}/payments/create-payment/"
