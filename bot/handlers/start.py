@@ -3,13 +3,20 @@ from aiogram.types import Message, CallbackQuery
 from bot.db import get_user, create_user
 from aiogram.filters import Command
 from bot.keyboards.main_menu import inline_main_menu
-from bot.keyboards.start_menu import inline_instruction_buttons
+from bot.keyboards.start_menu import inline_instruction_buttons, reply_main_menu
 import aiohttp
 from bot.services.user_service import register_user_via_api
 from aiogram.enums import ParseMode
+from bot.keyboards.reply import main_menu_kb  # импортируем клавиатуру
 
 
 router = Router()
+
+
+@router.message(F.text == "Главное меню")
+async def main_menu_button_pressed(message: Message):
+    # Если нажали "Главное меню" кнопкой — делаем то же самое, что при /start
+    await process_start(message.from_user.id, message.from_user.username, message)
 
 @router.message(Command("start"))
 async def cmd_start(message: Message):
@@ -22,6 +29,12 @@ async def callback_start(callback: CallbackQuery):
 
 async def process_start(user_id: int, username: str, respond_to: Message):
     result = await register_user_via_api(user_id)
+
+    # ПЕРВЫМ делом всегда отправляем ReplyKeyboardMarkup ("Главное меню")
+    await respond_to.answer(
+        text="Меню доступно ниже ⬇️",
+        reply_markup=main_menu_kb
+    )
 
     if result:
         link_code, created = result
@@ -58,8 +71,53 @@ async def process_start(user_id: int, username: str, respond_to: Message):
             "🔥 Наши серверы не имеют ограничений по скорости и трафику, VPN работает на всех устройствах, "
             "YouTube в 4K — без задержек!\n\n"
             "🔥 Максимальная анонимность и безопасность, которую не даст ни один VPN сервис в мире.\n\n"
-            "✅ Наш канал: @meme17k"
+            "✅ Наш канал: "
         ),
         reply_markup=inline_main_menu,
         parse_mode=ParseMode.HTML
     )
+
+    
+    
+    
+#говно
+
+
+
+
+
+@router.callback_query(F.data == "help")
+async def help_handler(callback: CallbackQuery):
+    await callback.message.answer("📦 Здесь будут ваши услуги")
+    await callback.answer()
+
+@router.callback_query(F.data == "reviews")
+async def reviews(callback: CallbackQuery):
+    await callback.message.edit_text("✍️ Здесь будут отзывы")
+    await callback.answer()
+
+@router.callback_query(F.data == "about_us")
+async def about_us(callback: CallbackQuery):
+    await callback.message.answer("о нас")
+    await callback.answer()
+
+@router.callback_query(F.data == "gift_friend")
+async def gift_friend(callback: CallbackQuery):
+    await callback.message.answer("📦 можно сделать подарок другу")
+    await callback.answer()
+
+@router.callback_query(F.data == "partners")
+async def partners(callback: CallbackQuery):
+    await callback.message.answer("📦 Здесь будут ваши партнеры")
+    await callback.answer()
+
+@router.callback_query(F.data == "other_services")
+async def other_services(callback: CallbackQuery):
+    await callback.message.answer("📦 Здесь будут другие услуги")
+    await callback.answer()
+    
+    
+@router.callback_query(F.data == "buy_proxy")
+async def buy_proxy(callback: CallbackQuery):
+    await callback.message.answer("📦 Здесь будут другие услуги")
+    await callback.answer()

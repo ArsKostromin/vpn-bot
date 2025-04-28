@@ -2,10 +2,13 @@
 
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
 inline_main_menu = InlineKeyboardMarkup(
     inline_keyboard=[
         [
             InlineKeyboardButton(text="🛡 Купить VPN", callback_data="buy_vpn"),
+            InlineKeyboardButton(text="🛒 Купить прокси", callback_data="buy_proxy"),
         ],
         [
             InlineKeyboardButton(text="📦 Мои услуги", callback_data="my_services"),
@@ -13,6 +16,19 @@ inline_main_menu = InlineKeyboardMarkup(
         ],
         [
             InlineKeyboardButton(text="💳 Пополнить", callback_data="balance_up"),
+            InlineKeyboardButton(text="🆘 Помощь", callback_data="help"),
+        ],
+        [
+            InlineKeyboardButton(text="📝 Отзывы", callback_data="reviews"),
+            InlineKeyboardButton(text="ℹ️ О нас", callback_data="about_us"),
+        ],
+        [
+            InlineKeyboardButton(text="🎁 Подари другу", callback_data="gift_friend"),
+            InlineKeyboardButton(text="🤝 Партнёрка", callback_data="partner"),
+        ],
+        [
+            InlineKeyboardButton(text="🛠 Другие сервисы", callback_data="other_services"),
+            InlineKeyboardButton(text="📢 Наш канал", callback_data="our_channel"),
         ],
     ]
 )

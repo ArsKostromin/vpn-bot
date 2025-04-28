@@ -59,7 +59,7 @@ async def profile_handler(callback: CallbackQuery):
     text = (
         f"💼 Ваш профиль:\n\n"
         f"▪️ Баланс: {balance}₽\n"
-        f"▪️ Код приглашения: {link_code}"
+        f"▪️ Код для подключения в приложении: {link_code}"
     )
 
     reply_markup = back_to_main_menu

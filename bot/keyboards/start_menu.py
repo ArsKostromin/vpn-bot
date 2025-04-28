@@ -24,3 +24,16 @@ inline_instruction_buttons = InlineKeyboardMarkup(inline_keyboard=[
     #     ),
     # ]
 ])
+
+
+
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+
+reply_main_menu = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="Главное меню"),
+        ],
+    ],
+    resize_keyboard=True  # чтобы кнопки аккуратно подстраивались под экран
+)

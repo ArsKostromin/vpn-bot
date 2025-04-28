@@ -1,6 +1,6 @@
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
-from bot.keyboards.balance_menu import get_balance_menu, start_balance
+from bot.keyboards.balance_menu import get_balance_menu, start_balance, get_balance_menu_roboc, end_upbalance
 from bot.services.upbalance import create_payment_link, create_crypto_payment
 import traceback
 
@@ -35,10 +35,10 @@ async def process_topup(callback: CallbackQuery):
 
     try:
         payment_link = await create_payment_link(telegram_id=callback.from_user.id, amount=amount)
-        await callback.message.answer(f"Вот ваша ссылка для оплаты на {amount} ₽:\n{payment_link}")
+        await callback.message.answer(f"Вот ваша ссылка для оплаты на {amount} ₽:\n{payment_link}", reply_markup=end_upbalance)
         await callback.answer()
     except Exception as e:
-        await callback.message.answer("Ошибка при создании платежа. Попробуйте позже.")
+        await callback.message.answer("Ошибка при создании платежа. Попробуйте позже.", reply_markup=end_upbalance)
         await callback.answer()
 
 # Обработка кнопки "Назад"
@@ -56,7 +56,7 @@ async def back_to_main_menu(callback: CallbackQuery):
 async def balance_up_start(call: CallbackQuery):
     await call.message.answer(
         "💵 Выберите сумму для пополнения:",
-        reply_markup=get_balance_menu()
+        reply_markup=get_balance_menu_roboc()
     )
 
 # Когда пользователь выбрал сумму
@@ -69,7 +69,8 @@ async def create_payment(call: CallbackQuery):
         payment_url = await create_crypto_payment(telegram_id, amount)
         await call.message.answer(
             f"🧾 Оплата на сумму {amount} ₽ создана!\n\n"
-            f"👉 Оплатить можно по ссылке: {payment_url}"
+            f"👉 Оплатить можно по ссылке: {payment_url}",
+            reply_markup=end_upbalance
         )
     except Exception as e:
         # Отправить короткое сообщение пользователю
