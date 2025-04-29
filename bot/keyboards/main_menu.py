@@ -8,7 +8,6 @@ inline_main_menu = InlineKeyboardMarkup(
     inline_keyboard=[
         [
             InlineKeyboardButton(text="🛡 Купить VPN", callback_data="buy_vpn"),
-            InlineKeyboardButton(text="🛒 Купить прокси", callback_data="buy_proxy"),
         ],
         [
             InlineKeyboardButton(text="📦 Мои услуги", callback_data="my_services"),

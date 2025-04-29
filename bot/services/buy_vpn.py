@@ -2,7 +2,7 @@
 
 import httpx
 
-API_URL = "https://vpnbot.onrender.com/vpn"  
+API_URL = "http://159.198.77.150:8000/vpn"  
 # API_URL = "http://backend:8000/vpn"
 
 

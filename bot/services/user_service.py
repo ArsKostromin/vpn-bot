@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)  # Можно поставить DEBUG на разработке
 
 
-API_URL = "https://vpnbot.onrender.com"
+API_URL = "http://159.198.77.150:8000"
 # API_URL = "http://backend:8000"
 
 
