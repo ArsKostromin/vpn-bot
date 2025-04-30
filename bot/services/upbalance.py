@@ -1,8 +1,8 @@
 #services/upbalance.py
 import aiohttp
 
-# API_URL = "http://159.198.77.150:8000"  # У тебя в докере так
-API_URL = "http://backend:8000"
+API_URL = "http://159.198.77.150:8000"  # У тебя в докере так
+# API_URL = "http://backend:8000"
 
 async def create_payment_link(telegram_id: int, amount: int) -> str:
     url = f"{API_URL}/payments/create-payment/"
