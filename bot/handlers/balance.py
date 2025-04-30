@@ -1,6 +1,7 @@
+#handlers/balance.py
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
-from bot.keyboards.balance_menu import get_balance_menu, start_balance, get_balance_menu_roboc, end_upbalance
+from bot.keyboards.balance_menu import get_crypto_currency_keyboard, get_balance_menu, start_balance, get_balance_menu_roboc, end_upbalance
 from bot.services.upbalance import create_payment_link, create_crypto_payment
 import traceback
 
@@ -23,7 +24,7 @@ async def balance_up_callback(call: CallbackQuery):
 async def balance_menu_callback(call: CallbackQuery):
     await call.message.answer(
         "Выберите сумму пополнения:",
-        reply_markup=get_balance_menu()
+        reply_markup=get_balance_menu_roboc()
     )
     await call.answer()
 
@@ -56,26 +57,40 @@ async def back_to_main_menu(callback: CallbackQuery):
 async def balance_up_start(call: CallbackQuery):
     await call.message.answer(
         "💵 Выберите сумму для пополнения:",
-        reply_markup=get_balance_menu_roboc()
+        reply_markup=get_balance_menu()
     )
 
-# Когда пользователь выбрал сумму
+
 @router.callback_query(F.data.startswith("balance_amount_"))
-async def create_payment(call: CallbackQuery):
+async def choose_crypto(call: CallbackQuery):
     amount = int(call.data.split("_")[-1])
+    await call.message.answer(
+        "💱 Выберите криптовалюту для оплаты:",
+        reply_markup=get_crypto_currency_keyboard(amount)
+    )
+
+
+# Когда пользователь выбрал сумму
+@router.callback_query(F.data.startswith("crypto_"))
+async def create_payment(call: CallbackQuery):
+    try:
+        _, asset, amount_str = call.data.split("_")
+        amount = int(amount_str)
+    except (ValueError, IndexError):
+        await call.message.answer("❌ Неверные данные для оплаты. Попробуйте снова.")
+        return
+
     telegram_id = call.from_user.id
 
     try:
-        payment_url = await create_crypto_payment(telegram_id, amount)
+        payment_url = await create_crypto_payment(telegram_id, amount, asset)
         await call.message.answer(
-            f"🧾 Оплата на сумму {amount} ₽ создана!\n\n"
-            f"👉 Оплатить можно по ссылке: {payment_url}",
+            f"🧾 Оплата на сумму {amount} ₽ через {asset} создана!\n\n"
+            f"👉 Перейдите по ссылке: {payment_url}",
             reply_markup=end_upbalance
         )
     except Exception as e:
-        # Отправить короткое сообщение пользователю
-        await call.message.answer(f"❌ Ошибка при создании платежа. Попробуйте позже.")
-        # А в логи сохранить полную трассировку
-        import logging
+        import logging, traceback
         logging.error(f"Ошибка при создании платежа для {telegram_id}: {e}")
         logging.error(traceback.format_exc())
+        await call.message.answer("❌ Ошибка при создании платежа. Попробуйте позже.")
