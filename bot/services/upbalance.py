@@ -1,7 +1,7 @@
 #services/upbalance.py
 import aiohttp
 
-# API_URL = "http://159.198.77.150:8000"  # У тебя в докере так
+API_URL = "http://159.198.77.222:8000"
 API_URL = "http://backend:8000"
 
 #robocassa(робосаса)

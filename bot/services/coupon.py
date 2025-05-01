@@ -1,8 +1,8 @@
 import httpx
 
 
-# API_URL = "http://159.198.77.150:8000/vpn
-API_URL = "http://backend:8000"
+API_URL = "http://159.198.77.222:8000"
+# API_URL = "http://backend:8000"
 
 async def apply_coupon(code: str, telegram_id: int) -> str:
     async with httpx.AsyncClient() as client:
