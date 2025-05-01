@@ -1,36 +1,50 @@
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
-from bot.db import get_user, create_user
-from aiogram.filters import Command
-from bot.keyboards.main_menu import inline_main_menu
-from bot.keyboards.start_menu import inline_instruction_buttons, reply_main_menu
-import aiohttp
-from bot.services.user_service import register_user_via_api
+from aiogram.filters import CommandStart, CommandObject
 from aiogram.enums import ParseMode
-from bot.keyboards.reply import main_menu_kb  # импортируем клавиатуру
 
+from bot.keyboards.main_menu import inline_main_menu
+from bot.keyboards.start_menu import inline_instruction_buttons
+from bot.keyboards.reply import main_menu_kb
+
+from bot.services.user_service import register_user_via_api
+from bot.services.telegram_service import is_user_subscribed
+from bot.services.promo_service import get_promo_code_from_api
 
 router = Router()
 
 
-@router.message(F.text == "Главное меню")
-async def main_menu_button_pressed(message: Message):
-    # Если нажали "Главное меню" кнопкой — делаем то же самое, что при /start
+@router.message(CommandStart(deep_link=False))
+async def cmd_start_no_ref(message: Message):
     await process_start(message.from_user.id, message.from_user.username, message)
 
-@router.message(Command("start"))
-async def cmd_start(message: Message):
+
+@router.message(F.text == "Главное меню")
+async def main_menu_button_pressed(message: Message):
     await process_start(message.from_user.id, message.from_user.username, message)
+
 
 @router.callback_query(F.data == "start_from_button")
 async def callback_start(callback: CallbackQuery):
     await process_start(callback.from_user.id, callback.from_user.username, callback.message)
     await callback.answer()
 
-async def process_start(user_id: int, username: str, respond_to: Message):
-    result = await register_user_via_api(user_id)
 
-    # ПЕРВЫМ делом всегда отправляем ReplyKeyboardMarkup ("Главное меню")
+@router.message(CommandStart(deep_link=True))
+async def cmd_start(message: Message, command: CommandObject):
+    referral_code = command.args
+    await process_start(message.from_user.id, message.from_user.username, message, referral_code)
+
+
+async def process_start(
+    user_id: int,
+    username: str,
+    respond_to: Message,
+    referral_code: str | None = None
+):
+    result = await register_user_via_api(user_id, referral_code)
+
+    # Показать клавиатуру
     await respond_to.answer(
         text="Меню доступно ниже ⬇️",
         reply_markup=main_menu_kb
@@ -40,17 +54,21 @@ async def process_start(user_id: int, username: str, respond_to: Message):
         link_code, created = result
 
         if created:
+            is_subscribed = await is_user_subscribed(respond_to.bot, user_id)
+
             await respond_to.answer(
                 text=(
-                    f"✅Добро пожаловать в Ваше название, {respond_to.from_user.full_name}!\n\n"
-                    "🔧 Ваш VPN УЖЕ готов к работе и будет доступен **БЕСПЛАТНО три дня!**\n\n"
+                    f"✅ Добро пожаловать в Anonix, {respond_to.from_user.full_name}!\n\n"
+                    "🔧 Ваш VPN УЖЕ готов к работе!**\n\n"
+                    f"🎁 получи **+5 дней** `\n\n"
+                    "📢 Чтобы получить **бесплатную подписку**, просто подпишитесь на наш канал ниже и нажмите кнопку «Проверить подписку» 👇\n\n"
                     "📲 Установите приложение для вашей OS:\n\n"
-                    "🍏 iOS: [Ваше название](https://)\n"
-                    "🤖 Android: [Ваше название](https://)\n"
-                    "🖥️ Windows: [Ваше название](https://)\n"
-                    "🍏 MacOS: [Ваше название](https://)\n\n"
-                    "🔗 Подключите VPN ключ в приложение (нажмите на текст ниже, чтобы скопировать):\n\n"
-                    f"`{link_code}`\n\n"
+                    "🍏 iOS: [Anonix](https://)\n"
+                    "🤖 Android: [Anonix](https://)\n"
+                    "🖥️ Windows: [Anonix](https://)\n"
+                    "🍏 MacOS: [Anonix](https://)\n\n"
+                    "🔗 Подключите VPN ключ в приложение:\n\n"
+                    f"▪️ реферальная ссылка: https://t.me/under_developmentt_bot?start={link_code}\n\n"
                     "-----------------------------\n"
                     "💰 Наши цены после истечения пробной версии:\n"
                     "├ 1 мес: $5\n"
@@ -61,9 +79,10 @@ async def process_start(user_id: int, username: str, respond_to: Message):
                 parse_mode=ParseMode.MARKDOWN,
                 reply_markup=inline_instruction_buttons
             )
+
             return
 
-    # Если пользователь уже есть или ошибка при регистрации
+    # Если пользователь уже зарегистрирован
     await respond_to.bot.send_photo(
         chat_id=respond_to.chat.id,
         photo="https://play-lh.googleusercontent.com/BFkf2bgtxsCvsTnR2yw8yuWD3mgpThoyiRoBhoazTqFFMNOmdxGAAqS7vMATyNwelQ",
@@ -77,13 +96,37 @@ async def process_start(user_id: int, username: str, respond_to: Message):
         parse_mode=ParseMode.HTML
     )
 
-    
-    
-    
-#говно
 
+@router.callback_query(F.data == "check_subscription")
+async def check_subscription_handler(callback: CallbackQuery):
+    user_id = callback.from_user.id
+    is_subscribed = await is_user_subscribed(callback.bot, user_id)
 
+    if is_subscribed:
+        promo_code = await get_promo_code_from_api(user_id)
 
+        await callback.message.answer(
+            text=(
+                "🎉 Спасибо за подписку на канал!\n\n"
+                f"🎁 Вот ваш промокод на +5 дней: `{promo_code}`\n\n"
+                "🚀 Теперь вы можете пользоваться VPN целых 8 дней бесплатно!"
+            ),
+            parse_mode=ParseMode.MARKDOWN,
+            reply_markup=main_menu_kb
+        )
+    else:
+        await callback.message.answer(
+            text=(
+                "❌ Вы еще не подписались на канал.\n\n"
+                "Пожалуйста, подпишитесь и нажмите кнопку ещё раз:"
+                "\n🔗 [Подписаться на канал]()"
+            ),
+            parse_mode=ParseMode.MARKDOWN
+        )
+
+    await callback.answer()
+
+    
 
 
 @router.callback_query(F.data == "help")
@@ -104,7 +147,7 @@ async def about_us(callback: CallbackQuery):
         "2️⃣ Мы раздаем VPN через Telegram, что делает нас недоступными для блокировок и удаления из магазинов приложений. С YouFast VPN™ вы всегда на связи, где бы вы ни находились! Это означает, что вы можете легко подключаться к нашему сервису в любой точке мира, не беспокоясь о доступности.\n\n"
         "3️⃣ В отличие от многих бесплатных VPN-сервисов, мы ценим вашу конфиденциальность. Мы не собираем и не продаем ваши данные. Все журналы удаляются с наших серверов мгновенно, а история ваших посещений остается только у вас. После деактивации мы не храним ваши VPN-ключи. Вы можете пользоваться нашим сервисом с полной уверенностью в том, что ваша личная информация защищена.\n\n"
         "4️⃣ Наши сервера обеспечивают неограниченную скорость и трафик (с каналами до 10 Гбит), а наш VPN работает на всех устройствах. Наслаждайтесь просмотром YouTube в 4K без задержек! Кроме того, мы предлагаем простую и интуитивно понятную настройку, чтобы вы могли быстро подключиться к сети без лишних хлопот.\n\n"
-        "Выбирая Ваше название, вы получаете надежного партнера для безопасного серфинга в Интернете. Присоединяйтесь к нам сегодня и откройте для себя мир без границ!"
+        "Выбирая Anonix, вы получаете надежного партнера для безопасного серфинга в Интернете. Присоединяйтесь к нам сегодня и откройте для себя мир без границ!"
     )
     await callback.answer()
 

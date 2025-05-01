@@ -1,7 +1,7 @@
-#handlers/balance.py
+#handlers/balance.py тут пополнение баланса
 from aiogram import Router, F
-from aiogram.types import Message, CallbackQuery
-from bot.keyboards.balance_menu import get_crypto_currency_keyboard, get_balance_menu, start_balance, get_balance_menu_roboc, end_upbalance
+from aiogram.types import Message, CallbackQuery, LabeledPrice
+from bot.keyboards.balance_menu import get_star_topup_menu, get_crypto_currency_keyboard, get_balance_menu, start_balance, get_balance_menu_roboc, end_upbalance
 from bot.services.upbalance import create_payment_link, create_crypto_payment
 import traceback
 
@@ -94,3 +94,49 @@ async def create_payment(call: CallbackQuery):
         logging.error(f"Ошибка при создании платежа для {telegram_id}: {e}")
         logging.error(traceback.format_exc())
         await call.message.answer("❌ Ошибка при создании платежа. Попробуйте позже.")
+
+
+#telegram stars
+STAR_PRICE_RUB = 1.79
+
+@router.callback_query(F.data == "tgstars")
+async def open_star_menu(callback: CallbackQuery):
+    await callback.message.answer("Выберите сумму пополнения через звёзды:", reply_markup=get_star_topup_menu())
+    await callback.answer()
+
+
+
+@router.callback_query(F.data.startswith("tgstars_"))
+async def process_star_topup(callback: CallbackQuery):
+    amount_rub = int(callback.data.split("_")[1])
+    stars = int(amount_rub / STAR_PRICE_RUB)
+
+    prices = [
+        LabeledPrice(label=f"{stars} звёзд", amount=stars * 100)  # в копейках
+    ]
+
+    await callback.bot.send_invoice(
+        chat_id=callback.from_user.id,
+        title="Пополнение баланса",
+        description=f"Вы пополняете баланс на {amount_rub}₽",
+        payload=f"user_{callback.from_user.id}_rub_{amount_rub}",
+        provider_token="robokassa:<merchant_login>:<password1>",  # ⚠️ замените!
+        currency="RUB",
+        prices=prices,
+        start_parameter="stars-payment"
+    )
+
+    await callback.answer()
+    
+    
+@router.message(F.successful_payment)
+async def handle_star_payment(message: Message):
+    total_amount = message.successful_payment.total_amount
+    currency = message.successful_payment.currency
+
+    stars = total_amount / 100
+    telegram_id = message.from_user.id
+
+    payment = await register_star_payment(user_id=telegram_id, stars=stars)
+
+    await message.answer(f"✅ Успешно! На ваш баланс зачислено {payment['amount']}₽ за {int(stars)} ⭐.")

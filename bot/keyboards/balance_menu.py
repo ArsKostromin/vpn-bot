@@ -23,6 +23,9 @@ start_balance = InlineKeyboardMarkup(
             InlineKeyboardButton(text="cryptobot", callback_data="cryptobot"),
         ],
         [
+            InlineKeyboardButton(text="Telegram stars", callback_data="tgstars"),
+        ],
+        [
             InlineKeyboardButton(text="Назад", callback_data="start_from_button")
         ],
     ]
@@ -61,3 +64,14 @@ def get_crypto_currency_keyboard(amount: int) -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text="LTC", callback_data=f"crypto_LTC_{amount}")],
         [InlineKeyboardButton(text="BNB", callback_data=f"crypto_BNB_{amount}")],
     ])
+    
+    
+def get_star_topup_menu():
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="1 руб", callback_data="tgstars_1")],
+            [InlineKeyboardButton(text="100 руб", callback_data="tgstars_100")],
+            [InlineKeyboardButton(text="500 руб", callback_data="tgstars_500")],
+            [InlineKeyboardButton(text="Назад", callback_data="start_from_button")],
+        ]
+    )

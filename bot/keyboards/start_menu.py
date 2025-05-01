@@ -13,8 +13,8 @@ inline_instruction_buttons = InlineKeyboardMarkup(inline_keyboard=[
             callback_data="start_from_button"
         ),
         InlineKeyboardButton(
-            text="❓ Задать вопрос", 
-            callback_data="not_ready"
+            text="✅ Я подписался", 
+            callback_data="check_subscription"
         ),
     ],
     # [

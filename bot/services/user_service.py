@@ -7,15 +7,22 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)  # Можно поставить DEBUG на разработке
 
 
-API_URL = "http://159.198.77.150:8000"
-# API_URL = "http://backend:8000"
+# API_URL = "http://159.198.77.150:8000"
+API_URL = "http://backend:8000"
 
 
-async def register_user_via_api(telegram_id: int) -> Optional[Tuple[str, bool]]:
+async def register_user_via_api(
+    telegram_id: int,
+    referral_code: str | None = None
+) -> Optional[Tuple[str, bool]]:
     url = f"{API_URL}/user/api/register/"
+    payload = {"telegram_id": telegram_id}
+    if referral_code:
+        payload["referral_code"] = referral_code
+
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.post(url, json={"telegram_id": telegram_id})
+            response = await client.post(url, json=payload)
             response.raise_for_status()
             data = response.json()
             return data.get("link_code"), data.get("created")

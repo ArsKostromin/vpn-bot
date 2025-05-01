@@ -22,7 +22,7 @@ inline_main_menu = InlineKeyboardMarkup(
             InlineKeyboardButton(text="ℹ️ О нас", callback_data="about_us"),
         ],
         [
-            InlineKeyboardButton(text="🎁 Подари другу", callback_data="gift_friend"),
+            InlineKeyboardButton(text="🎁 Ввести промокод", callback_data="coupon"),
             InlineKeyboardButton(text="🤝 Партнёрка", callback_data="partner"),
         ],
         [

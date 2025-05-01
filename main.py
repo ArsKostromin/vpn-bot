@@ -7,7 +7,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from bot.handlers import menu_callbacks
 
 from bot.handlers.commands_menu import set_main_menu
-from bot.handlers import start, vpn, my_services, balance
+from bot.handlers import start, vpn, my_services, balance, coupon
 from bot.config import load_config
 from bot.db import init_db
 
@@ -30,6 +30,7 @@ dp.include_router(vpn.router)
 dp.include_router(my_services.router)
 dp.include_router(balance.router)
 dp.include_router(menu_callbacks.router)
+dp.include_router(coupon.router)
 
 async def main():
     await init_db(config.db.url)

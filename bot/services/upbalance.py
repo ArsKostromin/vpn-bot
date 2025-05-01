@@ -1,9 +1,10 @@
 #services/upbalance.py
 import aiohttp
 
-API_URL = "http://159.198.77.150:8000"  # У тебя в докере так
-# API_URL = "http://backend:8000"
+# API_URL = "http://159.198.77.150:8000"  # У тебя в докере так
+API_URL = "http://backend:8000"
 
+#robocassa(робосаса)
 async def create_payment_link(telegram_id: int, amount: int) -> str:
     url = f"{API_URL}/payments/create-payment/"
     data = {
@@ -32,3 +33,21 @@ async def create_crypto_payment(telegram_id: int, amount: int, asset: str = "TON
             if response.status == 200:
                 return data.get("payment_url")
             raise Exception(data.get("error", "Не удалось создать платёж"))
+
+
+#telegram stars
+
+STAR_TO_RUB = 1.79
+
+async def register_star_payment(user_id: int, stars: float):
+    amount = round(stars * STAR_TO_RUB, 2)
+    payload = {
+        "user_id": user_id,
+        "stars": stars,
+        "amount": amount,
+        "method": "stars",
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post(f"{API_URL}/payments/stars/", json=payload) as response:
+            return await response.json()

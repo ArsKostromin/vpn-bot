@@ -23,3 +23,7 @@ def load_config() -> Config:
         bot=BotConfig(token=os.getenv("BOT_TOKEN")),
         db=DBConfig(url=os.getenv("DATABASE_URL", "sqlite+aiosqlite:///db.sqlite3"))
     )
+
+
+
+CHANNEL_USERNAME = "@hyitamhyisiam"
