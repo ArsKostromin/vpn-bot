@@ -59,7 +59,7 @@ async def profile_handler(callback: CallbackQuery):
     text = (
         f"💼 Ваш профиль:\n\n"
         f"▪️ Баланс: {balance}₽\n"
-        f"▪️ реферальная ссыка: https://t.me/under_developmentt_bot?start={link_code}"
+        f"▪️ реферальная ссыка: https://t.me/fastvpnVPNs_bot?start={link_code}"
     )
 
     reply_markup = back_to_main_menu

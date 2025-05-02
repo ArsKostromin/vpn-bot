@@ -120,7 +120,7 @@ async def process_star_topup(callback: CallbackQuery):
         title="Пополнение баланса",
         description=f"Вы пополняете баланс на {amount_rub}₽",
         payload=f"user_{callback.from_user.id}_rub_{amount_rub}",
-        provider_token="robokassa:<merchant_login>:<password1>",  # ⚠️ замените!
+        provider_token="robokassa:<VPN.RU>:<wc4vj9gdLQXs2nhrL1n2>",  # ⚠️ замените!
         currency="RUB",
         prices=prices,
         start_parameter="stars-payment"
