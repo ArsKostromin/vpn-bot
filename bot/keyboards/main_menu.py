@@ -15,10 +15,10 @@ inline_main_menu = InlineKeyboardMarkup(
         ],
         [
             InlineKeyboardButton(text="💳 Пополнить", callback_data="balance_up"),
-            InlineKeyboardButton(text="🆘 Помощь", callback_data="help"),
+            InlineKeyboardButton(text="🆘 Помощь", url="https://t.me/supersupport222_bot")
         ],
         [
-            InlineKeyboardButton(text="📝 Отзывы", callback_data="reviews"),
+            InlineKeyboardButton(text="📝 Отзывы", url="https://t.me/"),
             InlineKeyboardButton(text="ℹ️ О нас", callback_data="about_us"),
         ],
         [
@@ -26,7 +26,6 @@ inline_main_menu = InlineKeyboardMarkup(
             InlineKeyboardButton(text="🤝 Партнёрка", callback_data="partner"),
         ],
         [
-            InlineKeyboardButton(text="🛠 Другие сервисы", callback_data="other_services"),
             InlineKeyboardButton(text="📢 Наш канал", callback_data="our_channel"),
         ],
     ]
