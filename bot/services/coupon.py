@@ -16,12 +16,15 @@ async def apply_coupon(code: str, telegram_id: int) -> str:
                 timeout=10.0
             )
 
-            if response.status_code == 200:
-                data = response.json()
-                return data.get("detail", "Промокод успешно применён!")
-
-            # Ошибки
             data = response.json()
+
+            if response.status_code == 200:
+                msg = data.get("detail", "Промокод успешно применён!")
+                vless = data.get("vless")
+                if vless:
+                    msg += f"\n\n🔗 VLESS:\n<code>{vless}</code>"
+                return msg
+
             return data.get("detail") or data.get("error") or "Ошибка применения промокода."
 
         except httpx.RequestError:

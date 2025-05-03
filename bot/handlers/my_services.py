@@ -33,6 +33,7 @@ async def my_services_screen(callback: CallbackQuery):
                 f"🔹 Статус: {status}\n"
                 f"🔹 Начало: {sub['start_date'][:10]}\n"
                 f"🔹 Окончание: {sub['end_date'][:10]}\n\n"
+                f"🔹 VLESS: {sub['vless']}\n"
             )
 
         await callback.message.answer(
