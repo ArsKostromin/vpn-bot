@@ -15,9 +15,21 @@ router = Router()
 @router.callback_query(F.data == "buy_vpn")
 async def start_vpn_buying(callback: CallbackQuery, state: FSMContext):
     vpn_types = await get_vpn_types_from_api()
-    await callback.message.answer("Выберите тип VPN:", reply_markup=get_vpn_type_kb(vpn_types))
+
+    description = (
+        "🔒 <b>Одинарное шифрование (Solo VPN)</b>\n"
+        "Трафик проходит через один VPN-сервер, шифруясь один раз (например, AES-256). "
+        "Достаточно для защиты в публичных сетях и обхода блокировок.\n\n"
+        "🔐 <b>Двойное шифрование (Double VPN / Multi-hop)</b>\n"
+        "Трафик последовательно шифруется на двух серверах, усиливая анонимность. "
+        "Подходит для максимальной конфиденциальности.\n\n"
+        "Выберите тип VPN:"
+    )
+
+    await callback.message.answer(description, reply_markup=get_vpn_type_kb(vpn_types), parse_mode="HTML")
     await state.set_state(BuyVPN.vpn_type)
-    await callback.answer()  # закрыть "часики"
+    await callback.answer()
+
 
 @router.callback_query(F.data.startswith("vpn_type:"))
 async def select_duration(callback: CallbackQuery, state: FSMContext):
