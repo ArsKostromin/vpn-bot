@@ -64,15 +64,14 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
         duration=duration
     )
 
-    if not success and msg == "Недостаточно средств":
+    if not success and "недостаточно средств" in msg.lower():
         await callback.message.answer(
-            "❌ Недостаточно средств на балансе.",
-            reply_markup=get_insufficient_funds_kb()
+            text="❌ Недостаточно средств для оформления подписки.",
+            reply_markup=balance_or_back_kb
         )
-        await callback.answer()
-        return
+    else:
+        await callback.message.answer(msg)
 
-    await callback.message.answer(msg)
     await state.clear()
 
     await process_start(
@@ -81,3 +80,4 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
         respond_to=callback.message
     )
     await callback.answer()
+
