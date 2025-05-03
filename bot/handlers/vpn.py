@@ -69,8 +69,10 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
             text="❌ Недостаточно средств для оформления подписки.",
             reply_markup=get_insufficient_funds_kb
         )
-    else:
+    elif success:
         await callback.message.answer(msg)
+    else:
+        await callback.message.answer(f"❌ {msg}")
 
     await state.clear()
 
@@ -80,4 +82,5 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
         respond_to=callback.message
     )
     await callback.answer()
+
 
