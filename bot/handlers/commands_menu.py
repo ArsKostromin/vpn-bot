@@ -7,6 +7,5 @@ async def set_main_menu(bot: Bot):
         BotCommand(command="myservices", description="Мои услуги 📦"),
         BotCommand(command="account", description="Аккаунт ⚙️"),
         BotCommand(command="aboutus", description="О нас ℹ️"),
-        BotCommand(command="ourchannel", description="Наш канал 📣"),
     ]
     await bot.set_my_commands(commands)
