@@ -23,23 +23,24 @@ async def my_services_screen(callback: CallbackQuery):
             reply_markup=not_subscription
         )
     else:
-        text = "Ваши подписки:\n\n"
         for sub in subscriptions:
             status = "✅ Активна" if sub['is_active'] else "❌ Неактивна"
-            text += (
-                f"🔹 VPN: {sub['vpn_type']}\n"
-                f"🔹 Длительность: {sub['duration']}\n"
-                f"🔹 Цена: {sub['price']}₽\n"
-                f"🔹 Статус: {status}\n"
-                f"🔹 Начало: {sub['start_date'][:10]}\n"
-                f"🔹 Окончание: {sub['end_date'][:10]}\n\n"
-                f"🔹 VLESS: {sub['vless']}\n"
+            text = (
+                f"<b>🔹 VPN:</b> {sub['vpn_type']}\n"
+                f"<b>🔹 Длительность:</b> {sub['duration']}\n"
+                f"<b>🔹 Цена:</b> {sub['price']}₽\n"
+                f"<b>🔹 Статус:</b> {status}\n"
+                f"<b>🔹 Начало:</b> {sub['start_date'][:10]}\n"
+                f"<b>🔹 Окончание:</b> {sub['end_date'][:10]}\n\n"
+                f"<b>Нажмите и удерживайте текст ниже, чтобы скопировать VLESS:</b>\n"
+                f"<code>{sub['vless']}</code>"
             )
 
-        await callback.message.answer(
-            text,
-            reply_markup=back_to_main_menu
-        )
+            await callback.message.answer(
+                text,
+                parse_mode="HTML",
+                reply_markup=back_to_main_menu
+            )
 
     await callback.answer()
 
