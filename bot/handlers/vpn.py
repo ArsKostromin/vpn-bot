@@ -67,8 +67,9 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
     if not success and "недостаточно средств" in msg.lower():
         await callback.message.answer(
             text="❌ Недостаточно средств для оформления подписки.",
-            reply_markup=get_insufficient_funds_kb
+            reply_markup=get_insufficient_funds_kb()  # ← ✅ теперь ты передаёшь объект клавиатуры
         )
+
     elif success:
         await callback.message.answer(msg)
     else:
