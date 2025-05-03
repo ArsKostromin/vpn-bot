@@ -65,14 +65,14 @@ async def process_start(
             await respond_to.answer(
                 text=(
                     f"✅ Добро пожаловать в Anonix, {respond_to.from_user.full_name}!\n\n"
-                    "🔧 *Ваш VPN УЖЕ готов к работе!*\n\n"
-                    "🎁 получи **+5 дней** \n\n"
-                    "📢 Чтобы получить **бесплатную подписку**, просто подпишитесь на наш канал ниже и нажмите кнопку «Проверить подписку» 👇\n\n"
+                    "🔧 Ваш VPN УЖЕ готов к работе!\n\n"
+                    "🎁 получи *+5 дней*\n\n"
+                    "📢 Чтобы получить *бесплатную подписку*, просто подпишитесь на наш канал ниже и нажмите кнопку «Проверить подписку» 👇\n\n"
                     "📲 Установите приложение для вашей OS:\n\n"
-                    "🍏 iOS: [Anonix](https://)\n"
-                    "🤖 Android: [Anonix](https://)\n"
-                    "🖥️ Windows: [Anonix](https://)\n"
-                    "🍏 MacOS: [Anonix](https://)\n\n"
+                    "🍏 iOS: [Anonix](https://anonix.app/ios)\n"
+                    "🤖 Android: [Anonix](https://anonix.app/android)\n"
+                    "🖥️ Windows: [Anonix](https://anonix.app/windows)\n"
+                    "🍏 MacOS: [Anonix](https://anonix.app/macos)\n\n"
                     "🔗 Подключите VPN ключ в приложение:\n\n"
                     f"▪️ реферальная ссылка: https://t.me/fastvpnVPNs_bot?start={link_code}\n\n"
                 ),
