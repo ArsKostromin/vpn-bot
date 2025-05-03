@@ -21,3 +21,10 @@ def get_duration_kb(durations_with_price: list[tuple[str, str]]) -> InlineKeyboa
         [InlineKeyboardButton(text="⬅️ Назад", callback_data="start_from_button")]
     )
     return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def get_insufficient_funds_kb() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="💳 Пополнить баланс", callback_data="balance_up")],
+        [InlineKeyboardButton(text="🔙 Назад", callback_data="buy_vpn")]
+    ])
