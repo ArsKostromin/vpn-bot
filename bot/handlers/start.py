@@ -64,19 +64,19 @@ async def process_start(
 
             await respond_to.answer(
                 text=(
-                    f"✅ Добро пожаловать в Anonix, {respond_to.from_user.full_name}!\n\n"
+                    f"✅ Добро пожаловать в Anonix, <b>{respond_to.from_user.full_name}</b>!\n\n"
                     "🔧 Ваш VPN УЖЕ готов к работе!\n\n"
-                    "🎁 получи *+5 дней*\n\n"
-                    "📢 Чтобы получить *бесплатную подписку*, просто подпишитесь на наш канал ниже и нажмите кнопку «Проверить подписку» 👇\n\n"
+                    "🎁 получи <b>+5 дней</b>\n\n"
+                    "📢 Чтобы получить <b>бесплатную подписку</b>, просто подпишитесь на наш канал ниже и нажмите кнопку «Проверить подписку» 👇\n\n"
                     "📲 Установите приложение для вашей OS:\n\n"
-                    "🍏 iOS: [Anonix](https://anonix.app/ios)\n"
-                    "🤖 Android: [Anonix](https://anonix.app/android)\n"
-                    "🖥️ Windows: [Anonix](https://anonix.app/windows)\n"
-                    "🍏 MacOS: [Anonix](https://anonix.app/macos)\n\n"
+                    "🍏 iOS: <a href='https://anonix.app/ios'>Anonix</a>\n"
+                    "🤖 Android: <a href='https://anonix.app/android'>Anonix</a>\n"
+                    "🖥️ Windows: <a href='https://anonix.app/windows'>Anonix</a>\n"
+                    "🍏 MacOS: <a href='https://anonix.app/macos'>Anonix</a>\n\n"
                     "🔗 Подключите VPN ключ в приложение:\n\n"
                     f"▪️ реферальная ссылка: https://t.me/fastvpnVPNs_bot?start={link_code}\n\n"
                 ),
-                parse_mode=ParseMode.MARKDOWN,
+                parse_mode=ParseMode.HTML,
                 reply_markup=inline_instruction_buttons
             )
             return
