@@ -40,4 +40,11 @@ async def buy_subscription_api(telegram_id: int, vpn_type: str, duration: str) -
         )
 
         if buy_resp.status_code == 201:
-            return True, buy_resp.json()['message']
+            return True, buy_resp.json().get("message", "Подписка успешно оформлена.")
+        else:
+            try:
+                error_data = buy_resp.json()
+                error_message = error_data.get("error") or error_data.get("detail", "Ошибка при покупке.")
+                return False, error_message
+            except Exception:
+                return False, f"Ошибка сервера ({buy_resp.status_code})"
