@@ -1,3 +1,4 @@
+import logging
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import CommandStart, CommandObject
@@ -11,29 +12,30 @@ from bot.services.user_service import register_user_via_api
 from bot.services.telegram_service import is_user_subscribed
 from bot.services.promo_service import get_promo_code_from_api
 
+# Настройка логирования
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+
 router = Router()
 
-
-@router.message(CommandStart(deep_link=False))
-async def cmd_start_no_ref(message: Message):
-    await process_start(message.from_user.id, message.from_user.username, message)
+@router.message(CommandStart())  # Объединённый хендлер
+async def cmd_start(message: Message, command: CommandObject):
+    referral_code = command.args if command.args else None
+    logger.info(f"Start triggered by {message.from_user.id}, referral: {referral_code}")
+    await process_start(message.from_user.id, message.from_user.username, message, referral_code)
 
 
 @router.message(F.text == "Главное меню")
 async def main_menu_button_pressed(message: Message):
+    logger.info(f"'Главное меню' button pressed by {message.from_user.id}")
     await process_start(message.from_user.id, message.from_user.username, message)
 
 
 @router.callback_query(F.data == "start_from_button")
 async def callback_start(callback: CallbackQuery):
+    logger.info(f"Callback start triggered by {callback.from_user.id}")
     await process_start(callback.from_user.id, callback.from_user.username, callback.message)
     await callback.answer()
-
-
-@router.message(CommandStart(deep_link=True))
-async def cmd_start(message: Message, command: CommandObject):
-    referral_code = command.args
-    await process_start(message.from_user.id, message.from_user.username, message, referral_code)
 
 
 async def process_start(
@@ -42,7 +44,10 @@ async def process_start(
     respond_to: Message,
     referral_code: str | None = None
 ):
+    logger.info(f"Processing start for user {user_id} (username: {username}), referral: {referral_code}")
+    
     result = await register_user_via_api(user_id, referral_code)
+    logger.info(f"User registration result: {result}")
 
     # Показать клавиатуру
     await respond_to.answer(
@@ -55,6 +60,7 @@ async def process_start(
 
         if created:
             is_subscribed = await is_user_subscribed(respond_to.bot, user_id)
+            logger.info(f"New user {user_id} is subscribed: {is_subscribed}")
 
             await respond_to.answer(
                 text=(
@@ -68,15 +74,15 @@ async def process_start(
                     "🖥️ Windows: [Anonix](https://)\n"
                     "🍏 MacOS: [Anonix](https://)\n\n"
                     "🔗 Подключите VPN ключ в приложение:\n\n"
-                    f"▪️ реферальная ссылка: https://t.me/under_developmentt_bot?start={link_code}\n\n"
+                    f"▪️ реферальная ссылка: https://t.me/fastvpnVPNs_bot?start={link_code}\n\n"
                 ),
                 parse_mode=ParseMode.MARKDOWN,
                 reply_markup=inline_instruction_buttons
             )
-
             return
 
-    # Если пользователь уже зарегистрирован
+    # Пользователь уже зарегистрирован
+    logger.info(f"User {user_id} already registered")
     await respond_to.bot.send_photo(
         chat_id=respond_to.chat.id,
         photo="https://play-lh.googleusercontent.com/BFkf2bgtxsCvsTnR2yw8yuWD3mgpThoyiRoBhoazTqFFMNOmdxGAAqS7vMATyNwelQ",
@@ -91,13 +97,17 @@ async def process_start(
     )
 
 
+
 @router.callback_query(F.data == "check_subscription")
 async def check_subscription_handler(callback: CallbackQuery):
     user_id = callback.from_user.id
+    logger.info(f"Check subscription for user {user_id}")
+
     is_subscribed = await is_user_subscribed(callback.bot, user_id)
 
     if is_subscribed:
         promo_code = await get_promo_code_from_api(user_id)
+        logger.info(f"User {user_id} subscribed. Promo code: {promo_code}")
 
         await callback.message.answer(
             text=(
@@ -109,16 +119,18 @@ async def check_subscription_handler(callback: CallbackQuery):
             reply_markup=main_menu_kb
         )
     else:
+        logger.info(f"User {user_id} has NOT subscribed yet.")
         await callback.message.answer(
             text=(
                 "❌ Вы еще не подписались на канал.\n\n"
-                "Пожалуйста, подпишитесь и нажмите кнопку ещё раз:"
+                "Пожалуйста, подпишитесь и нажмите кнопку ещё раз:" 
                 "\n🔗 [Подписаться на канал]()"
             ),
             parse_mode=ParseMode.MARKDOWN
         )
 
     await callback.answer()
+
 
     
 
