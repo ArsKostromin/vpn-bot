@@ -45,6 +45,6 @@ async def buy_subscription_api(telegram_id: int, vpn_type: str, duration: str) -
             # Пытаемся декодировать JSON, иначе показываем код ошибки
             try:
                 error_data = buy_resp.json()
-                return False, error_data.get("error") or error_data.get("detail", "Ошибка при покупке.")
+                return False, error_data.get("error") or error_data.get("detail", "недостаточно средств")
             except Exception:
                 return False, f"Ошибка сервера ({buy_resp.status_code})"
