@@ -57,7 +57,7 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     vpn_type = data["vpn_type"]
 
-    success, msg = await buy_subscription_api(
+    success, msg, vless = await buy_subscription_api(
         telegram_id=callback.from_user.id,
         vpn_type=vpn_type,
         duration=duration
@@ -66,12 +66,16 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
     if not success and "недостаточно средств" in msg.lower():
         await callback.message.answer(
             text="❌ Недостаточно средств для оформления подписки.",
-            reply_markup=get_insufficient_funds_kb()  # ← ✅ теперь ты передаёшь объект клавиатуры
+            reply_markup=get_insufficient_funds_kb()
         )
-        await callback.answer()  # чтобы не было "loading..." в Telegram
-        return  # ⛔ Прерываем выполнение, дальше код не идёт
+        await callback.answer()
+        return
 
-    await callback.message.answer(msg)
+    # Если есть VLESS, добавляем его красиво
+    if success and vless:
+        msg += f"\n\n<b>Нажмите и удерживайте ниже, чтобы скопировать VLESS:</b>\n<code>{vless}</code>"
+
+    await callback.message.answer(msg, parse_mode="HTML")
     await state.clear()
 
     await process_start(

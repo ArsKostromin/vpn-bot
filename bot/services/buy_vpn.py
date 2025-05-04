@@ -21,17 +21,15 @@ async def get_durations_by_type_from_api(vpn_type: str) -> list[tuple[str, str]]
         return [(p['duration'], p['price']) for p in plans if p['vpn_type'] == vpn_type]
 
 
-async def buy_subscription_api(telegram_id: int, vpn_type: str, duration: str) -> tuple[bool, str]:
+async def buy_subscription_api(telegram_id: int, vpn_type: str, duration: str) -> tuple[bool, str, str | None]:
     async with httpx.AsyncClient() as client:
-        # Получаем список тарифов
         response = await client.get(f"{API_URL}/plans/")
         response.raise_for_status()
         plans = response.json()
 
-        # Находим подходящий тариф
         matching = [p for p in plans if p['vpn_type'] == vpn_type and p['duration'] == duration]
         if not matching:
-            return False, "Такого тарифа не существует."
+            return False, "Такого тарифа не существует.", None
         
         plan_id = matching[0]['id']
         buy_resp = await client.post(
@@ -40,11 +38,11 @@ async def buy_subscription_api(telegram_id: int, vpn_type: str, duration: str) -
         )
 
         if buy_resp.status_code == 201:
-            return True, buy_resp.json()['message']
+            data = buy_resp.json()
+            return True, data.get("message", "Подписка успешно оформлена."), data.get("vless")
         else:
-            # Пытаемся декодировать JSON, иначе показываем код ошибки
             try:
                 error_data = buy_resp.json()
-                return False, error_data.get("error") or error_data.get("detail", "недостаточно средств")
+                return False, error_data.get("error") or error_data.get("detail", "Ошибка"), None
             except Exception:
-                return False, f"Ошибка сервера ({buy_resp.status_code})"
+                return False, f"Ошибка сервера ({buy_resp.status_code})", None
