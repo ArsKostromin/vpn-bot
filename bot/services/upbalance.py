@@ -37,10 +37,14 @@ async def create_crypto_payment(telegram_id: int, amount: int, asset: str = "TON
 
 #telegram stars
 
-STAR_TO_RUB = 1.79
+
+STAR_PRICE_RUB = 1
+STAR_TO_RUB = 1 # 1 звезда ≈ 1.79₽
+
 
 async def register_star_payment(user_id: int, stars: float):
     amount = round(stars * STAR_TO_RUB, 2)
+
     payload = {
         "user_id": user_id,
         "stars": stars,
@@ -49,5 +53,5 @@ async def register_star_payment(user_id: int, stars: float):
     }
 
     async with aiohttp.ClientSession() as session:
-        async with session.post(f"{API_URL}/payments/stars/", json=payload) as response:
+        async with session.post(f"{API_URL}/payments/payments/stars/", json=payload) as response:
             return await response.json()

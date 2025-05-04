@@ -2,7 +2,7 @@
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery, LabeledPrice
 from bot.keyboards.balance_menu import get_star_topup_menu, get_crypto_currency_keyboard, get_balance_menu, start_balance, get_balance_menu_roboc, end_upbalance
-from bot.services.upbalance import create_payment_link, create_crypto_payment
+from bot.services.upbalance import create_payment_link, create_crypto_payment, register_star_payment, STAR_PRICE_RUB
 import traceback
 
 router = Router()
@@ -96,47 +96,36 @@ async def create_payment(call: CallbackQuery):
         await call.message.answer("❌ Ошибка при создании платежа. Попробуйте позже.")
 
 
-#telegram stars
-STAR_PRICE_RUB = 1.79
-
+#telegram stars handlers/balance.py
 @router.callback_query(F.data == "tgstars")
 async def open_star_menu(callback: CallbackQuery):
-    await callback.message.answer("Выберите сумму пополнения через звёзды:", reply_markup=get_star_topup_menu())
+    await callback.message.answer(
+        "Выберите сумму пополнения через звёзды (вам нужно подарить звёзды боту):",
+        reply_markup=get_star_topup_menu()
+    )
     await callback.answer()
-
 
 
 @router.callback_query(F.data.startswith("tgstars_"))
 async def process_star_topup(callback: CallbackQuery):
     amount_rub = int(callback.data.split("_")[1])
-    stars = int(amount_rub / STAR_PRICE_RUB)
+    stars_needed = int(amount_rub / STAR_PRICE_RUB)
 
-    prices = [
-        LabeledPrice(label=f"{stars} звёзд", amount=stars * 100)  # в копейках
-    ]
-
-    await callback.bot.send_invoice(
-        chat_id=callback.from_user.id,
-        title="Пополнение баланса",
-        description=f"Вы пополняете баланс на {amount_rub}₽",
-        payload=f"user_{callback.from_user.id}_rub_{amount_rub}",
-        provider_token="robokassa:VPN.RU:wc4vj9gdLQXs2nhrL1n2",  # ⚠️ замените!
-        currency="RUB",
-        prices=prices,
-        start_parameter="stars-payment"
+    await callback.message.answer(
+        f"🎁 Чтобы пополнить на {amount_rub}₽, подарите {stars_needed} звёзд этому боту в чате.\n\n"
+        f"Как только вы подарите звёзды, они автоматически будут зачислены на баланс."
     )
-
     await callback.answer()
-    
-    
-@router.message(F.successful_payment)
-async def handle_star_payment(message: Message):
-    total_amount = message.successful_payment.total_amount
-    currency = message.successful_payment.currency
 
-    stars = total_amount / 100
-    telegram_id = message.from_user.id
 
-    payment = await register_star_payment(user_id=telegram_id, stars=stars)
+@router.message()
+async def handle_gifted_stars(message: Message):
+    if message.gifted_stars:
+        stars = message.gifted_stars.gift.count
+        user_id = message.from_user.id
 
-    await message.answer(f"✅ Успешно! На ваш баланс зачислено {payment['amount']}₽ за {int(stars)} ⭐.")
+        payment = await register_star_payment(user_id=user_id, stars=stars)
+
+        await message.answer(
+            f"✅ Спасибо за {stars} ⭐!\nНа ваш баланс зачислено {payment['amount']}₽."
+        )
