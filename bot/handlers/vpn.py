@@ -2,7 +2,7 @@ from aiogram import Router, F
 from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
 from bot.states.vpn import BuyVPN
-from bot.keyboards.vpn_menu import get_vpn_type_kb, get_duration_kb, get_insufficient_funds_kb
+from bot.keyboards.vpn_menu import get_vpn_type_kb, get_duration_kb, get_insufficient_funds_kb, get_instruktion_kb
 from bot.services.buy_vpn import (
     get_vpn_types_from_api,
     get_durations_by_type_from_api,
@@ -71,16 +71,17 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
         await callback.answer()
         return
 
-    # Если есть VLESS, добавляем его красиво
-    if success and vless:
-        msg += f"\n\n<b>Нажмите и удерживайте ниже, чтобы скопировать VLESS:</b>\n<code>{vless}</code>"
+    reply_markup = None
 
-    await callback.message.answer(msg, parse_mode="HTML")
+    if success and vless:
+        msg += (
+            f"\n\n<b>Нажмите и удерживайте ниже, чтобы скопировать VLESS:</b>\n"
+            f"<code>{vless}</code>"
+        )
+        reply_markup = get_instruktion_kb
+
+    await callback.message.answer(msg, parse_mode="HTML", reply_markup=reply_markup)
     await state.clear()
 
-    await process_start(
-        user_id=callback.from_user.id,
-        username=callback.from_user.username,
-        respond_to=callback.message
-    )
+
     await callback.answer()

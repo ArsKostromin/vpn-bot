@@ -43,6 +43,6 @@ async def buy_subscription_api(telegram_id: int, vpn_type: str, duration: str) -
         else:
             try:
                 error_data = buy_resp.json()
-                return False, error_data.get("error") or error_data.get("detail", "Ошибка"), None
+                return False, error_data.get("error") or error_data.get("detail", "недостаточно средств"), None
             except Exception:
                 return False, f"Ошибка сервера ({buy_resp.status_code})", None

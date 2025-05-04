@@ -28,3 +28,18 @@ def get_insufficient_funds_kb() -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text="💳 Пополнить баланс", callback_data="balance_up")],
         [InlineKeyboardButton(text="🔙 Назад", callback_data="buy_vpn")]
     ])
+    
+    
+    
+
+get_instruktion_kb = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="Инструкция", url="http://159.198.77.222:8080/"),
+        ],
+
+        [
+            InlineKeyboardButton(text="⬅️ Назад", callback_data="start_from_button"),
+        ],
+    ]
+)
