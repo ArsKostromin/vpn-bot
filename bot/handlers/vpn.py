@@ -76,7 +76,8 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
     if success and vless:
         msg += (
             f"\n\n<b>Нажмите и удерживайте ниже, чтобы скопировать VLESS:</b>\n"
-            f"<code>{vless}</code>"
+            f"<code>{vless}</code>\n\n"
+            "чтобы его использовать скачайте приложение под вашу платформу"
         )
         reply_markup = get_instruktion_kb
 
