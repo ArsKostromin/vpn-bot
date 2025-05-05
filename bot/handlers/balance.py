@@ -1,10 +1,10 @@
 #handlers/balance.py тут пополнение баланса
 from aiogram import Router, F
-from aiogram.types import Message, CallbackQuery, LabeledPrice
 from bot.keyboards.balance_menu import get_star_topup_menu, get_crypto_currency_keyboard, get_balance_menu, start_balance, get_balance_menu_roboc, end_upbalance, get_star_topup_menu
 from bot.services.upbalance import create_payment_link, create_crypto_payment, register_star_payment, STAR_PRICE_RUB
 import traceback
 from aiogram.fsm.context import FSMContext
+from aiogram.types import Message, CallbackQuery, LabeledPrice, PreCheckoutQuery
 
 router = Router()
 
