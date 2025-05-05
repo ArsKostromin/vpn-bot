@@ -99,60 +99,45 @@ async def create_payment(call: CallbackQuery):
 
 #telegram stars handlers/balance.py
 
-# Показываем меню пополнения через звёзды
 @router.callback_query(F.data == "tgstars")
 async def open_star_menu(callback: CallbackQuery):
     await callback.message.answer(
-        "💫 Выберите сумму для пополнения через звёзды:",
+        "💫 Выберите сумму пополнения через звёзды:",
         reply_markup=get_star_topup_menu()
     )
     await callback.answer()
 
 
-# Отправка инвойса на оплату звёздами
 @router.callback_query(F.data.startswith("tgstars_"))
-async def process_star_invoice(callback: CallbackQuery):
-    try:
-        amount_rub = int(callback.data.split("_")[1])
-        stars_amount = amount_rub * 100  # В копейках (1 руб = 100)
+async def process_star_topup(callback: CallbackQuery, state: FSMContext):
+    amount_rub = int(callback.data.split("_")[1])
+    stars_needed = round(amount_rub / STAR_PRICE_RUB)
 
-        prices = [LabeledPrice(label=f"{amount_rub}₽ через Telegram Stars", amount=stars_amount)]
+    await callback.message.answer(
+        f"🎁 Чтобы пополнить баланс на <b>{amount_rub}₽</b>, "
+        f"подарите <b>{stars_needed} звёзд</b> этому боту прямо в этом чате.\n\n"
+        f"После получения звёзд, баланс пополнится автоматически ✅",
+        parse_mode="HTML"
+    )
+    await callback.answer()
+    
+    
+@router.message(F.gifted_stars)
+async def handle_gifted_stars(message: Message):
+    if not message.gifted_stars:
+        return
 
-        await bot.send_invoice(
-            chat_id=callback.from_user.id,
-            title='Пополнение через Telegram Stars',
-            description='Оплата через Telegram Stars',
-            provider_token="PASTE_YOUR_PROVIDER_TOKEN_HERE",  # ОБЯЗАТЕЛЬНО вставь свой токен
-            currency="XTR",  # Валюта Telegram Stars
-            prices=prices,
-            start_parameter='stars-payment',
-            payload=f'stars-{amount_rub}'
-        )
-        await callback.answer()
-    except Exception as e:
-        await callback.message.answer("❌ Ошибка при создании платежа. Попробуйте позже.")
-        await callback.answer()
-
-
-# Обработка подтверждения оплаты
-@router.pre_checkout_query()
-async def pre_checkout_handler(pre_checkout_query: PreCheckoutQuery):
-    await bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True)
-
-
-# Обработка успешной оплаты
-@router.message(F.successful_payment)
-async def successful_payment_handler(message: Message):
-    payment_info = message.successful_payment
-    payload = payment_info.invoice_payload
-    amount_rub = payment_info.total_amount // 100
+    stars = message.gifted_stars.gift.count
     user_id = message.from_user.id
 
     try:
-        await register_star_payment(user_id=user_id, stars=amount_rub)
+        payment = await register_star_payment(user_id=user_id, stars=stars)
+        amount = payment.get("amount", 0)
+
         await message.answer(
-            f"✅ Оплата на сумму <b>{amount_rub}₽</b> успешно получена и зачислена на ваш баланс!",
+            f"✅ Спасибо за {stars} ⭐!\n"
+            f"💸 На ваш баланс зачислено <b>{amount}₽</b>.",
             parse_mode="HTML"
         )
-    except Exception:
-        await message.answer("❌ Оплата прошла, но возникла ошибка при зачислении средств.")
+    except Exception as e:
+        await message.answer("❌ Произошла ошибка при зачислении звёзд.")
