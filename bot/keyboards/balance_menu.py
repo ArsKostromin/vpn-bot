@@ -76,3 +76,14 @@ def get_star_topup_menu():
             [InlineKeyboardButton(text="🔙 Назад", callback_data="start_from_button")],
         ]
     )
+
+
+
+def get_star_topup_menu() -> InlineKeyboardMarkup:
+    buttons = [
+        [InlineKeyboardButton(text="💫 30₽", callback_data="tgstars_30")],
+        [InlineKeyboardButton(text="💫 50₽", callback_data="tgstars_50")],
+        [InlineKeyboardButton(text="💫 100₽", callback_data="tgstars_100")],
+        [InlineKeyboardButton(text="💫 200₽", callback_data="tgstars_200")],
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=buttons)

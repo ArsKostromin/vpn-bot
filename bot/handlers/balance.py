@@ -1,9 +1,10 @@
 #handlers/balance.py тут пополнение баланса
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery, LabeledPrice
-from bot.keyboards.balance_menu import get_star_topup_menu, get_crypto_currency_keyboard, get_balance_menu, start_balance, get_balance_menu_roboc, end_upbalance
+from bot.keyboards.balance_menu import get_star_topup_menu, get_crypto_currency_keyboard, get_balance_menu, start_balance, get_balance_menu_roboc, end_upbalance, get_star_topup_menu
 from bot.services.upbalance import create_payment_link, create_crypto_payment, register_star_payment, STAR_PRICE_RUB
 import traceback
+from aiogram.fsm.context import FSMContext
 
 router = Router()
 
@@ -97,35 +98,46 @@ async def create_payment(call: CallbackQuery):
 
 
 #telegram stars handlers/balance.py
+
 @router.callback_query(F.data == "tgstars")
 async def open_star_menu(callback: CallbackQuery):
     await callback.message.answer(
-        "Выберите сумму пополнения через звёзды (вам нужно подарить звёзды боту):",
+        "💫 Выберите сумму пополнения через звёзды:",
         reply_markup=get_star_topup_menu()
     )
     await callback.answer()
 
 
 @router.callback_query(F.data.startswith("tgstars_"))
-async def process_star_topup(callback: CallbackQuery):
+async def process_star_topup(callback: CallbackQuery, state: FSMContext):
     amount_rub = int(callback.data.split("_")[1])
-    stars_needed = int(amount_rub / STAR_PRICE_RUB)
+    stars_needed = round(amount_rub / STAR_PRICE_RUB)
 
     await callback.message.answer(
-        f"🎁 Чтобы пополнить на {amount_rub}₽, подарите {stars_needed} звёзд этому боту в чате.\n\n"
-        f"Как только вы подарите звёзды, они автоматически будут зачислены на баланс."
+        f"🎁 Чтобы пополнить баланс на <b>{amount_rub}₽</b>, "
+        f"подарите <b>{stars_needed} звёзд</b> этому боту прямо в этом чате.\n\n"
+        f"После получения звёзд, баланс пополнится автоматически ✅",
+        parse_mode="HTML"
     )
     await callback.answer()
-
-
-@router.message()
+    
+    
+@router.message(F.gifted_stars)
 async def handle_gifted_stars(message: Message):
-    if message.gifted_stars:
-        stars = message.gifted_stars.gift.count
-        user_id = message.from_user.id
+    if not message.gifted_stars:
+        return
 
+    stars = message.gifted_stars.gift.count
+    user_id = message.from_user.id
+
+    try:
         payment = await register_star_payment(user_id=user_id, stars=stars)
+        amount = payment.get("amount", 0)
 
         await message.answer(
-            f"✅ Спасибо за {stars} ⭐!\nНа ваш баланс зачислено {payment['amount']}₽."
+            f"✅ Спасибо за {stars} ⭐!\n"
+            f"💸 На ваш баланс зачислено <b>{amount}₽</b>.",
+            parse_mode="HTML"
         )
+    except Exception as e:
+        await message.answer("❌ Произошла ошибка при зачислении звёзд.")
