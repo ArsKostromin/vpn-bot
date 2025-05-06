@@ -51,7 +51,7 @@ get_target_vpn = InlineKeyboardMarkup(
             InlineKeyboardButton(text="🌭 Для YouTube и соцсетей", callback_data="target:social"),
         ],
         [
-            InlineKeyboardButton(text="🏴‍☠️ Для торрентов", callback_data="target:social"),  # пока такой же
+            InlineKeyboardButton(text="🏴‍☠️ Для торрентов", callback_data="target:torrent"),  # пока такой же
         ],
         [
             InlineKeyboardButton(text="🛡 Двойное шифрование (Double VPN)", callback_data="target:double"),
@@ -73,36 +73,36 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 def get_country_kb() -> InlineKeyboardMarkup:
     buttons = [
         [
-            InlineKeyboardButton(text="🇬🇧 Британия", callback_data="target:social"),
-            InlineKeyboardButton(text="🇩🇪 Германия", callback_data="target:social")
+            InlineKeyboardButton(text="🇬🇧 Британия", callback_data="target:country"),
+            InlineKeyboardButton(text="🇩🇪 Германия", callback_data="target:country")
         ],
         [
-            InlineKeyboardButton(text="🇮🇱 Израиль", callback_data="target:social"),
-            InlineKeyboardButton(text="🇪🇸 Испания", callback_data="target:social")
+            InlineKeyboardButton(text="🇮🇱 Израиль", callback_data="target:country"),
+            InlineKeyboardButton(text="🇪🇸 Испания", callback_data="target:country")
         ],
         [
-            InlineKeyboardButton(text="🇰🇿 Казахстан", callback_data="target:social"),
-            InlineKeyboardButton(text="🇨🇦 Канада", callback_data="target:social")
+            InlineKeyboardButton(text="🇰🇿 Казахстан", callback_data="target:country"),
+            InlineKeyboardButton(text="🇨🇦 Канада", callback_data="target:country")
         ],
         [
-            InlineKeyboardButton(text="🇳🇱 Нидерланды", callback_data="target:social"),
-            InlineKeyboardButton(text="🇦🇪 ОАЭ", callback_data="target:social")
+            InlineKeyboardButton(text="🇳🇱 Нидерланды", callback_data="target:country"),
+            InlineKeyboardButton(text="🇦🇪 ОАЭ", callback_data="target:country")
         ],
         [
-            InlineKeyboardButton(text="🇵🇱 Польша", callback_data="target:social"),
-            InlineKeyboardButton(text="🇷🇺 Россия", callback_data="target:social")
+            InlineKeyboardButton(text="🇵🇱 Польша", callback_data="target:country"),
+            InlineKeyboardButton(text="🇷🇺 Россия", callback_data="target:country")
         ],
         [
-            InlineKeyboardButton(text="🇺🇸 США", callback_data="target:social"),
-            InlineKeyboardButton(text="🇹🇷 Турция", callback_data="target:social")
+            InlineKeyboardButton(text="🇺🇸 США", callback_data="target:country"),
+            InlineKeyboardButton(text="🇹🇷 Турция", callback_data="target:country")
         ],
         [
-            InlineKeyboardButton(text="🇺🇦 Украина", callback_data="target:social"),
-            InlineKeyboardButton(text="🇫🇷 Франция", callback_data="target:social")
+            InlineKeyboardButton(text="🇺🇦 Украина", callback_data="target:country"),
+            InlineKeyboardButton(text="🇫🇷 Франция", callback_data="target:country")
         ],
         [
-            InlineKeyboardButton(text="🇸🇪 Швеция", callback_data="target:social"),
-            InlineKeyboardButton(text="🇯🇵 Япония", callback_data="target:social")
+            InlineKeyboardButton(text="🇸🇪 Швеция", callback_data="target:country"),
+            InlineKeyboardButton(text="🇯🇵 Япония", callback_data="target:country")
         ],
         [
             InlineKeyboardButton(text="⚙️ Аккаунт", callback_data="account")
