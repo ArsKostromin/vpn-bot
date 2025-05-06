@@ -4,7 +4,8 @@ from bot.keyboards.balance_menu import get_star_topup_menu, get_crypto_currency_
 from bot.services.upbalance import create_payment_link, create_crypto_payment, register_star_payment, STAR_PRICE_RUB
 import traceback
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery, LabeledPrice, PreCheckoutQuery
+from aiogram.types import Message, CallbackQuery, LabeledPrice, PreCheckoutQuery, InlineKeyboardMarkup, InlineKeyboardButton
+
 
 router = Router()
 
