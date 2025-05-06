@@ -81,3 +81,24 @@ inline_country_menu = InlineKeyboardMarkup(
         ],
     ]
 )
+
+
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+def get_target_vpn() -> InlineKeyboardMarkup:
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🔒 Соцсети", callback_data="vpn_type:social")],
+        [InlineKeyboardButton(text="🎬 Стриминг", callback_data="vpn_type:stream")],
+        [InlineKeyboardButton(text="⚙️ Выбрать по стране", callback_data="country")]
+    ])
+    return keyboard
+
+
+def get_country_kb() -> InlineKeyboardMarkup:
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🇷🇺 Россия", callback_data="vpn_type:ru")],
+        [InlineKeyboardButton(text="🇺🇸 США", callback_data="vpn_type:us")],
+        [InlineKeyboardButton(text="🇳🇱 Нидерланды", callback_data="vpn_type:nl")],
+        [InlineKeyboardButton(text="🔙 Назад", callback_data="buy_vpn1")]
+    ])
+    return keyboard
