@@ -51,7 +51,10 @@ get_target_vpn = InlineKeyboardMarkup(
             InlineKeyboardButton(text="🌭 Для YouTube и соцсетей", callback_data="target:social"),
         ],
         [
-            InlineKeyboardButton(text="🏴‍☠️ Для торрентов", callback_data="buy_vpn1"),  # можно позже сделать `target:torrent`
+            InlineKeyboardButton(text="🏴‍☠️ Для торрентов", callback_data="target:social"),  # пока такой же
+        ],
+        [
+            InlineKeyboardButton(text="🛡 Двойное шифрование (Double VPN)", callback_data="target:double"),
         ],
         [
             InlineKeyboardButton(text="🌐 Выбор по стране", callback_data="country"),
@@ -64,41 +67,42 @@ get_target_vpn = InlineKeyboardMarkup(
 
 
 
+
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 def get_country_kb() -> InlineKeyboardMarkup:
     buttons = [
         [
-            InlineKeyboardButton(text="🇬🇧 Британия", callback_data="buy_vpn1"),
-            InlineKeyboardButton(text="🇩🇪 Германия", callback_data="buy_vpn1")
+            InlineKeyboardButton(text="🇬🇧 Британия", callback_data="target:social"),
+            InlineKeyboardButton(text="🇩🇪 Германия", callback_data="target:social")
         ],
         [
-            InlineKeyboardButton(text="🇮🇱 Израиль", callback_data="buy_vpn1"),
-            InlineKeyboardButton(text="🇪🇸 Испания", callback_data="buy_vpn1")
+            InlineKeyboardButton(text="🇮🇱 Израиль", callback_data="target:social"),
+            InlineKeyboardButton(text="🇪🇸 Испания", callback_data="target:social")
         ],
         [
-            InlineKeyboardButton(text="🇰🇿 Казахстан", callback_data="buy_vpn1"),
-            InlineKeyboardButton(text="🇨🇦 Канада", callback_data="buy_vpn1")
+            InlineKeyboardButton(text="🇰🇿 Казахстан", callback_data="target:social"),
+            InlineKeyboardButton(text="🇨🇦 Канада", callback_data="target:social")
         ],
         [
-            InlineKeyboardButton(text="🇳🇱 Нидерланды", callback_data="buy_vpn1"),
-            InlineKeyboardButton(text="🇦🇪 ОАЭ", callback_data="buy_vpn1")
+            InlineKeyboardButton(text="🇳🇱 Нидерланды", callback_data="target:social"),
+            InlineKeyboardButton(text="🇦🇪 ОАЭ", callback_data="target:social")
         ],
         [
-            InlineKeyboardButton(text="🇵🇱 Польша", callback_data="buy_vpn1"),
-            InlineKeyboardButton(text="🇷🇺 Россия", callback_data="buy_vpn1")
+            InlineKeyboardButton(text="🇵🇱 Польша", callback_data="target:social"),
+            InlineKeyboardButton(text="🇷🇺 Россия", callback_data="target:social")
         ],
         [
-            InlineKeyboardButton(text="🇺🇸 США", callback_data="buy_vpn1"),
-            InlineKeyboardButton(text="🇹🇷 Турция", callback_data="buy_vpn1")
+            InlineKeyboardButton(text="🇺🇸 США", callback_data="target:social"),
+            InlineKeyboardButton(text="🇹🇷 Турция", callback_data="target:social")
         ],
         [
-            InlineKeyboardButton(text="🇺🇦 Украина", callback_data="buy_vpn1"),
-            InlineKeyboardButton(text="🇫🇷 Франция", callback_data="buy_vpn1")
+            InlineKeyboardButton(text="🇺🇦 Украина", callback_data="target:social"),
+            InlineKeyboardButton(text="🇫🇷 Франция", callback_data="target:social")
         ],
         [
-            InlineKeyboardButton(text="🇸🇪 Швеция", callback_data="buy_vpn1"),
-            InlineKeyboardButton(text="🇯🇵 Япония", callback_data="buy_vpn1")
+            InlineKeyboardButton(text="🇸🇪 Швеция", callback_data="target:social"),
+            InlineKeyboardButton(text="🇯🇵 Япония", callback_data="target:social")
         ],
         [
             InlineKeyboardButton(text="⚙️ Аккаунт", callback_data="account")
