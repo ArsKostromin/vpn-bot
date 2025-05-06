@@ -48,13 +48,13 @@ get_instruktion_kb = InlineKeyboardMarkup(
 get_target_vpn = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="Для YoyTube и соцсетей", callback_data="buy_vpn1"),
+            InlineKeyboardButton(text="🌭 Для YouTube и соцсетей", callback_data="buy_vpn1"),
         ],
         [
-            InlineKeyboardButton(text="Для торрентов", callback_data="buy_vpn1"),
+            InlineKeyboardButton(text="🏴‍☠️ Для торрентов", callback_data="buy_vpn1"),
         ],
         [
-            InlineKeyboardButton(text="Выбор по стране", callback_data="country"),
+            InlineKeyboardButton(text="🌐 Выбор по стране", callback_data="country"),
         ],
         [
             InlineKeyboardButton(text="⬅️ Назад", callback_data="start_from_button"),
