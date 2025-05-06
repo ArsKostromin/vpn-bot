@@ -108,6 +108,8 @@ async def open_star_menu(callback: CallbackQuery):
     await callback.answer()
 
 
+from aiogram.types import LabeledPrice, Message, InlineKeyboardMarkup, InlineKeyboardButton
+
 @router.callback_query(F.data.startswith("tgstars_"))
 async def process_star_topup(callback: CallbackQuery, state: FSMContext):
     amount_rub = int(callback.data.split("_")[1])
@@ -116,10 +118,17 @@ async def process_star_topup(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer(
         f"🎁 Чтобы пополнить баланс на <b>{amount_rub}₽</b>, "
         f"подарите <b>{stars_needed} звёзд</b> этому боту прямо в этом чате.\n\n"
-        f"После получения звёзд, баланс пополнится автоматически ✅",
-        parse_mode="HTML"
+        f"Нажмите на кнопку ниже, чтобы подарить ⭐️:",
+        parse_mode="HTML",
+        reply_markup=InlineKeyboardMarkup(
+            inline_keyboard=[
+                [InlineKeyboardButton("Подарить ⭐️", pay=True)],
+                [InlineKeyboardButton("🔙 Назад", callback_data="tgstars")]
+            ]
+        )
     )
     await callback.answer()
+
     
     
 @router.message(F.gifted_stars)
