@@ -118,3 +118,24 @@ async def select_country(callback: CallbackQuery, state: FSMContext):
         reply_markup=get_country_kb_func()
     )
     await callback.answer()
+
+
+
+@router.callback_query(F.data == "target:social")
+async def select_duration_social(callback: CallbackQuery, state: FSMContext):
+    vpn_type = "solo"
+    await state.update_data(vpn_type=vpn_type)
+
+    durations_with_price = await get_durations_by_type_from_api(vpn_type)
+
+    if not durations_with_price:
+        await callback.message.answer("❌ Нет доступных подписок для YouTube и соцсетей.")
+        await callback.answer()
+        return
+
+    await callback.message.answer(
+        text="Выберите длительность подписки для YouTube и соцсетей:",
+        reply_markup=get_duration_kb(durations_with_price)
+    )
+    await state.set_state(BuyVPN.duration)
+    await callback.answer()

@@ -48,10 +48,10 @@ get_instruktion_kb = InlineKeyboardMarkup(
 get_target_vpn = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="🌭 Для YouTube и соцсетей", callback_data="buy_vpn1"),
+            InlineKeyboardButton(text="🌭 Для YouTube и соцсетей", callback_data="target:social"),
         ],
         [
-            InlineKeyboardButton(text="🏴‍☠️ Для торрентов", callback_data="buy_vpn1"),
+            InlineKeyboardButton(text="🏴‍☠️ Для торрентов", callback_data="buy_vpn1"),  # можно позже сделать `target:torrent`
         ],
         [
             InlineKeyboardButton(text="🌐 Выбор по стране", callback_data="country"),
@@ -61,6 +61,7 @@ get_target_vpn = InlineKeyboardMarkup(
         ],
     ]
 )
+
 
 
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
