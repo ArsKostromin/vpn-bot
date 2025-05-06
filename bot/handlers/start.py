@@ -69,10 +69,10 @@ async def process_start(
                     "🎁 получи <b>+5 дней</b>\n\n"
                     "📢 Чтобы получить <b>бесплатную подписку</b>, просто подпишитесь на наш канал ниже и нажмите кнопку «Проверить подписку» 👇\n\n"
                     "📲 Установите приложение для вашей OS:\n\n"
-                    "🍏 iOS: <a href='https://apps.apple.com/us/app/hiddify-proxy-vpn/id6596777532'>Anonix</a>\n"
+                    "🍏 iOS: <a href='https://apps.apple.com/ru/app/v2raytun/id6476628951'>Anonix</a>\n"
                     "🤖 Android: <a href='https://play.google.com/store/apps/details?id=app.hiddify.com&hl=ru&pli=1'>Anonix</a>\n"
                     "🖥️ Windows: <a href='https://apps.microsoft.com/detail/9pdfnl3qv2s5?hl=ru-RU&gl=RU'>Anonix</a>\n"
-                    "🍏 MacOS: <a href='https://hiddify.com/#app'>Anonix</a>\n\n"
+                    "🍏 MacOS: <a href='https://apps.apple.com/ru/app/v2box-v2ray-client/id6446814690'>Anonix</a>\n\n"
                     "🔗 Подключите VPN ключ в приложение:\n\n"
                     f"▪️ реферальная ссылка: https://t.me/fastvpnVPNs_bot?start={link_code}\n\n"
                 ),
