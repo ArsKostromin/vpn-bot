@@ -43,3 +43,68 @@ get_instruktion_kb = InlineKeyboardMarkup(
         ],
     ]
 )
+
+
+get_target_vpn = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="Для YoyTube и соцсетей", callback_data="buy_vpn1"),
+        ],
+        [
+            InlineKeyboardButton(text="Для торрентов", callback_data="buy_vpn1"),
+        ],
+        [
+            InlineKeyboardButton(text="Выбор по стране", callback_data="country"),
+        ],
+        [
+            InlineKeyboardButton(text="⬅️ Назад", callback_data="start_from_button"),
+        ],
+    ]
+)
+
+
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+def get_country_kb() -> InlineKeyboardMarkup:
+    buttons = [
+        [
+            InlineKeyboardButton(text="🇬🇧 Британия", callback_data="buy_vpn1"),
+            InlineKeyboardButton(text="🇩🇪 Германия", callback_data="buy_vpn1")
+        ],
+        [
+            InlineKeyboardButton(text="🇮🇱 Израиль", callback_data="buy_vpn1"),
+            InlineKeyboardButton(text="🇪🇸 Испания", callback_data="buy_vpn1")
+        ],
+        [
+            InlineKeyboardButton(text="🇰🇿 Казахстан", callback_data="buy_vpn1"),
+            InlineKeyboardButton(text="🇨🇦 Канада", callback_data="buy_vpn1")
+        ],
+        [
+            InlineKeyboardButton(text="🇳🇱 Нидерланды", callback_data="buy_vpn1"),
+            InlineKeyboardButton(text="🇦🇪 ОАЭ", callback_data="buy_vpn1")
+        ],
+        [
+            InlineKeyboardButton(text="🇵🇱 Польша", callback_data="buy_vpn1"),
+            InlineKeyboardButton(text="🇷🇺 Россия", callback_data="buy_vpn1")
+        ],
+        [
+            InlineKeyboardButton(text="🇺🇸 США", callback_data="buy_vpn1"),
+            InlineKeyboardButton(text="🇹🇷 Турция", callback_data="buy_vpn1")
+        ],
+        [
+            InlineKeyboardButton(text="🇺🇦 Украина", callback_data="buy_vpn1"),
+            InlineKeyboardButton(text="🇫🇷 Франция", callback_data="buy_vpn1")
+        ],
+        [
+            InlineKeyboardButton(text="🇸🇪 Швеция", callback_data="buy_vpn1"),
+            InlineKeyboardButton(text="🇯🇵 Япония", callback_data="buy_vpn1")
+        ],
+        [
+            InlineKeyboardButton(text="⚙️ Аккаунт", callback_data="account")
+        ],
+        [
+            InlineKeyboardButton(text="🔙 Назад", callback_data="start_from_button")
+        ]
+    ]
+
+    return InlineKeyboardMarkup(inline_keyboard=buttons)

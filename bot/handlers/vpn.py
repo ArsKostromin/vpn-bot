@@ -2,7 +2,7 @@ from aiogram import Router, F
 from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
 from bot.states.vpn import BuyVPN
-from bot.keyboards.vpn_menu import get_vpn_type_kb, get_duration_kb, get_insufficient_funds_kb, get_instruktion_kb
+from bot.keyboards.vpn_menu import get_vpn_type_kb, get_duration_kb, get_insufficient_funds_kb, get_instruktion_kb, InlineKeyboardMarkup, get_country_kb
 from bot.services.buy_vpn import (
     get_vpn_types_from_api,
     get_durations_by_type_from_api,
@@ -12,7 +12,7 @@ from bot.handlers.start import process_start
 
 router = Router()
 
-@router.callback_query(F.data == "buy_vpn")
+@router.callback_query(F.data == "buy_vpn1")
 async def start_vpn_buying(callback: CallbackQuery, state: FSMContext):
     vpn_types = await get_vpn_types_from_api()
 
@@ -85,4 +85,32 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
     await state.clear()
 
 
+    await callback.answer()
+
+
+
+@router.callback_query(F.data == "buy_vpn")
+async def select_target(callback: CallbackQuery, state: FSMContext):
+    await callback.message.answer(
+        text=(
+            "Выберите VPN по цели использования или стране ⬇️\n\n"
+            "⚠️ Вы получите VPN той страны, в которой мы гарантируем работу выбранного вами направления.\n\n"
+            "Если же вам нужна конкретная страна VPN – жмите «Выбрать по стране»."
+        ),
+        reply_markup=get_target_vpn()
+    )
+    await callback.answer()
+
+
+@router.callback_query(F.data == "country")
+async def select_target(callback: CallbackQuery, state: FSMContext):
+    await callback.message.answer(
+        text=(
+            "Выберите страну для вашего VPN ⬇️\n\n"
+            "⚠️ Если вам нужен VPN для соцсетей или торрентов – вернитесь назад и выберите цель использования. "
+            "Ни в коем случае не используйте просто страновой VPN для скачивания с торрентов!\n\n"
+            "⛔️ Выбирая страну самостоятельно, мы НЕ гарантируем что ваш инстаграм будет работать в России с российского IP 😄"
+        ),
+        reply_markup=get_country_kb()
+    )
     await callback.answer()
