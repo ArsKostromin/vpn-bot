@@ -67,15 +67,18 @@ def get_crypto_currency_keyboard(amount: int) -> InlineKeyboardMarkup:
     
     
 
-def get_star_topup_menu():
-    return InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton(text="1 руб", callback_data="tgstars_1")],
-            [InlineKeyboardButton(text="100 руб", callback_data="tgstars_100")],
-            [InlineKeyboardButton(text="500 руб", callback_data="tgstars_500")],
-            [InlineKeyboardButton(text="🔙 Назад", callback_data="start_from_button")],
-        ]
-    )
+
+
+def get_star_topup_menu() -> InlineKeyboardMarkup:
+    buttons = [
+        [InlineKeyboardButton(text="💫 30₽", callback_data="tgstars_30")],
+        [InlineKeyboardButton(text="💫 50₽", callback_data="tgstars_50")],
+        [InlineKeyboardButton(text="💫 100₽", callback_data="tgstars_100")],
+        [InlineKeyboardButton(text="💫 200₽", callback_data="tgstars_200")],
+        [InlineKeyboardButton(text="🔙 Назад", callback_data="start_from_button")],
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
 
 
 
