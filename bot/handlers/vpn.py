@@ -2,7 +2,7 @@ from aiogram import Router, F
 from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
 from bot.states.vpn import BuyVPN
-from bot.keyboards.vpn_menu import get_vpn_type_kb, get_duration_kb, get_insufficient_funds_kb, get_instruktion_kb, InlineKeyboardMarkup, get_country_kb
+from bot.keyboards.vpn_menu import get_vpn_type_kb, get_duration_kb, get_insufficient_funds_kb, get_instruktion_kb, InlineKeyboardMarkup, get_country_kb, get_target_vpn
 from bot.services.buy_vpn import (
     get_vpn_types_from_api,
     get_durations_by_type_from_api,
