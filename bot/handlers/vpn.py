@@ -88,7 +88,7 @@ async def select_target(callback: CallbackQuery, state: FSMContext):
             "⚠️ Вы получите VPN той страны, в которой мы гарантируем работу выбранного направления.\n\n"
             "Если нужна конкретная страна VPN – жмите «Выбрать по стране»."
         ),
-        reply_markup=get_target_vpn_func
+        reply_markup=get_target_vpn_func()
     )
     await callback.answer()
 
