@@ -123,7 +123,7 @@ async def select_country(callback: CallbackQuery, state: FSMContext):
 
 @router.callback_query(F.data == "target:social")
 async def select_duration_social(callback: CallbackQuery, state: FSMContext):
-    vpn_type = "solo"
+    vpn_type = "socials"
     await state.update_data(vpn_type=vpn_type)
 
     durations_with_price = await get_durations_by_type_from_api(vpn_type)
@@ -143,7 +143,7 @@ async def select_duration_social(callback: CallbackQuery, state: FSMContext):
     
 @router.callback_query(F.data == "target:torrent")
 async def select_duration_social(callback: CallbackQuery, state: FSMContext):
-    vpn_type = "solo"
+    vpn_type = "torrents"
     await state.update_data(vpn_type=vpn_type)
 
     durations_with_price = await get_durations_by_type_from_api(vpn_type)
@@ -183,7 +183,7 @@ async def select_duration_double(callback: CallbackQuery, state: FSMContext):
 
 @router.callback_query(F.data == "target:country")
 async def select_duration_social(callback: CallbackQuery, state: FSMContext):
-    vpn_type = "solo"
+    vpn_type = "country"
     await state.update_data(vpn_type=vpn_type)
 
     durations_with_price = await get_durations_by_type_from_api(vpn_type)
