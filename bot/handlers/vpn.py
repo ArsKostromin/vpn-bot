@@ -9,7 +9,7 @@ from bot.keyboards.vpn_menu import (
     get_insufficient_funds_kb,
     get_instruktion_kb,
     get_country_kb as get_country_kb_func,
-    get_target_vpn as get_target_vpn_func,
+    get_target_vpn_kb as get_target_vpn_func,
 )
 from bot.services.buy_vpn import (
     get_vpn_types_from_api,
