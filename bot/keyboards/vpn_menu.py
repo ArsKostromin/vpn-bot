@@ -12,14 +12,35 @@ def get_vpn_type_kb(types: list[str]) -> InlineKeyboardMarkup:
     return kb.as_markup()
 
 def get_duration_kb(durations_with_price: list[tuple[str, str]]) -> InlineKeyboardMarkup:
+    # Карта для преобразования суффикса в слово
+    suffix_map = {
+        'm': 'месяц',
+        'y': 'год',
+    }
+
+    def format_duration(code: str) -> str:
+        num = code[:-1]
+        suffix = code[-1]
+        word = suffix_map.get(suffix, '')
+        # Простое склонение (можно улучшить при необходимости)
+        if word == 'месяц':
+            word = 'месяц' if num == '1' else 'месяца' if num in ['2', '3', '4'] else 'месяцев'
+        elif word == 'год':
+            word = 'год' if num == '1' else 'года' if num in ['2', '3', '4'] else 'лет'
+        return f"{num} {word}"
+
     buttons = [
-        [InlineKeyboardButton(text=f"{duration} — Р{price}", callback_data=f"duration:{duration}")]
+        [InlineKeyboardButton(
+            text=f"{format_duration(duration)} — ${price}",
+            callback_data=f"duration:{duration}"
+        )]
         for duration, price in durations_with_price
     ]
-    # Добавляем кнопку Назад отдельным рядом
-    buttons.append(
-        [InlineKeyboardButton(text="⬅️ Назад", callback_data="start_from_button")]
-    )
+
+    buttons.append([
+        InlineKeyboardButton(text="⬅️ Назад", callback_data="start_from_button")
+    ])
+
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
