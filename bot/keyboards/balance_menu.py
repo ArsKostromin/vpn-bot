@@ -23,7 +23,7 @@ start_balance = InlineKeyboardMarkup(
             InlineKeyboardButton(text="cryptobot", callback_data="cryptobot"),
         ],
         [
-            InlineKeyboardButton(text="Telegram stars", callback_data="tgstars"),
+            InlineKeyboardButton(text="Telegram stars", url="https://t.me/Anonixvpnpaybot"),
         ],
         [
             InlineKeyboardButton(text="Назад", callback_data="start_from_button")

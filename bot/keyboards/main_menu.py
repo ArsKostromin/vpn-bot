@@ -15,7 +15,7 @@ inline_main_menu = InlineKeyboardMarkup(
         ],
         [
             InlineKeyboardButton(text="💳 Пополнить", callback_data="balance_up"),
-            InlineKeyboardButton(text="🆘 Помощь", url="https://t.me/supersupport222_bot")
+            InlineKeyboardButton(text="🆘 Помощь", url="https://t.me/Anonixvpnsupportbot")
         ],
         [
             InlineKeyboardButton(text="📝 Отзывы", url="https://t.me/"),
