@@ -1,15 +1,16 @@
-# Dockerfile (Aiogram бот)
-FROM python:3.11
+FROM python:3.11-slim
 
 WORKDIR /app
 
-# Копируем только requirements.txt сначала
-COPY requirements.txt .
+# Устанавливаем только сертификаты
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Устанавливаем зависимости
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Теперь копируем остальной код
 COPY . .
 
 CMD ["python", "main.py"]
