@@ -31,7 +31,7 @@ def get_duration_kb(durations_with_price: list[tuple[str, str]]) -> InlineKeyboa
 
     buttons = [
         [InlineKeyboardButton(
-            text=f"{format_duration(duration)} — ${price}",
+            text=f"{format_duration(duration)} — Р{price}",
             callback_data=f"duration:{duration}"
         )]
         for duration, price in durations_with_price
