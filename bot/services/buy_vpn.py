@@ -2,7 +2,7 @@
 
 import httpx
 
-API_URL = "http://159.198.77.222:8000/vpn"
+API_URL = "https://server2.anonixvpn.space/vpn"
 # API_URL = "http://backend:8000/vpn"
 
 

@@ -1,8 +1,8 @@
 #services/upbalance.py
 import aiohttp
 
-API_URL = "http://159.198.77.222:8000"
-API_URL = "http://backend:8000"
+API_URL = "https://server2.anonixvpn.space"
+# API_URL = "http://backend:8000"
 
 #robocassa(робосаса)
 async def create_payment_link(telegram_id: int, amount: int) -> str:

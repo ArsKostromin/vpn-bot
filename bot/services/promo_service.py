@@ -2,7 +2,8 @@ import httpx
 import logging
 
 logger = logging.getLogger(__name__)
-API_URL = "http://159.198.77.222:8000"
+
+API_URL = "https://server2.anonixvpn.space"
 
 async def get_promo_code_from_api(user_id: int) -> str:
     url = f"{API_URL}/coupon/generate_promo/"
