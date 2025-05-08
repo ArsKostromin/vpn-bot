@@ -163,7 +163,7 @@ async def select_duration_social(callback: CallbackQuery, state: FSMContext):
 
 @router.callback_query(F.data == "target:double")
 async def select_duration_double(callback: CallbackQuery, state: FSMContext):
-    vpn_type = "double"
+    vpn_type = "secure"
     await state.update_data(vpn_type=vpn_type)
 
     durations_with_price = await get_durations_by_type_from_api(vpn_type)
