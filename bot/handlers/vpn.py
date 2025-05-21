@@ -19,6 +19,20 @@ from bot.services.buy_vpn import (
 
 router = Router()
 
+@router.callback_query(F.data == "buy_vpn")
+async def select_target(callback: CallbackQuery, state: FSMContext):
+    vpn_types = await get_vpn_types_from_api()
+    await callback.message.answer(
+        text=(
+            "Выберите VPN по цели использования или стране ⬇️\n\n"
+            "⚠️ Вы получите VPN той страны, в которой мы гарантируем работу выбранного вами направления.\n\n"
+            "Если же вам нужна конкретная страна VPN – жмите «Выбрать по стране»."
+        ),
+        reply_markup=get_vpn_type_kb(vpn_types)
+    )
+    await callback.answer()
+
+
 # @router.callback_query(F.data == "buy_vpn1")
 # async def start_vpn_buying(callback: CallbackQuery, state: FSMContext):
 #     vpn_types = await get_vpn_types_from_api()
@@ -94,19 +108,6 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
 
     await callback.message.answer(msg, parse_mode="HTML", reply_markup=reply_markup)
     await state.clear()
-    await callback.answer()
-
-
-@router.callback_query(F.data == "buy_vpn")
-async def select_target(callback: CallbackQuery, state: FSMContext):
-    await callback.message.answer(
-        text=(
-            "Выберите VPN по цели использования или стране ⬇️\n\n"
-            "⚠️ Вы получите VPN той страны, в которой мы гарантируем работу выбранного вами направления.\n\n"
-            "Если же вам нужна конкретная страна VPN – жмите «Выбрать по стране»."
-        ),
-        reply_markup=get_vpn_type_kb
-    )
     await callback.answer()
 
 
