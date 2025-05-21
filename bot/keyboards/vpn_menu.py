@@ -2,38 +2,22 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-def get_vpn_type_kb(types: list[str]) -> InlineKeyboardMarkup:
+def get_vpn_type_kb(types: list[tuple[str, str]]) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
-    for vpn_type in types:
-        kb.button(text=vpn_type, callback_data=f"vpn_type:{vpn_type}")
-    kb.button(text="⬅️ Назад", callback_data="start_from_button")  # добавляем кнопку Назад
-    kb.adjust(2)  # 2 кнопки в ряд
+    for value, display in types:
+        kb.button(text=display, callback_data=f"vpn_type:{value}")
+    kb.button(text="⬅️ Назад", callback_data="start_from_button")
+    kb.adjust(2)
     return kb.as_markup()
 
-def get_duration_kb(durations_with_price: list[tuple[str, str]]) -> InlineKeyboardMarkup:
-    # Карта для преобразования суффикса в слово
-    suffix_map = {
-        'm': 'месяц',
-        'y': 'год',
-    }
 
-    def format_duration(code: str) -> str:
-        num = code[:-1]
-        suffix = code[-1]
-        word = suffix_map.get(suffix, '')
-        # Простое склонение (можно улучшить при необходимости)
-        if word == 'месяц':
-            word = 'месяц' if num == '1' else 'месяца' if num in ['2', '3', '4'] else 'месяцев'
-        elif word == 'год':
-            word = 'год' if num == '1' else 'года' if num in ['2', '3', '4'] else 'лет'
-        return f"{num} {word}"
-
+def get_duration_kb(durations: list[tuple[str, str, str]]) -> InlineKeyboardMarkup:
     buttons = [
         [InlineKeyboardButton(
-            text=f"{format_duration(duration)} — Р{price}",
-            callback_data=f"duration:{duration}"
+            text=f"{display} — Р{price}",
+            callback_data=f"duration:{code}"
         )]
-        for duration, price in durations_with_price
+        for code, price, display in durations
     ]
 
     buttons.append([
@@ -41,6 +25,7 @@ def get_duration_kb(durations_with_price: list[tuple[str, str]]) -> InlineKeyboa
     ])
 
     return InlineKeyboardMarkup(inline_keyboard=buttons)
+
 
 
 def get_insufficient_funds_kb() -> InlineKeyboardMarkup:
