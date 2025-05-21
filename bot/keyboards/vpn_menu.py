@@ -87,43 +87,23 @@ get_target_vpn = InlineKeyboardMarkup(
 )
 
 
-
-
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-
 def get_country_kb() -> InlineKeyboardMarkup:
     buttons = [
         [
-            InlineKeyboardButton(text="🇬🇧 Британия", callback_data="target:country"),
-            InlineKeyboardButton(text="🇩🇪 Германия", callback_data="target:country")
+            InlineKeyboardButton(text="🇺🇸 США", callback_data="target:usa"),
+            InlineKeyboardButton(text="🇧🇷 Бразилия", callback_data="target:brazil")
         ],
         [
-            InlineKeyboardButton(text="🇮🇱 Израиль", callback_data="target:country"),
-            InlineKeyboardButton(text="🇪🇸 Испания", callback_data="target:country")
+            InlineKeyboardButton(text="🇩🇪 Германия", callback_data="target:germany"),
+            InlineKeyboardButton(text="🇯🇵 Япония", callback_data="target:japan")
         ],
         [
-            InlineKeyboardButton(text="🇰🇿 Казахстан", callback_data="target:country"),
-            InlineKeyboardButton(text="🇨🇦 Канада", callback_data="target:country")
+            InlineKeyboardButton(text="🇦🇪 ОАЭ", callback_data="target:uae"),
+            InlineKeyboardButton(text="🇦🇺 Австралия", callback_data="target:australia")
         ],
         [
-            InlineKeyboardButton(text="🇳🇱 Нидерланды", callback_data="target:country"),
-            InlineKeyboardButton(text="🇦🇪 ОАЭ", callback_data="target:country")
-        ],
-        [
-            InlineKeyboardButton(text="🇵🇱 Польша", callback_data="target:country"),
-            InlineKeyboardButton(text="🇷🇺 Россия", callback_data="target:country")
-        ],
-        [
-            InlineKeyboardButton(text="🇺🇸 США", callback_data="target:country"),
-            InlineKeyboardButton(text="🇹🇷 Турция", callback_data="target:country")
-        ],
-        [
-            InlineKeyboardButton(text="🇺🇦 Украина", callback_data="target:country"),
-            InlineKeyboardButton(text="🇫🇷 Франция", callback_data="target:country")
-        ],
-        [
-            InlineKeyboardButton(text="🇸🇪 Швеция", callback_data="target:country"),
-            InlineKeyboardButton(text="🇯🇵 Япония", callback_data="target:country")
+            InlineKeyboardButton(text="🇷🇺 Россия", callback_data="target:russia"),
+            InlineKeyboardButton(text="🇿🇦 ЮАР", callback_data="target:southafrica")
         ],
         [
             InlineKeyboardButton(text="⚙️ Аккаунт", callback_data="account")
