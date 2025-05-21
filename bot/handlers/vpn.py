@@ -41,22 +41,29 @@ async def select_target(callback: CallbackQuery, state: FSMContext):
 
 # Хендлер: обработка выбора цели/типа VPN
 @router.callback_query(F.data.startswith("vpn_type:"))
-async def select_duration(callback: CallbackQuery, state: FSMContext):
+async def select_country_or_duration(callback: CallbackQuery, state: FSMContext):
     vpn_type = callback.data.split(":")[1]
     await state.update_data(vpn_type=vpn_type)
 
-    durations_with_price = await get_durations_by_type_from_api(vpn_type)
+    if vpn_type == "country":
+        await callback.message.answer(
+            text="Выберите страну для VPN:",
+            reply_markup=get_country_kb_func()  # каждая кнопка — страна
+        )
+    else:
+        durations_with_price = await get_durations_by_type_from_api(vpn_type)
 
-    if not durations_with_price:
-        await callback.message.answer("❌ Нет доступных подписок.")
-        await callback.answer()
-        return
+        if not durations_with_price:
+            await callback.message.answer("❌ Нет доступных подписок.")
+            await callback.answer()
+            return
 
-    await callback.message.answer(
-        text="Выберите тип подписки:",
-        reply_markup=get_duration_kb(durations_with_price)
-    )
-    await state.set_state(BuyVPN.duration)
+        await callback.message.answer(
+            text="Выберите тип подписки:",
+            reply_markup=get_duration_kb(durations_with_price)
+        )
+        await state.set_state(BuyVPN.duration)
+
     await callback.answer()
 
 
@@ -94,102 +101,26 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer(msg, parse_mode="HTML", reply_markup=reply_markup)
     await state.clear()
     await callback.answer()
+    
+    
+@router.callback_query(F.data.startswith("target_country"))
+async def select_duration_by_country(callback: CallbackQuery, state: FSMContext):
+    if not durations_with_price:
+        await callback.message.answer("❌ Нет доступных подписок по выбранной стране.")
+        await callback.answer()
+        return
 
-
-# Хендлер: пользователь решил выбрать VPN по стране
-@router.callback_query(F.data == "country")
-async def select_country(callback: CallbackQuery, state: FSMContext):
-    await callback.message.answer(
-        text=(
-            "Выберите страну для вашего VPN ⬇️\n\n"
-            "⚠️ Если вам нужен VPN для соцсетей или торрентов – вернитесь назад и выберите цель использования. "
-            "Ни в коем случае не используйте просто страновой VPN для скачивания с торрентов!\n\n"
-            "⛔️ Выбирая страну самостоятельно, мы НЕ гарантируем что ваш инстаграм будет работать в России с российского IP 😄"
-        ),
-        reply_markup=get_country_kb_func()
-    )
-    await callback.answer()
-
-
-# VPN для соцсетей
-# @router.callback_query(F.data == "target:social")
-# async def select_duration_social(callback: CallbackQuery, state: FSMContext):
-#     vpn_type = "socials"
-#     await state.update_data(vpn_type=vpn_type)
-
-#     durations_with_price = await get_durations_by_type_from_api(vpn_type)
-
-#     if not durations_with_price:
-#         await callback.message.answer("❌ Нет доступных подписок для YouTube и соцсетей.")
-#         await callback.answer()
-#         return
-
-#     await callback.message.answer(
-#         text="Выберите длительность подписки для YouTube и соцсетей:",
-#         reply_markup=get_duration_kb(durations_with_price)
-#     )
-#     await state.set_state(BuyVPN.duration)
-#     await callback.answer()
-
-
-# # VPN для торрентов
-# @router.callback_query(F.data == "target:torrent")
-# async def select_duration_torrent(callback: CallbackQuery, state: FSMContext):
-#     vpn_type = "torrents"
-#     await state.update_data(vpn_type=vpn_type)
-
-#     durations_with_price = await get_durations_by_type_from_api(vpn_type)
-
-#     if not durations_with_price:
-#         await callback.message.answer("❌ Нет доступных подписок для торрентов.")
-#         await callback.answer()
-#         return
-
-#     await callback.message.answer(
-#         text="Выберите длительность подписки для торрент-трафика:",
-#         reply_markup=get_duration_kb(durations_with_price)
-#     )
-#     await state.set_state(BuyVPN.duration)
-#     await callback.answer()
-
-
-# # VPN с двойным шифрованием
-# @router.callback_query(F.data == "target:double")
-# async def select_duration_double(callback: CallbackQuery, state: FSMContext):
-#     vpn_type = "secure"
-#     await state.update_data(vpn_type=vpn_type)
-
-#     durations_with_price = await get_durations_by_type_from_api(vpn_type)
-
-#     if not durations_with_price:
-#         await callback.message.answer("❌ Нет доступных подписок для Double VPN.")
-#         await callback.answer()
-#         return
-
-#     await callback.message.answer(
-#         text="Выберите длительность подписки с двойным шифрованием:",
-#         reply_markup=get_duration_kb(durations_with_price)
-#     )
-#     await state.set_state(BuyVPN.duration)
-#     await callback.answer()
-
-
-# Выбор странового VPN
-@router.callback_query(F.data == "target:country")
-async def select_duration_country(callback: CallbackQuery, state: FSMContext):
-    vpn_type = "country"
-    await state.update_data(vpn_type=vpn_type)
-
-    durations_with_price = await get_durations_by_type_from_api(vpn_type)
+    durations_with_price = await get_durations_by_type_from_api('country')
 
     if not durations_with_price:
-        await callback.message.answer("❌ Нет доступных подписок по странам.")
+        await callback.message.answer("❌ Нет доступных подписок.")
         await callback.answer()
         return
 
     await callback.message.answer(
-        text="Выберите страну подписки:",
-        reply_markup=get_country_kb_func()
+        text="Выберите тип подписки:",
+        reply_markup=get_duration_kb(durations_with_price)
     )
     await state.set_state(BuyVPN.duration)
+
     await callback.answer()

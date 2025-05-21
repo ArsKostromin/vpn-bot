@@ -74,20 +74,20 @@ get_target_vpn = InlineKeyboardMarkup(
 def get_country_kb() -> InlineKeyboardMarkup:
     buttons = [
         [
-            InlineKeyboardButton(text="🇺🇸 США", callback_data="target:usa"),
-            InlineKeyboardButton(text="🇧🇷 Бразилия", callback_data="target:brazil")
+            InlineKeyboardButton(text="🇺🇸 США", callback_data="target_country"),
+            InlineKeyboardButton(text="🇧🇷 Бразилия", callback_data="target_country")
         ],
         [
-            InlineKeyboardButton(text="🇩🇪 Германия", callback_data="target:germany"),
-            InlineKeyboardButton(text="🇯🇵 Япония", callback_data="target:japan")
+            InlineKeyboardButton(text="🇩🇪 Германия", callback_data="target_country"),
+            InlineKeyboardButton(text="🇯🇵 Япония", callback_data="target_country")
         ],
         [
-            InlineKeyboardButton(text="🇦🇪 ОАЭ", callback_data="target:uae"),
-            InlineKeyboardButton(text="🇦🇺 Австралия", callback_data="target:australia")
+            InlineKeyboardButton(text="🇦🇪 ОАЭ", callback_data="target_country"),
+            InlineKeyboardButton(text="🇦🇺 Австралия", callback_data="target_country")
         ],
         [
-            InlineKeyboardButton(text="🇷🇺 Россия", callback_data="target:russia"),
-            InlineKeyboardButton(text="🇿🇦 ЮАР", callback_data="target:southafrica")
+            InlineKeyboardButton(text="🇷🇺 Россия", callback_data="target_country"),
+            InlineKeyboardButton(text="🇿🇦 ЮАР", callback_data="target_country")
         ],
         [
             InlineKeyboardButton(text="⚙️ Аккаунт", callback_data="account")
