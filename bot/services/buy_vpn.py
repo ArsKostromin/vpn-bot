@@ -15,6 +15,7 @@ async def get_vpn_types_from_api() -> list[tuple[str, str]]:
         unique_types = {(plan['vpn_type'], plan['vpn_type_display']) for plan in plans}
         return list(unique_types)
 
+
 async def get_durations_by_type_from_api(vpn_type: str) -> list[tuple[str, str, str]]:
     async with httpx.AsyncClient() as client:
         response = await client.get(f"{API_URL}/plans/")

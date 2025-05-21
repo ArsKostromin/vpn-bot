@@ -175,13 +175,13 @@ async def select_duration_social(callback: CallbackQuery, state: FSMContext):
     durations_with_price = await get_durations_by_type_from_api(vpn_type)
 
     if not durations_with_price:
-        await callback.message.answer("❌ Нет доступных подписок для YouTube и соцсетей.")
+        await callback.message.answer("❌ Нет доступных подписок по странам.")
         await callback.answer()
         return
 
     await callback.message.answer(
-        text="Выберите длительность подписки:",
-        reply_markup=get_duration_kb(durations_with_price)
+        text="Выберите страну подписки:",
+        reply_markup=get_country_kb()
     )
     await state.set_state(BuyVPN.duration)
     await callback.answer()
