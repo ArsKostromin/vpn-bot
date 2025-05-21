@@ -19,23 +19,23 @@ from bot.services.buy_vpn import (
 
 router = Router()
 
-@router.callback_query(F.data == "buy_vpn1")
-async def start_vpn_buying(callback: CallbackQuery, state: FSMContext):
-    vpn_types = await get_vpn_types_from_api()
+# @router.callback_query(F.data == "buy_vpn1")
+# async def start_vpn_buying(callback: CallbackQuery, state: FSMContext):
+#     vpn_types = await get_vpn_types_from_api()
 
-    description = (
-        "🔒 <b>Одинарное шифрование (Solo VPN)</b>\n"
-        "Трафик проходит через один VPN-сервер, шифруясь один раз (например, AES-256). "
-        "Достаточно для защиты в публичных сетях и обхода блокировок.\n\n"
-        "🔐 <b>Двойное шифрование (Double VPN / Multi-hop)</b>\n"
-        "Трафик последовательно шифруется на двух серверах, усиливая анонимность. "
-        "Подходит для максимальной конфиденциальности.\n\n"
-        "Выберите тип VPN:"
-    )
+#     description = (
+#         "🔒 <b>Одинарное шифрование (Solo VPN)</b>\n"
+#         "Трафик проходит через один VPN-сервер, шифруясь один раз (например, AES-256). "
+#         "Достаточно для защиты в публичных сетях и обхода блокировок.\n\n"
+#         "🔐 <b>Двойное шифрование (Double VPN / Multi-hop)</b>\n"
+#         "Трафик последовательно шифруется на двух серверах, усиливая анонимность. "
+#         "Подходит для максимальной конфиденциальности.\n\n"
+#         "Выберите тип VPN:"
+#     )
 
-    await callback.message.answer(description, reply_markup=get_vpn_type_kb(vpn_types), parse_mode="HTML")
-    await state.set_state(BuyVPN.vpn_type)
-    await callback.answer()
+#     await callback.message.answer(description, reply_markup=get_vpn_type_kb(vpn_types), parse_mode="HTML")
+#     await state.set_state(BuyVPN.vpn_type)
+#     await callback.answer()
 
 
 @router.callback_query(F.data.startswith("vpn_type:"))
@@ -43,17 +43,21 @@ async def select_duration(callback: CallbackQuery, state: FSMContext):
     vpn_type = callback.data.split(":")[1]
     await state.update_data(vpn_type=vpn_type)
 
+    # получаем список длительностей с ценами
     durations_with_price = await get_durations_by_type_from_api(vpn_type)
 
     if not durations_with_price:
-        await callback.message.answer("❌ Нет доступных подписок для этого типа VPN.")
+        await callback.message.answer("❌ Нет доступных подписок.")
         await callback.answer()
         return
 
+    # отправляем клавиатуру с вариантами длительности
     await callback.message.answer(
-        text="Выберите длительность подписки:",
+        text="Выберите тип подписки:",
         reply_markup=get_duration_kb(durations_with_price)
     )
+
+    # переводим в состояние выбора длительности
     await state.set_state(BuyVPN.duration)
     await callback.answer()
 

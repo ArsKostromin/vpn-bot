@@ -99,6 +99,6 @@ def get_country_kb() -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text="🇷🇺 Россия", callback_data="vpn_type:ru")],
         [InlineKeyboardButton(text="🇺🇸 США", callback_data="vpn_type:us")],
         [InlineKeyboardButton(text="🇳🇱 Нидерланды", callback_data="vpn_type:nl")],
-        [InlineKeyboardButton(text="🔙 Назад", callback_data="buy_vpn1")]
+        [InlineKeyboardButton(text="🔙 Назад", callback_data="back")]
     ])
     return keyboard
