@@ -9,7 +9,6 @@ from bot.keyboards.vpn_menu import (
     get_insufficient_funds_kb,
     get_instruktion_kb,
     get_country_kb as get_country_kb_func,
-    get_target_vpn as get_target_vpn_func
 )
 from bot.services.buy_vpn import (
     get_vpn_types_from_api,
@@ -32,24 +31,6 @@ async def select_target(callback: CallbackQuery, state: FSMContext):
     )
     await callback.answer()
 
-
-# @router.callback_query(F.data == "buy_vpn1")
-# async def start_vpn_buying(callback: CallbackQuery, state: FSMContext):
-#     vpn_types = await get_vpn_types_from_api()
-
-#     description = (
-#         "🔒 <b>Одинарное шифрование (Solo VPN)</b>\n"
-#         "Трафик проходит через один VPN-сервер, шифруясь один раз (например, AES-256). "
-#         "Достаточно для защиты в публичных сетях и обхода блокировок.\n\n"
-#         "🔐 <b>Двойное шифрование (Double VPN / Multi-hop)</b>\n"
-#         "Трафик последовательно шифруется на двух серверах, усиливая анонимность. "
-#         "Подходит для максимальной конфиденциальности.\n\n"
-#         "Выберите тип VPN:"
-#     )
-
-#     await callback.message.answer(description, reply_markup=get_vpn_type_kb(vpn_types), parse_mode="HTML")
-#     await state.set_state(BuyVPN.vpn_type)
-#     await callback.answer()
 
 
 @router.callback_query(F.data.startswith("vpn_type:"))
