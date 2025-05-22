@@ -105,11 +105,6 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
     
 @router.callback_query(F.data.startswith("target_country"))
 async def select_duration_by_country(callback: CallbackQuery, state: FSMContext):
-    if not durations_with_price:
-        await callback.message.answer("❌ Нет доступных подписок по выбранной стране.")
-        await callback.answer()
-        return
-
     durations_with_price = await get_durations_by_type_from_api('country')
 
     if not durations_with_price:
