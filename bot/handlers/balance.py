@@ -24,7 +24,9 @@ from bot.services.upbalance import (
 
 import logging
 import traceback
-
+from bot.states import TopUpStates
+from aiogram import types
+from decimal import Decimal
 router = Router()
 
 
@@ -69,6 +71,37 @@ async def process_topup(callback: CallbackQuery):
 async def back_to_main_menu(callback: CallbackQuery):
     await callback.message.answer("Вы вернулись в главное меню.")
     await callback.answer()
+    
+
+# обработка кнопки "💰 Ввести свою сумму"
+@router.callback_query(F.data == "topup_custom")
+async def process_custom_amount_request(callback: CallbackQuery, state: FSMContext):
+    await callback.message.answer("Введите сумму пополнения в рублях (например, 250):")
+    await state.set_state(TopUpStates.waiting_for_custom_amount)
+    await callback.answer()
+
+# обработка пользовательского ввода суммы
+@router.message(TopUpStates.waiting_for_custom_amount)
+async def process_custom_amount_input(message: Message, state: FSMContext):
+    try:
+        amount = int(message.text)
+        if amount < 5:
+            await message.answer("Минимальная сумма пополнения — 5 $. Попробуйте снова.")
+            return
+
+        payment_link = await create_payment_link(telegram_id=message.from_user.id, amount=amount)
+        await message.answer(
+            f"Вот ваша ссылка для оплаты на {amount} :\n{payment_link}",
+            reply_markup=end_upbalance
+        )
+        await state.clear()
+    except ValueError:
+        await message.answer("Пожалуйста, введите число. Пример: 150")
+    except Exception as e:
+        logging.error(traceback.format_exc())
+        await message.answer("Ошибка при создании платежа. Попробуйте позже.")
+        await state.clear()
+
 
 
 # ₿ Крипта: выбор суммы

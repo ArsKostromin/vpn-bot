@@ -9,7 +9,11 @@ def get_balance_menu_roboc():
         ],
         [
             InlineKeyboardButton(text="Назад", callback_data="start_from_button")
-        ]
+        ],
+        [
+            InlineKeyboardButton(text="💰 Ввести свою сумму", callback_data="topup_custom")
+        ],
+
     ])
     return keyboard
 
