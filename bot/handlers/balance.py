@@ -27,6 +27,9 @@ import traceback
 from bot.states.upbalance import TopUpStates
 from aiogram import types
 from decimal import Decimal
+from aiogram.exceptions import TelegramBadRequest
+
+
 router = Router()
 
 
