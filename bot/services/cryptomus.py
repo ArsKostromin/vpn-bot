@@ -20,10 +20,11 @@ async def create_cryptomus_invoice(user_id: int, amount: int, currency: str) -> 
         "is_payment_multiple": False,
     }
 
-    # Сортировка ключей и сериализация
+    # Сортировка и сериализация для подписи
     sorted_payload = OrderedDict(sorted(payload_dict.items()))
     payload_str = json.dumps(sorted_payload, separators=(',', ':'), ensure_ascii=False)
 
+    # Генерация подписи
     signature = hmac.new(
         CRYPTOMUS_API_KEY.encode(),
         payload_str.encode(),
@@ -37,12 +38,12 @@ async def create_cryptomus_invoice(user_id: int, amount: int, currency: str) -> 
     headers = {
         "merchant": CRYPTOMUS_MERCHANT_ID,
         "sign": signature,
-        "Content-Type": "application/json",
         "accept": "application/json",
+        "Content-Type": "application/json"
     }
 
     async with aiohttp.ClientSession() as session:
-        async with session.post(CRYPTOMUS_URL, data=payload_str, headers=headers) as resp:
+        async with session.post(CRYPTOMUS_URL, json=sorted_payload, headers=headers) as resp:
             result = await resp.json()
             if result.get("status") == "success":
                 return result["result"]["url"]
