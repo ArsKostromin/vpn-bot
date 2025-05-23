@@ -21,7 +21,7 @@ from bot.services.upbalance import (
     register_star_payment,
     STAR_PRICE_RUB,
 )
-from bot.services.cryptomus import create_cryptomus_invoice=
+from bot.services.cryptomus import create_cryptomus_invoice
 import logging
 import traceback
 from bot.states.upbalance import TopUpStates
