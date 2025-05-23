@@ -118,10 +118,23 @@ async def process_custom_amount_input(message: Message, state: FSMContext):
 # ₿ Крипта: выбор суммы
 @router.callback_query(F.data == "cryptobot")
 async def balance_up_start(call: CallbackQuery):
-    await call.message.edit_text(
-        "💸 Выбери сумму пополнения:",
-        reply_markup=get_balance_menu()
-    )
+    try:
+        await call.message.edit_text(
+            "💸 Выбери сумму пополнения:",
+            reply_markup=get_balance_menu()
+        )
+    except TelegramBadRequest as e:
+        if "there is no text in the message to edit" in str(e):
+            # Используем send_message как fallback
+            await call.message.answer(
+                "💸 Выбери сумму пополнения:",
+                reply_markup=get_balance_menu()
+            )
+            # Или: сначала удаляем старое сообщение
+            # await call.message.delete()
+            # await call.message.answer("💸 Выбери сумму пополнения:", reply_markup=get_balance_menu())
+        else:
+            raise
 
 
 @router.callback_query(F.data.startswith("balance_amount_"))
