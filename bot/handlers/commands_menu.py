@@ -3,7 +3,7 @@ from aiogram.types import BotCommand
 
 async def set_main_menu(bot: Bot):
     commands = [
-        BotCommand(command="Главное меню", description="Главное меню"),
+        BotCommand(command="/start", description="Главное меню"),
         BotCommand(command="buyvpn", description="Купить VPN 🛡"),
         BotCommand(command="myservices", description="Мои услуги 📦"),
         BotCommand(command="account", description="Аккаунт ⚙️"),
