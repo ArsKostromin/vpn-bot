@@ -3,6 +3,7 @@ import logging
 import json
 import hmac
 import hashlib
+from collections import OrderedDict
 
 CRYPTOMUS_API_KEY = "WwNQW5SvFmkwozP6JTetW1VCpo5ywjoZ0DbfEgM9GfkVaXj5VS1Ey4TwPzsaUEgvQcNi7ldIhtcNF6ZchEYtIKqUFRjw8R3qkJMN9G9VB3V6vtdd0XW0dxKotU9fvtcE"
 CRYPTOMUS_MERCHANT_ID = "59fc86a1-d195-4df8-8d17-3d6b06d2fe48"
@@ -19,16 +20,18 @@ async def create_cryptomus_invoice(user_id: int, amount: int, currency: str) -> 
         "is_payment_multiple": False,
     }
 
-    # Генерация подписи
-    payload_str = json.dumps(payload_dict, separators=(',', ':'), ensure_ascii=False)  # важно: ensure_ascii=False
+    # Сортировка ключей и сериализация
+    sorted_payload = OrderedDict(sorted(payload_dict.items()))
+    payload_str = json.dumps(sorted_payload, separators=(',', ':'), ensure_ascii=False)
+
     signature = hmac.new(
         CRYPTOMUS_API_KEY.encode(),
         payload_str.encode(),
         hashlib.sha256
     ).hexdigest()
 
-    # Вывод для отладки
-    logging.warning(f"[Cryptomus DEBUG] Payload string: {payload_str}")
+    # DEBUG
+    logging.warning(f"[Cryptomus DEBUG] Payload string (sorted): {payload_str}")
     logging.warning(f"[Cryptomus DEBUG] Signature: {signature}")
 
     headers = {
