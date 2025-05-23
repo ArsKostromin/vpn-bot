@@ -118,42 +118,29 @@ async def process_custom_amount_input(message: Message, state: FSMContext):
 # ₿ Крипта: выбор суммы
 @router.callback_query(F.data == "cryptobot")
 async def balance_up_start(call: CallbackQuery):
-    await call.message.answer(
-        "💵 Выберите сумму для пополнения:",
+    await call.message.edit_text(
+        "💸 Выбери сумму пополнения:",
         reply_markup=get_balance_menu()
     )
 
+
 @router.callback_query(F.data.startswith("balance_amount_"))
-async def choose_crypto(call: CallbackQuery):
+async def select_crypto_currency(call: CallbackQuery):
     amount = int(call.data.split("_")[-1])
-    await call.message.answer(
-        "💱 Выберите криптовалюту для оплаты:",
+    await call.message.edit_text(
+        f"Выбери криптовалюту для пополнения на {amount}$:",
         reply_markup=get_crypto_currency_keyboard(amount)
     )
 
+
 @router.callback_query(F.data.startswith("crypto_"))
-async def create_payment(call: CallbackQuery):
-    try:
-        _, asset, amount_str = call.data.split("_")
-        amount_usd = int(amount_str)
-    except (ValueError, IndexError):
-        await call.message.answer("❌ Неверные данные для оплаты. Попробуйте снова.")
-        return
+async def start_crypto_payment(call: CallbackQuery):
+    _, currency, amount = call.data.split("_")
+    amount = int(amount)
 
-    telegram_id = call.from_user.id
+    url = await create_cryptomus_invoice(amount, currency, call.from_user.id)
 
-    try:
-        payment_url = await create_cryptomus_invoice(
-            user_id=telegram_id,
-            amount=amount_usd,
-            currency=asset
-        )
-        await call.message.answer(
-            f"🧾 Оплата на сумму {amount_usd}$ через {asset} создана!\n\n"
-            f"👉 <a href=\"{payment_url}\">Перейти к оплате</a>",
-            reply_markup=end_upbalance,
-            disable_web_page_preview=True
-        )
-    except Exception as e:
-        logging.error(f"Ошибка при создании платежа через Cryptomus: {e}")
-        await call.message.answer("❌ Ошибка при создании платежа. Попробуйте позже.")
+    await call.message.edit_text(
+        f"🔗 Вот твоя ссылка для оплаты:\n\n{url}",
+        reply_markup=end_upbalance
+    )
