@@ -24,7 +24,7 @@ from bot.services.upbalance import (
 
 import logging
 import traceback
-from bot.states import TopUpStates
+from bot.states.upbalance import TopUpStates
 from aiogram import types
 from decimal import Decimal
 router = Router()
