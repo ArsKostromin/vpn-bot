@@ -3,7 +3,7 @@ import logging
 
 CRYPTOMUS_API_KEY = "YOUR_CRYPTOMUS_API_KEY"
 CRYPTOMUS_MERCHANT_ID = "YOUR_MERCHANT_ID"
-CRYPTOMUS_URL = "https://api.cryptomus.com/v1/invoice"
+CRYPTOMUS_URL = "https://api.cryptomus.com/v1/payment"
 
 async def create_cryptomus_invoice(user_id: int, amount: int, currency: str) -> str:
     payload = {
