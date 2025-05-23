@@ -20,12 +20,16 @@ async def create_cryptomus_invoice(user_id: int, amount: int, currency: str) -> 
     }
 
     # Генерация подписи
-    payload_str = json.dumps(payload_dict, separators=(',', ':'))  # без пробелов!
+    payload_str = json.dumps(payload_dict, separators=(',', ':'), ensure_ascii=False)  # важно: ensure_ascii=False
     signature = hmac.new(
         CRYPTOMUS_API_KEY.encode(),
         payload_str.encode(),
         hashlib.sha256
     ).hexdigest()
+
+    # Вывод для отладки
+    logging.warning(f"[Cryptomus DEBUG] Payload string: {payload_str}")
+    logging.warning(f"[Cryptomus DEBUG] Signature: {signature}")
 
     headers = {
         "merchant": CRYPTOMUS_MERCHANT_ID,
