@@ -20,17 +20,15 @@ async def create_cryptomus_invoice(user_id: int, amount: int, currency: str) -> 
         "is_payment_multiple": False,
     }
 
-    # Сериализуем JSON в точности как Cryptomus хочет
-    payload_str = json.dumps(payload_dict, separators=(',', ':'), ensure_ascii=False)
+    # ВАЖНО: sort_keys=True — Сортировка по алфавиту обязательна!
+    payload_str = json.dumps(payload_dict, separators=(',', ':'), ensure_ascii=False, sort_keys=True)
 
-    # Считаем подпись
     signature = hmac.new(
         CRYPTOMUS_API_KEY.encode(),
         payload_str.encode(),
         hashlib.sha256
     ).hexdigest()
 
-    # DEBUG
     logging.warning(f"[Cryptomus DEBUG] Payload string (for sign): {payload_str}")
     logging.warning(f"[Cryptomus DEBUG] Signature: {signature}")
 
