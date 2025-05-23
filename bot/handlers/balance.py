@@ -21,7 +21,7 @@ from bot.services.upbalance import (
     register_star_payment,
     STAR_PRICE_RUB,
 )
-
+from bot.services.cryptomus import create_cryptomus_invoice=
 import logging
 import traceback
 from bot.states.upbalance import TopUpStates
@@ -123,8 +123,6 @@ async def balance_up_start(call: CallbackQuery):
         reply_markup=get_balance_menu()
     )
 
-
-# ₿ Крипта: выбор монеты
 @router.callback_query(F.data.startswith("balance_amount_"))
 async def choose_crypto(call: CallbackQuery):
     amount = int(call.data.split("_")[-1])
@@ -133,13 +131,11 @@ async def choose_crypto(call: CallbackQuery):
         reply_markup=get_crypto_currency_keyboard(amount)
     )
 
-
-# ₿ Крипта: создание платежа
 @router.callback_query(F.data.startswith("crypto_"))
 async def create_payment(call: CallbackQuery):
     try:
         _, asset, amount_str = call.data.split("_")
-        amount = int(amount_str)
+        amount_usd = int(amount_str)
     except (ValueError, IndexError):
         await call.message.answer("❌ Неверные данные для оплаты. Попробуйте снова.")
         return
@@ -147,65 +143,17 @@ async def create_payment(call: CallbackQuery):
     telegram_id = call.from_user.id
 
     try:
-        payment_url = await create_crypto_payment(telegram_id, amount, asset)
+        payment_url = await create_cryptomus_invoice(
+            user_id=telegram_id,
+            amount=amount_usd,
+            currency=asset
+        )
         await call.message.answer(
-            f"🧾 Оплата на сумму {amount} ₽ через {asset} создана!\n\n"
-            f"👉 Перейдите по ссылке: {payment_url}",
-            reply_markup=end_upbalance
+            f"🧾 Оплата на сумму {amount_usd}$ через {asset} создана!\n\n"
+            f"👉 <a href=\"{payment_url}\">Перейти к оплате</a>",
+            reply_markup=end_upbalance,
+            disable_web_page_preview=True
         )
     except Exception as e:
-        logging.error(f"Ошибка при создании платежа для {telegram_id}: {e}")
-        logging.error(traceback.format_exc())
+        logging.error(f"Ошибка при создании платежа через Cryptomus: {e}")
         await call.message.answer("❌ Ошибка при создании платежа. Попробуйте позже.")
-
-
-# ⭐ Telegram Stars: меню
-@router.callback_query(F.data == "tgstars")
-async def open_star_menu(callback: CallbackQuery):
-    await callback.message.answer(
-        "💫 Выберите сумму пополнения через звёзды:",
-        reply_markup=get_star_topup_menu()
-    )
-    await callback.answer()
-
-
-# ⭐ Telegram Stars: инструкция по пополнению
-@router.callback_query(F.data.startswith("tgstars_"))
-async def process_star_topup(callback: CallbackQuery, state: FSMContext):
-    amount_rub = int(callback.data.split("_")[1])
-    stars_needed = round(amount_rub / STAR_PRICE_RUB)
-
-    await callback.message.answer(
-        f"🎁 Чтобы пополнить баланс на <b>{amount_rub}₽</b>, "
-        f"подарите <b>{stars_needed} звёзд</b> этому боту прямо в этом чате.\n\n"
-        f"Просто нажмите на сообщение и выберите <b>“Подарить звезду”</b> ⭐️",
-        parse_mode="HTML",
-        reply_markup=InlineKeyboardMarkup(
-            inline_keyboard=[
-                [InlineKeyboardButton(text="🔙 Назад", callback_data="tgstars")]
-            ]
-        )
-    )
-    await callback.answer()
-
-
-# ⭐ Telegram Stars: приём подарка
-@router.message(F.gifted_stars)
-async def handle_gifted_stars(message: Message):
-    if not message.gifted_stars:
-        return
-
-    stars = message.gifted_stars.gift.count
-    user_id = message.from_user.id
-
-    try:
-        payment = await register_star_payment(user_id=user_id, stars=stars)
-        amount = payment.get("amount", 0)
-
-        await message.answer(
-            f"✅ Спасибо за {stars} ⭐!\n"
-            f"💸 На ваш баланс зачислено <b>{amount}₽</b>.",
-            parse_mode="HTML"
-        )
-    except Exception:
-        await message.answer("❌ Произошла ошибка при зачислении звёзд.")
