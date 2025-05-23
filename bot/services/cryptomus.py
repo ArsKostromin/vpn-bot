@@ -13,7 +13,7 @@ async def create_cryptomus_invoice(user_id: int, amount: int, currency: str) -> 
         "amount": str(amount),
         "currency": currency.upper(),
         "order_id": str(user_id),
-        "url_callback": "https://yourdomain.com/cryptomus-webhook",
+        "url_callback": "https://server2.anonixvpn.space/payments/api/crypto/webhook/",
         "lifetime": 3600,
         "description": f"Пополнение баланса пользователем {user_id}",
         "is_payment_multiple": False,
