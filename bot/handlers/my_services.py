@@ -60,7 +60,7 @@ async def profile_handler(callback: CallbackQuery):
 
     text = (
         f"💼 Ваш профиль:\n\n"
-        f"▪️ Баланс: {balance}₽\n"
+        f"▪️ Баланс: {balance}$\n"
         f"▪️ реферальная ссылка: https://t.me/Anonixvpn_vpnBot?start={link_code}"
     )
 
