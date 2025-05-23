@@ -23,7 +23,7 @@ inline_main_menu = InlineKeyboardMarkup(
         ],
         [
             InlineKeyboardButton(text="🎁 Ввести промокод", callback_data="coupon"),
-            InlineKeyboardButton(text="🤝 Инструкция", url="http://159.198.77.222:8080/"),
+            InlineKeyboardButton(text="🤝 Как подключить", url="http://159.198.77.222:8080/"),
         ],
         [
             InlineKeyboardButton(text="📢 Наш канал", callback_data="our_channel"),

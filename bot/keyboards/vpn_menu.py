@@ -14,7 +14,7 @@ def get_vpn_type_kb(types: list[tuple[str, str]]) -> InlineKeyboardMarkup:
 def get_duration_kb(durations: list[tuple[str, str, str]]) -> InlineKeyboardMarkup:
     buttons = [
         [InlineKeyboardButton(
-            text=f"{display} — {price}Р",
+            text=f"{display} — {price}$",
             callback_data=f"duration:{code}"
         )]
         for code, price, display in durations

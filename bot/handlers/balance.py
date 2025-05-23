@@ -34,7 +34,7 @@ async def balance_up_callback(call: CallbackQuery):
     await call.bot.send_photo(
         chat_id=call.message.chat.id,
         photo="https://play-lh.googleusercontent.com/BFkf2bgtxsCvsTnR2yw8yuWD3mgpThoyiRoBhoazTqFFMNOmdxGAAqS7vMATyNwelQ",
-        caption="🔥 Выберите крипту или Робокассу",
+        caption="🔥 Выберите способ оплаты",
         reply_markup=start_balance,
     )
 
