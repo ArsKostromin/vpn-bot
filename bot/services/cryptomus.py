@@ -16,17 +16,17 @@ CRYPTOMUS_NETWORK = "TRC20"
 
 
 def generate_signature(data: dict) -> str:
-    """Генерация подписи Cryptomus"""
-    payload_str = json.dumps(data, separators=(',', ':'), ensure_ascii=False)
+    """Генерация подписи Cryptomus (в правильном порядке ключей)"""
+    payload_str = json.dumps(data, separators=(',', ':'), ensure_ascii=False, sort_keys=True)
     signature = hmac.new(
         CRYPTOMUS_API_KEY.encode("utf-8"),
         payload_str.encode("utf-8"),
         hashlib.sha256
     ).hexdigest()
-
     logger.debug(f"[SIGNATURE] Payload: {payload_str}")
     logger.debug(f"[SIGNATURE] Signature: {signature}")
     return signature
+
 
 
 async def create_cryptomus_invoice(amount: int, currency: str, user_id: int) -> str:
