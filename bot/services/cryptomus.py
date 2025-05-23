@@ -6,7 +6,7 @@ import hashlib
 
 CRYPTOMUS_API_KEY = "WwNQW5SvFmkwozP6JTetW1VCpo5ywjoZ0DbfEgM9GfkVaXj5VS1Ey4TwPzsaUEgvQcNi7ldIhtcNF6ZchEYtIKqUFRjw8R3qkJMN9G9VB3V6vtdd0XW0dxKotU9fvtcE"
 CRYPTOMUS_MERCHANT_ID = "59fc86a1-d195-4df8-8d17-3d6b06d2fe48"
-CRYPTOMUS_URL = "https://api.cryptomus.com/v1/payment"
+CRYPTOMUS_URL = "https://api.cryptomus.com/v1/invoice"
 
 def json_dumps_cryptomus(data: dict) -> str:
     """
