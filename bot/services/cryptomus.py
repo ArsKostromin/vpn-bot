@@ -8,7 +8,6 @@ CRYPTOMUS_API_KEY = "WwNQW5SvFmkwozP6JTetW1VCpo5ywjoZ0DbfEgM9GfkVaXj5VS1Ey4TwPzs
 CRYPTOMUS_MERCHANT_ID = "59fc86a1-d195-4df8-8d17-3d6b06d2fe48"
 CRYPTOMUS_URL = "https://api.cryptomus.com/v1/payment"
 
-
 async def create_cryptomus_invoice(user_id: int, amount: int, currency: str) -> str:
     payload_dict = {
         "amount": str(amount),
@@ -20,17 +19,15 @@ async def create_cryptomus_invoice(user_id: int, amount: int, currency: str) -> 
         "is_payment_multiple": False,
     }
 
-    # ⚠ Без сортировки, но сериализация строго без пробелов
+    # Подпись по строке JSON
     payload_str = json.dumps(payload_dict, separators=(',', ':'), ensure_ascii=False)
-
-    # Вычисляем подпись
     signature = hmac.new(
         CRYPTOMUS_API_KEY.encode(),
         payload_str.encode(),
         hashlib.sha256
     ).hexdigest()
 
-    # DEBUG лог
+    # DEBUG
     logging.warning(f"[Cryptomus DEBUG] Payload string (for sign): {payload_str}")
     logging.warning(f"[Cryptomus DEBUG] Signature: {signature}")
 
@@ -42,7 +39,7 @@ async def create_cryptomus_invoice(user_id: int, amount: int, currency: str) -> 
     }
 
     async with aiohttp.ClientSession() as session:
-        async with session.post(CRYPTOMUS_URL, data=payload_str, headers=headers) as resp:
+        async with session.post(CRYPTOMUS_URL, json=payload_dict, headers=headers) as resp:
             try:
                 result = await resp.json()
             except Exception as e:
