@@ -20,13 +20,10 @@ async def create_cryptomus_invoice(user_id: int, amount: int, currency: str) -> 
         "is_payment_multiple": False,
     }
 
-    # Сортируем по ключам как требует Cryptomus
-    sorted_payload = dict(sorted(payload_dict.items()))
-    
-    # Строгая сериализация без пробелов
-    payload_str = json.dumps(sorted_payload, separators=(',', ':'), ensure_ascii=False)
+    # ⚠ Без сортировки, но сериализация строго без пробелов
+    payload_str = json.dumps(payload_dict, separators=(',', ':'), ensure_ascii=False)
 
-    # Вычисляем подпись от этой строки
+    # Вычисляем подпись
     signature = hmac.new(
         CRYPTOMUS_API_KEY.encode(),
         payload_str.encode(),
