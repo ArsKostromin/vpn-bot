@@ -53,17 +53,28 @@ async def balance_menu_callback(call: CallbackQuery):
 
 # 🧾 Обработка выбора суммы для Робокассы
 @router.callback_query(F.data.startswith("topup_"))
-async def process_topup(callback: CallbackQuery):
+async def process_topup(callback: CallbackQuery, state: FSMContext):
     amount_str = callback.data.split("_")[1]
-    amount = int(amount_str)
+    
+    if amount_str == "custom":
+        # Перенаправляем на FSM
+        await callback.message.answer("Введите сумму пополнения в рублях (например, 250):")
+        await state.set_state(TopUpStates.waiting_for_custom_amount)
+        await callback.answer()
+        return
 
     try:
+        amount = int(amount_str)
         payment_link = await create_payment_link(telegram_id=callback.from_user.id, amount=amount)
-        await callback.message.answer(f"Вот ваша ссылка для оплаты на {amount} ₽:\n{payment_link}", reply_markup=end_upbalance)
+        await callback.message.answer(
+            f"Вот ваша ссылка для оплаты на {amount} ₽:\n{payment_link}",
+            reply_markup=end_upbalance
+        )
         await callback.answer()
     except Exception:
         await callback.message.answer("Ошибка при создании платежа. Попробуйте позже.", reply_markup=end_upbalance)
         await callback.answer()
+
 
 
 # 🔙 Назад в меню
