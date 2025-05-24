@@ -10,25 +10,32 @@ CRYPTO_CALLBACK_URL = "https://server2.anonixvpn.space/payments/api/crypto/webho
 
 
 def generate_signature(data: dict, api_key: str) -> str:
-    message = json.dumps(data, separators=(',', ':'), ensure_ascii=False)
+    # json.dumps возвращает строку, которая должна быть в точности такой же, как тело запроса
+    message = json.dumps(data, separators=(',', ':'), ensure_ascii=False, sort_keys=True)
     return hmac.new(api_key.encode(), message.encode(), hashlib.sha256).hexdigest()
+
 
 
 async def make_request(endpoint: str, payload: dict):
     url = f"https://api.cryptomus.com/v1/{endpoint}"
 
+    # ВАЖНО: фиксируем порядок ключей при генерации подписи
+    signature_payload = json.loads(json.dumps(payload, separators=(',', ':'), ensure_ascii=False, sort_keys=True))
+    sign = generate_signature(signature_payload, CRYPTOMUS_API_KEY)
+
     headers = {
         "Content-Type": "application/json",
         "merchant": CRYPTOMUS_MERCHANT_UUID,
-        "sign": generate_signature(payload, CRYPTOMUS_API_KEY),
+        "sign": sign,
     }
 
     async with aiohttp.ClientSession() as session:
-        async with session.post(url, json=payload, headers=headers) as response:
+        async with session.post(url, json=signature_payload, headers=headers) as response:
             data = await response.json()
             if data.get("status") != "success":
                 raise Exception(f"Cryptomus error: {data}")
-            return data["result"]
+            return data
+
 
 
 async def create_payment(amount: int, user_id: int):
