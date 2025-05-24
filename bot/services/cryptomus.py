@@ -1,3 +1,4 @@
+
 import json
 import hmac
 import hashlib
@@ -7,7 +8,6 @@ import logging
 logger = logging.getLogger("bot.services.cryptomus")
 logging.basicConfig(level=logging.INFO)
 
-# ❗ Вынеси в .env и проверь правильность данных
 CRYPTOMUS_API_KEY = "WwNQW5SvFmkwozP6JTetW1VCpo5ywjoZ0DbfEgM9GfkVaXj5VS1Ey4TwPzsaUEgvQcNi7ldIhtcNF6ZchEYtIKqUFRjw8R3qkJMN9G9VB3V6vtdd0XW0dxKotU9fvtcE"
 CRYPTOMUS_MERCHANT_ID = "59fc86a1-d195-4df8-8d17-3d6b06d2fe48"
 CRYPTOMUS_CALLBACK_URL = "https://server2.anonixvpn.space/payments/api/crypto/webhook/"
@@ -16,21 +16,21 @@ CRYPTOMUS_NETWORK = "TRC20"
 
 
 def generate_signature(data: dict) -> str:
-    payload_str = json.dumps(data, separators=(',', ':'), ensure_ascii=False)
+    sorted_data = dict(sorted(data.items()))
+    payload_str = json.dumps(sorted_data, separators=(',', ':'), ensure_ascii=False)
     logger.debug(f"[SIGNATURE] Payload string: {payload_str}")
-    
+
     signature = hmac.new(
         CRYPTOMUS_API_KEY.encode("utf-8"),
         payload_str.encode("utf-8"),
         hashlib.sha256
     ).hexdigest()
-    
+
     logger.debug(f"[SIGNATURE] Generated HMAC-SHA256: {signature}")
     return signature
 
 
 async def create_cryptomus_invoice(amount: int, currency: str, user_id: int) -> str:
-    """Создание счёта Cryptomus и возврат ссылки"""
     url = "https://api.cryptomus.com/v1/payment"
 
     payload = {
@@ -55,7 +55,7 @@ async def create_cryptomus_invoice(amount: int, currency: str, user_id: int) -> 
     }
 
     logger.info(f"[HTTPX] Headers: {headers}")
-    
+
     async with httpx.AsyncClient() as client:
         logger.info("[HTTPX] Sending request to Cryptomus...")
         response = await client.post(url, json=payload, headers=headers)
