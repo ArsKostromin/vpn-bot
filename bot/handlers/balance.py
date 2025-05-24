@@ -28,7 +28,7 @@ from aiogram import types
 from decimal import Decimal
 from aiogram.exceptions import TelegramBadRequest
 import asyncio
-from services.cryptomus import make_request, check_invoice_paid
+from bot.services.cryptomus import make_request, check_invoice_paid
 
 
 router = Router()
