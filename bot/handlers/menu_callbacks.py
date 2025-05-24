@@ -47,4 +47,3 @@ async def handle_command_as_callback(message: Message, state: FSMContext):
             await callback_handler(fake_callback_query, state)
         else:
             await callback_handler(fake_callback_query)
-
