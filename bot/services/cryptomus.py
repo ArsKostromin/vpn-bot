@@ -26,7 +26,6 @@ def generate_signature(data: dict) -> str:
 
 
 
-
 async def create_cryptomus_invoice(amount: int, currency: str, user_id: int) -> str:
     """Создание счёта Cryptomus и возврат ссылки"""
     url = "https://api.cryptomus.com/v1/payment"
@@ -53,7 +52,8 @@ async def create_cryptomus_invoice(amount: int, currency: str, user_id: int) -> 
     }
 
     logger.debug(f"[HEADERS] {headers}")
-
+    logger.debug(f"[REQUEST JSON] {json.dumps(payload)}")
+    
     async with httpx.AsyncClient() as client:
         logger.info("[HTTPX] Sending request to Cryptomus...")
         response = await client.post(url, json=payload, headers=headers)
