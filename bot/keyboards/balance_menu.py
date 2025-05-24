@@ -59,7 +59,7 @@ end_upbalance = InlineKeyboardMarkup(
 
 def get_crypto_currency_keyboard(amount: int) -> InlineKeyboardMarkup:
     supported_currencies = [
-        "TON", "USDT", "USDC", "DAI",
+        "TON", "USDT", "USDC",
         "BTC", "ETH", "BNB", "LTC"
     ]
 

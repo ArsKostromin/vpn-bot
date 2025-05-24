@@ -169,14 +169,12 @@ async def start_crypto_payment(call: CallbackQuery):
     networks_required = {
         "USDT": "TRON",
         "USDC": "POLYGON",
-        "DAI": "ERC20",
         "TON": "TON",
         "ETH": "ERC20",
         "BNB": "BEP20",
         "LTC": "LTC",
         "BTC": "BTC"
     }
-
 
     if currency.upper() in networks_required:
         invoice_data["network"] = networks_required[currency.upper()]
