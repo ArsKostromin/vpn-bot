@@ -167,8 +167,8 @@ async def start_crypto_payment(call: CallbackQuery):
     }
 
     networks_required = {
-        "USDT": "TRC20",
-        "USDC": "TRC20",
+        "USDT": "TRON",
+        "USDC": "TRON",
         "DAI": "ERC20",
         "TON": "TON",
         "ETH": "ERC20",
