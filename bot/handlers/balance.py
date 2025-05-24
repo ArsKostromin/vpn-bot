@@ -166,7 +166,11 @@ async def start_crypto_payment(call: CallbackQuery):
         "USDT": "TRC20",
         "USDC": "TRC20",
         "DAI": "ERC20",
-        # если хочешь добавить другие — допиши сюда
+        "TON": "TON",
+        "ETH": "ERC20",
+        "BNB": "BEP20",
+        "LTC": "LTC",
+        "BTC": "BTC"
     }
 
     if currency.upper() in networks_required:
