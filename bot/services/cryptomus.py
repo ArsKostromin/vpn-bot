@@ -1,4 +1,3 @@
-
 import json
 import hmac
 import hashlib
@@ -16,8 +15,8 @@ CRYPTOMUS_NETWORK = "TRC20"
 
 
 def generate_signature(data: dict) -> str:
-    sorted_data = dict(sorted(data.items()))
-    payload_str = json.dumps(sorted_data, separators=(',', ':'), ensure_ascii=False)
+    # Cryptomus требует сортировку ключей
+    payload_str = json.dumps(data, separators=(',', ':'), ensure_ascii=False, sort_keys=True)
     logger.debug(f"[SIGNATURE] Payload string: {payload_str}")
 
     signature = hmac.new(
