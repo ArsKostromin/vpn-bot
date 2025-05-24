@@ -17,7 +17,6 @@ def get_balance_menu_roboc():
     ])
     return keyboard
 
-
 start_balance = InlineKeyboardMarkup(
     inline_keyboard=[
         [
@@ -34,7 +33,6 @@ start_balance = InlineKeyboardMarkup(
         ],
     ]
 )
-
 
 
 def get_balance_menu():
@@ -68,29 +66,3 @@ def get_crypto_currency_keyboard(amount: int) -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text="LTC", callback_data=f"crypto_LTC_{amount}")],
         [InlineKeyboardButton(text="BNB", callback_data=f"crypto_BNB_{amount}")],
     ])
-    
-    
-
-
-
-def get_star_topup_menu() -> InlineKeyboardMarkup:
-    buttons = [
-        [InlineKeyboardButton(text="💫 30$", callback_data="tgstars_30")],
-        [InlineKeyboardButton(text="💫 50$", callback_data="tgstars_50")],
-        [InlineKeyboardButton(text="💫 100$", callback_data="tgstars_100")],
-        [InlineKeyboardButton(text="💫 200$", callback_data="tgstars_200")],
-        [InlineKeyboardButton(text="🔙 Назад", callback_data="start_from_button")],
-    ]
-    return InlineKeyboardMarkup(inline_keyboard=buttons)
-
-
-
-
-def get_star_topup_menu() -> InlineKeyboardMarkup:
-    buttons = [
-        [InlineKeyboardButton(text="💫 30$", callback_data="tgstars_30")],
-        [InlineKeyboardButton(text="💫 50$", callback_data="tgstars_50")],
-        [InlineKeyboardButton(text="💫 100$", callback_data="tgstars_100")],
-        [InlineKeyboardButton(text="💫 200$", callback_data="tgstars_200")],
-    ]
-    return InlineKeyboardMarkup(inline_keyboard=buttons)

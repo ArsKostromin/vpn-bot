@@ -122,12 +122,14 @@ async def process_custom_amount_input(message: Message, state: FSMContext):
 # ₿ Крипта: выбор суммы
 @router.callback_query(F.data == "cryptobot")
 async def balance_up_start(call: CallbackQuery):
+    logging.debug(f"callback_query: cryptobot | from_user={call.from_user.id}")
     try:
         await call.message.edit_text(
             "💸 Выбери сумму пополнения:",
             reply_markup=get_balance_menu()
         )
     except TelegramBadRequest as e:
+        logging.warning(f"TelegramBadRequest: {e}")
         if "there is no text in the message to edit" in str(e):
             await call.message.answer(
                 "💸 Выбери сумму пополнения:",
@@ -139,6 +141,7 @@ async def balance_up_start(call: CallbackQuery):
 
 @router.callback_query(F.data.startswith("balance_amount_"))
 async def select_crypto_currency(call: CallbackQuery):
+    logging.debug(f"callback_query: {call.data} | from_user={call.from_user.id}")
     amount = int(call.data.split("_")[-1])
     await call.message.edit_text(
         f"Выбери криптовалюту для пополнения на {amount}$:",
@@ -148,6 +151,7 @@ async def select_crypto_currency(call: CallbackQuery):
 
 @router.callback_query(F.data.startswith("crypto_"))
 async def start_crypto_payment(call: CallbackQuery):
+    logging.debug(f"callback_query: {call.data} | from_user={call.from_user.id}")
     _, currency, amount = call.data.split("_")
     amount = int(amount)
 
@@ -161,7 +165,6 @@ async def start_crypto_payment(call: CallbackQuery):
         "lifetime": 900,
     }
 
-    # Варианты валют, для которых нужно указывать сеть
     networks_required = {
         "USDT": "TRC20",
         "USDC": "TRC20",
@@ -177,10 +180,12 @@ async def start_crypto_payment(call: CallbackQuery):
         invoice_data["network"] = networks_required[currency.upper()]
 
     try:
+        logging.info(f"Creating invoice: {invoice_data}")
         response = await make_request(
             url="https://api.cryptomus.com/v1/payment",
             invoice_data=invoice_data
         )
+        logging.info(f"Cryptomus response: {response}")
         invoice_url = response["result"]["url"]
         invoice_uuid = response["result"]["uuid"]
 
@@ -191,4 +196,5 @@ async def start_crypto_payment(call: CallbackQuery):
             reply_markup=end_upbalance
         )
     except Exception as e:
+        logging.error(f"❌ Ошибка при создании платежа: {e}", exc_info=True)
         await call.message.answer(f"❌ Ошибка при создании платежа: {e}")
