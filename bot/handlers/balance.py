@@ -6,7 +6,6 @@ from aiogram.types import (
     InlineKeyboardButton,
 )
 from aiogram.fsm.context import FSMContext
-
 from bot.keyboards.balance_menu import (
     get_crypto_currency_keyboard,
     get_balance_menu,
@@ -22,9 +21,7 @@ from bot.services.upbalance import (
 )
 import logging
 import traceback
-from bot.states.upbalance import TopUpStates
-from aiogram import types
-from decimal import Decimal
+from bot.states.upbalance import TopUpStates, CryptoTopUpStates
 from aiogram.exceptions import TelegramBadRequest
 import asyncio
 from bot.services.cryptomus import make_request, check_invoice_paid
@@ -59,10 +56,9 @@ async def balance_menu_callback(call: CallbackQuery):
 @router.callback_query(F.data.startswith("topup_"))
 async def process_topup(callback: CallbackQuery, state: FSMContext):
     amount_str = callback.data.split("_")[1]
-    
+
     if amount_str == "custom":
-        # Перенаправляем на FSM
-        await callback.message.answer("Введите сумму пополнения в долларах (например, 250):")
+        await callback.message.answer("Введите сумму пополнения в рублях (например, 250):")
         await state.set_state(TopUpStates.waiting_for_custom_amount)
         await callback.answer()
         return
@@ -80,33 +76,33 @@ async def process_topup(callback: CallbackQuery, state: FSMContext):
         await callback.answer()
 
 
-
 # 🔙 Назад в меню
 @router.callback_query(F.data == "back_to_menu")
 async def back_to_main_menu(callback: CallbackQuery):
     await callback.message.answer("Вы вернулись в главное меню.")
     await callback.answer()
-    
 
-# обработка кнопки "💰 Ввести свою сумму"
+
+# обработка кнопки "💰 Ввести свою сумму" (Робокасса)
 @router.callback_query(F.data == "topup_custom")
 async def process_custom_amount_request(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer("Введите сумму пополнения в рублях (например, 250):")
     await state.set_state(TopUpStates.waiting_for_custom_amount)
     await callback.answer()
 
-# обработка пользовательского ввода суммы
+
+# обработка пользовательского ввода суммы (Робокасса)
 @router.message(TopUpStates.waiting_for_custom_amount)
 async def process_custom_amount_input(message: Message, state: FSMContext):
     try:
         amount = int(message.text)
         if amount < 5:
-            await message.answer("Минимальная сумма пополнения — 5 $. Попробуйте снова.")
+            await message.answer("Минимальная сумма пополнения — 5 ₽. Попробуйте снова.")
             return
 
         payment_link = await create_payment_link(telegram_id=message.from_user.id, amount=amount)
         await message.answer(
-            f"Вот ваша ссылка для оплаты на {amount} :\n{payment_link}",
+            f"Вот ваша ссылка для оплаты на {amount} ₽:\n{payment_link}",
             reply_markup=end_upbalance
         )
         await state.clear()
@@ -116,7 +112,6 @@ async def process_custom_amount_input(message: Message, state: FSMContext):
         logging.error(traceback.format_exc())
         await message.answer("Ошибка при создании платежа. Попробуйте позже.")
         await state.clear()
-
 
 
 # ₿ Крипта: выбор суммы
@@ -139,6 +134,7 @@ async def balance_up_start(call: CallbackQuery):
             raise
 
 
+# обработка кнопок 1/100/500$
 @router.callback_query(F.data.startswith("balance_amount_"))
 async def select_crypto_currency(call: CallbackQuery):
     logging.debug(f"callback_query: {call.data} | from_user={call.from_user.id}")
@@ -148,15 +144,38 @@ async def select_crypto_currency(call: CallbackQuery):
         reply_markup=get_crypto_currency_keyboard(amount)
     )
 
-# обработка кнопки "💰 Ввести свою сумму"
+
+# обработка кнопки "💰 Ввести свою сумму" (Крипта)
 @router.callback_query(F.data == "topup_custom_crypto")
 async def process_custom_amount_request_crypto(callback: CallbackQuery, state: FSMContext):
-    await callback.message.answer("Введите сумму пополнения в рублях (например, 250):")
-    await state.set_state(start_crypto_payment.waiting_for_custom_amount)
+    await callback.message.answer("Введите сумму пополнения в долларах (например, 250):")
+    await state.set_state(CryptoTopUpStates.waiting_for_custom_amount)
     await callback.answer()
 
 
+# обработка пользовательского ввода суммы (Крипта)
+@router.message(CryptoTopUpStates.waiting_for_custom_amount)
+async def process_custom_crypto_amount_input(message: Message, state: FSMContext):
+    try:
+        amount = int(message.text)
+        if amount < 5:
+            await message.answer("Минимальная сумма пополнения — 5 $. Попробуйте снова.")
+            return
 
+        await message.answer(
+            f"Выберите криптовалюту для пополнения на {amount} $:",
+            reply_markup=get_crypto_currency_keyboard(amount)
+        )
+        await state.clear()
+    except ValueError:
+        await message.answer("Пожалуйста, введите число. Пример: 150")
+    except Exception as e:
+        logging.error(traceback.format_exc())
+        await message.answer("Ошибка. Попробуйте позже.")
+        await state.clear()
+
+
+# запуск криптоплатежа
 @router.callback_query(F.data.startswith("crypto_"))
 async def start_crypto_payment(call: CallbackQuery):
     logging.debug(f"callback_query: {call.data} | from_user={call.from_user.id}")
@@ -175,13 +194,13 @@ async def start_crypto_payment(call: CallbackQuery):
     }
 
     networks_required = {
-        "USDT": "TRON",       # Tether на сети Tron
-        "USDC": "TRC20",       
-        "ETH": "ARBITRUM",     # Ethereum на сети Arbitrum
-        "BNB": "BSC",          # Binance Coin на сети Binance Smart Chain
-        "LTC": "LTC",          # Litecoin на собственной сети
-        "BTC": "BTC",          # Bitcoin на собственной сети
-        "TON": "TON"           # Toncoin на собственной сети
+        "USDT": "TRON",
+        "USDC": "TRC20",
+        "ETH": "ARBITRUM",
+        "BNB": "BSC",
+        "LTC": "LTC",
+        "BTC": "BTC",
+        "TON": "TON"
     }
 
     if currency.upper() in networks_required:
