@@ -137,6 +137,15 @@ async def balance_up_start(call: CallbackQuery):
             raise
 
 
+@router.callback_query(F.data.startswith("balance_amount_"))
+async def select_crypto_currency(call: CallbackQuery):
+    amount = int(call.data.split("_")[-1])
+    await call.message.edit_text(
+        f"Выбери криптовалюту для пополнения на {amount}$:",
+        reply_markup=get_crypto_currency_keyboard(amount)
+    )
+
+
 @router.callback_query(F.data.startswith("crypto_"))
 async def start_crypto_payment(call: CallbackQuery):
     _, currency, amount = call.data.split("_")
