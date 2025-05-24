@@ -21,13 +21,14 @@ from bot.services.upbalance import (
     register_star_payment,
     STAR_PRICE_RUB,
 )
-from bot.services.cryptomus import create_cryptomus_invoice
 import logging
 import traceback
 from bot.states.upbalance import TopUpStates
 from aiogram import types
 from decimal import Decimal
 from aiogram.exceptions import TelegramBadRequest
+import asyncio
+from services.cryptomus import make_request, check_invoice_paid
 
 
 router = Router()
@@ -128,14 +129,10 @@ async def balance_up_start(call: CallbackQuery):
         )
     except TelegramBadRequest as e:
         if "there is no text in the message to edit" in str(e):
-            # Используем send_message как fallback
             await call.message.answer(
                 "💸 Выбери сумму пополнения:",
                 reply_markup=get_balance_menu()
             )
-            # Или: сначала удаляем старое сообщение
-            # await call.message.delete()
-            # await call.message.answer("💸 Выбери сумму пополнения:", reply_markup=get_balance_menu())
         else:
             raise
 
@@ -154,9 +151,31 @@ async def start_crypto_payment(call: CallbackQuery):
     _, currency, amount = call.data.split("_")
     amount = int(amount)
 
-    url = await create_cryptomus_invoice(amount, currency, call.from_user.id)
+    invoice_data = {
+        "amount": str(amount),
+        "currency": currency.upper(),
+        "order_id": f"user_{call.from_user.id}_{amount}",
+        "url_callback": "https://server2.anonixvpn.space/payments/api/crypto/webhook/",
+        "url_return": "https://t.me/fastvpnVPNs_bot",
+        "is_payment_multiple": False,
+        "lifetime": 900,
+        "network": "TRC20"
+    }
 
-    await call.message.edit_text(
-        f"🔗 Вот твоя ссылка для оплаты:\n\n{url}",
-        reply_markup=end_upbalance
-    )
+    try:
+        response = await make_request(
+            url="https://api.cryptomus.com/v1/payment",
+            invoice_data=invoice_data
+        )
+        invoice_url = response["result"]["url"]
+        invoice_uuid = response["result"]["uuid"]
+
+        # Запускаем проверку оплаты в фоне
+        asyncio.create_task(check_invoice_paid(invoice_uuid, call.message))
+
+        await call.message.edit_text(
+            f"🔗 Вот твоя ссылка для оплаты:\n\n{invoice_url}",
+            reply_markup=end_upbalance
+        )
+    except Exception as e:
+        await call.message.answer(f"❌ Ошибка при создании платежа: {e}")
