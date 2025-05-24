@@ -1,7 +1,7 @@
 import uuid
 import time
 import aiohttp
-from config import settings
+from bot.config import settings
 
 CRYPTO_CALLBACK_URL = f"{settings.BASE_BACKEND_URL}/api/cryptomus/callback/"
 
