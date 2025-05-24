@@ -225,3 +225,4 @@ async def start_crypto_payment(call: CallbackQuery):
     except Exception as e:
         logging.error(f"❌ Ошибка при создании платежа: {e}", exc_info=True)
         await call.message.answer(f"❌ Ошибка при создании платежа: {e}")
+
