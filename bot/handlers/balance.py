@@ -62,7 +62,7 @@ async def process_topup(callback: CallbackQuery, state: FSMContext):
     
     if amount_str == "custom":
         # Перенаправляем на FSM
-        await callback.message.answer("Введите сумму пополнения в рублях (например, 250):")
+        await callback.message.answer("Введите сумму пополнения в долларах (например, 250):")
         await state.set_state(TopUpStates.waiting_for_custom_amount)
         await callback.answer()
         return
