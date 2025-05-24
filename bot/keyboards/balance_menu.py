@@ -41,7 +41,7 @@ def get_balance_menu():
             [InlineKeyboardButton(text="1 $", callback_data="balance_amount_1")],
             [InlineKeyboardButton(text="100 $", callback_data="balance_amount_100")],
             [InlineKeyboardButton(text="500 $", callback_data="balance_amount_500")],
-            [InlineKeyboardButton(text="Ввести  сумму", callback_data="topup_custom_crypto")],
+            [InlineKeyboardButton(text="Ввести  сумму", callback_data="cryptotopup_custom")],
             [InlineKeyboardButton(text="Назад", callback_data="start_from_button")],
         ]
     )
