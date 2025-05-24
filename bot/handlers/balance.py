@@ -195,7 +195,7 @@ async def start_crypto_payment(call: CallbackQuery):
 
     networks_required = {
         "USDT": "TRON",
-        "USDC": "TRC20",
+        "USDC": "ETH",
         "ETH": "ARBITRUM",
         "BNB": "BSC",
         "LTC": "LTC",
