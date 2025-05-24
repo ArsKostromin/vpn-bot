@@ -149,11 +149,12 @@ async def select_crypto_currency(call: CallbackQuery):
     )
 
 # обработка кнопки "💰 Ввести свою сумму"
-@router.callback_query(F.data == "topup_custom")
+@router.callback_query(F.data == "topup_custom_crypto")
 async def process_custom_amount_request_crypto(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer("Введите сумму пополнения в рублях (например, 250):")
     await state.set_state(start_crypto_payment.waiting_for_custom_amount)
     await callback.answer()
+
 
 
 @router.callback_query(F.data.startswith("crypto_"))
