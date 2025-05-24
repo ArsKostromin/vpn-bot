@@ -58,11 +58,19 @@ end_upbalance = InlineKeyboardMarkup(
 )
 
 def get_crypto_currency_keyboard(amount: int) -> InlineKeyboardMarkup:
-    return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="TON", callback_data=f"crypto_TON_{amount}")],
-        [InlineKeyboardButton(text="USDT", callback_data=f"crypto_USDT_{amount}")],
-        [InlineKeyboardButton(text="BTC", callback_data=f"crypto_BTC_{amount}")],
-        [InlineKeyboardButton(text="ETH", callback_data=f"crypto_ETH_{amount}")],
-        [InlineKeyboardButton(text="LTC", callback_data=f"crypto_LTC_{amount}")],
-        [InlineKeyboardButton(text="BNB", callback_data=f"crypto_BNB_{amount}")],
-    ])
+    supported_currencies = [
+        "TON", "USDT", "USDC", "DAI",
+        "BTC", "ETH", "BNB", "LTC"
+    ]
+
+    keyboard = []
+    row = []
+    for i, currency in enumerate(supported_currencies, start=1):
+        row.append(InlineKeyboardButton(text=currency, callback_data=f"crypto_{currency}_{amount}"))
+        if i % 2 == 0:
+            keyboard.append(row)
+            row = []
+    if row:
+        keyboard.append(row)
+
+    return InlineKeyboardMarkup(inline_keyboard=keyboard)
