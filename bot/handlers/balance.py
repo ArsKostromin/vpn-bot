@@ -180,7 +180,8 @@ async def start_crypto_payment(call: CallbackQuery):
 
     try:
         logging.info(f"Creating invoice: {invoice_data}")
-        response = await make_request("payment", invoice_data)
+        response = await make_request("https://api.cryptomus.com/v1/payment", invoice_data)
+
 
         logging.info(f"Cryptomus response: {response}")
         invoice_url = response["result"]["url"]
