@@ -1,13 +1,11 @@
 from aiogram import Router, F
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import (
+    Message,
+    CallbackQuery,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+)
 from aiogram.fsm.context import FSMContext
-from aiogram.exceptions import TelegramBadRequest
-import logging
-import traceback
-import asyncio
-import uuid
-
-from decimal import Decimal
 
 from bot.keyboards.balance_menu import (
     get_crypto_currency_keyboard,
@@ -22,12 +20,21 @@ from bot.services.upbalance import (
     register_star_payment,
     STAR_PRICE_RUB,
 )
-from bot.services.cryptomus import make_request, check_invoice_paid
+import logging
+import traceback
 from bot.states.upbalance import TopUpStates
+from aiogram import types
+from decimal import Decimal
+from aiogram.exceptions import TelegramBadRequest
+import asyncio
+from bot.services.cryptomus import make_request, check_invoice_paid
+import uuid
+
 
 router = Router()
 
 
+# 📲 Главное меню пополнения
 @router.callback_query(F.data == "balance_up")
 async def balance_up_callback(call: CallbackQuery):
     await call.bot.send_photo(
@@ -38,6 +45,7 @@ async def balance_up_callback(call: CallbackQuery):
     )
 
 
+# 💳 Меню Робокассы
 @router.callback_query(F.data == "robokassa")
 async def balance_menu_callback(call: CallbackQuery):
     await call.message.answer(
@@ -47,11 +55,13 @@ async def balance_menu_callback(call: CallbackQuery):
     await call.answer()
 
 
+# 🧾 Обработка выбора суммы для Робокассы
 @router.callback_query(F.data.startswith("topup_"))
 async def process_topup(callback: CallbackQuery, state: FSMContext):
     amount_str = callback.data.split("_")[1]
-
+    
     if amount_str == "custom":
+        # Перенаправляем на FSM
         await callback.message.answer("Введите сумму пополнения в рублях (например, 250):")
         await state.set_state(TopUpStates.waiting_for_custom_amount)
         await callback.answer()
@@ -70,12 +80,22 @@ async def process_topup(callback: CallbackQuery, state: FSMContext):
         await callback.answer()
 
 
+
+# 🔙 Назад в меню
 @router.callback_query(F.data == "back_to_menu")
 async def back_to_main_menu(callback: CallbackQuery):
     await callback.message.answer("Вы вернулись в главное меню.")
     await callback.answer()
+    
 
+# обработка кнопки "💰 Ввести свою сумму"
+@router.callback_query(F.data == "topup_custom")
+async def process_custom_amount_request(callback: CallbackQuery, state: FSMContext):
+    await callback.message.answer("Введите сумму пополнения в рублях (например, 250):")
+    await state.set_state(TopUpStates.waiting_for_custom_amount)
+    await callback.answer()
 
+# обработка пользовательского ввода суммы
 @router.message(TopUpStates.waiting_for_custom_amount)
 async def process_custom_amount_input(message: Message, state: FSMContext):
     try:
@@ -98,6 +118,8 @@ async def process_custom_amount_input(message: Message, state: FSMContext):
         await state.clear()
 
 
+
+# ₿ Крипта: выбор суммы
 @router.callback_query(F.data == "cryptobot")
 async def balance_up_start(call: CallbackQuery):
     logging.debug(f"callback_query: cryptobot | from_user={call.from_user.id}")
@@ -126,6 +148,13 @@ async def select_crypto_currency(call: CallbackQuery):
         reply_markup=get_crypto_currency_keyboard(amount)
     )
 
+# обработка кнопки "💰 Ввести свою сумму"
+@router.callback_query(F.data == "topup_custom")
+async def process_custom_amount_request_crypto(callback: CallbackQuery, state: FSMContext):
+    await callback.message.answer("Введите сумму пополнения в рублях (например, 250):")
+    await state.set_state(start_crypto_payment.waiting_for_custom_amount)
+    await callback.answer()
+
 
 @router.callback_query(F.data.startswith("crypto_"))
 async def start_crypto_payment(call: CallbackQuery):
@@ -145,13 +174,13 @@ async def start_crypto_payment(call: CallbackQuery):
     }
 
     networks_required = {
-        "USDT": "TRON",
-        "USDC": "TRC20",
-        "ETH": "ARBITRUM",
-        "BNB": "BSC",
-        "LTC": "LTC",
-        "BTC": "BTC",
-        "TON": "TON"
+        "USDT": "TRON",       # Tether на сети Tron
+        "USDC": "TRC20",       
+        "ETH": "ARBITRUM",     # Ethereum на сети Arbitrum
+        "BNB": "BSC",          # Binance Coin на сети Binance Smart Chain
+        "LTC": "LTC",          # Litecoin на собственной сети
+        "BTC": "BTC",          # Bitcoin на собственной сети
+        "TON": "TON"           # Toncoin на собственной сети
     }
 
     if currency.upper() in networks_required:
