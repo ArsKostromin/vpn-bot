@@ -8,7 +8,6 @@ from aiogram.types import (
 from aiogram.fsm.context import FSMContext
 
 from bot.keyboards.balance_menu import (
-    get_crypto_currency_keyboard,
     get_balance_menu,
     start_balance,
     get_balance_menu_roboc,
