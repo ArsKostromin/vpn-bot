@@ -137,15 +137,6 @@ async def balance_up_start(call: CallbackQuery):
             raise
 
 
-@router.callback_query(F.data.startswith("balance_amount_"))
-async def select_crypto_currency(call: CallbackQuery):
-    amount = int(call.data.split("_")[-1])
-    await call.message.edit_text(
-        f"Выбери криптовалюту для пополнения на {amount}$:",
-        reply_markup=get_crypto_currency_keyboard(amount)
-    )
-
-
 @router.callback_query(F.data.startswith("crypto_"))
 async def start_crypto_payment(call: CallbackQuery):
     _, currency, amount = call.data.split("_")
@@ -159,8 +150,18 @@ async def start_crypto_payment(call: CallbackQuery):
         "url_return": "https://t.me/fastvpnVPNs_bot",
         "is_payment_multiple": False,
         "lifetime": 900,
-        "network": "TRC20"
     }
+
+    # Варианты валют, для которых нужно указывать сеть
+    networks_required = {
+        "USDT": "TRC20",
+        "USDC": "TRC20",
+        "DAI": "ERC20",
+        # если хочешь добавить другие — допиши сюда
+    }
+
+    if currency.upper() in networks_required:
+        invoice_data["network"] = networks_required[currency.upper()]
 
     try:
         response = await make_request(
@@ -170,7 +171,6 @@ async def start_crypto_payment(call: CallbackQuery):
         invoice_url = response["result"]["url"]
         invoice_uuid = response["result"]["uuid"]
 
-        # Запускаем проверку оплаты в фоне
         asyncio.create_task(check_invoice_paid(invoice_uuid, call.message))
 
         await call.message.edit_text(
