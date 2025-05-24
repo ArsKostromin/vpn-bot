@@ -41,7 +41,7 @@ def get_balance_menu():
             [InlineKeyboardButton(text="1 $", callback_data="balance_amount_1")],
             [InlineKeyboardButton(text="100 $", callback_data="balance_amount_100")],
             [InlineKeyboardButton(text="500 $", callback_data="balance_amount_500")],
-            [InlineKeyboardButton(text="💰 Ввести свою сумму", callback_data="topup_custom_crypto")],
+            [InlineKeyboardButton(text="💰 Ввести свою сумму", callback_data="topup_custom")],
             [InlineKeyboardButton(text="Назад", callback_data="start_from_button")],
         ]
     )
@@ -58,6 +58,8 @@ end_upbalance = InlineKeyboardMarkup(
     ]
 )
 
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
 def get_crypto_currency_keyboard(amount: int) -> InlineKeyboardMarkup:
     supported_currencies = [
         "TON", "USDT", "USDC",
@@ -73,5 +75,10 @@ def get_crypto_currency_keyboard(amount: int) -> InlineKeyboardMarkup:
             row = []
     if row:
         keyboard.append(row)
+
+    # 💰 Добавляем кнопку "Своя сумма" отдельной строкой
+    keyboard.append([
+        InlineKeyboardButton(text="💰 Ввести свою сумму", callback_data="topup_custom_crypto")
+    ])
 
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
