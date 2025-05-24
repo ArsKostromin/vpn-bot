@@ -185,8 +185,8 @@ async def start_crypto_payment(call: CallbackQuery):
 
     invoice_data = {
         "amount": str(amount),
-        "currency": currency.upper(),
-        "to_currency": "USDT",
+        "to_currency": currency.upper(),
+        "currency": "USDT",
         "order_id": order_id,
         "url_callback": "https://server2.anonixvpn.space/payments/api/crypto/webhook/",
         "url_return": "https://t.me/fastvpnVPNs_bot",
