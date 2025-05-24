@@ -168,7 +168,7 @@ async def start_crypto_payment(call: CallbackQuery):
 
     networks_required = {
         "USDT": "TRON",       # Tether на сети Tron
-        "USDC": "POLYGON",       
+        "USDC": "TRC20",       
         "ETH": "ARBITRUM",     # Ethereum на сети Arbitrum
         "BNB": "BSC",          # Binance Coin на сети Binance Smart Chain
         "LTC": "LTC",          # Litecoin на собственной сети
