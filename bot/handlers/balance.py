@@ -192,6 +192,7 @@ async def start_crypto_payment(call: CallbackQuery):
         "url_return": "https://t.me/fastvpnVPNs_bot",
         "is_payment_multiple": False,
         "lifetime": 900,
+        "is_test": True,
     }
 
 
