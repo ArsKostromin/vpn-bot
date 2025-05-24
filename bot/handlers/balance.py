@@ -167,13 +167,14 @@ async def start_crypto_payment(call: CallbackQuery):
     }
 
     networks_required = {
-        "USDT": "TRON",
-        "USDC": "POLYGON",
-        "TON": "TON",
-        "ETH": "ERC20",
-        "BNB": "BEP20",
-        "LTC": "LTC",
-        "BTC": "BTC"
+        "USDT": "TRC20",       # Tether на сети Tron
+        "USDC": "TRC20",       # USD Coin на сети Tron
+        "DAI": "BSC",          # DAI на сети Binance Smart Chain
+        "ETH": "ARBITRUM",     # Ethereum на сети Arbitrum
+        "BNB": "BSC",          # Binance Coin на сети Binance Smart Chain
+        "LTC": "LTC",          # Litecoin на собственной сети
+        "BTC": "BTC",          # Bitcoin на собственной сети
+        "TON": "TON"           # Toncoin на собственной сети
     }
 
     if currency.upper() in networks_required:
