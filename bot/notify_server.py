@@ -29,6 +29,6 @@ async def run_aiohttp_server(bot_instance):
 
     runner = web.AppRunner(app)
     await runner.setup()
-    site = web.TCPSite(runner, "0.0.0.0", 8080)  # слушаем на 8080
+    site = web.TCPSite(runner, "0.0.0.0", 8081)  # слушаем на 8080
     await site.start()
     print("[i] AIOHTTP сервер запущен на порту 8080")
