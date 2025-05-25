@@ -1,5 +1,4 @@
 # services/buy_vpn.py
-
 import httpx
 
 API_URL = "https://server2.anonixvpn.space/vpn"
@@ -11,18 +10,17 @@ async def get_vpn_types_from_api() -> list[tuple[str, str]]:
         response = await client.get(f"{API_URL}/plans/")
         response.raise_for_status()
         plans = response.json()
-        # Собираем пары (vpn_type, vpn_type_display) и удаляем дубли
         unique_types = {(plan['vpn_type'], plan['vpn_type_display']) for plan in plans}
         return list(unique_types)
 
 
-async def get_durations_by_type_from_api(vpn_type: str) -> list[tuple[str, str, str]]:
+async def get_durations_by_type_from_api(vpn_type: str) -> list[tuple[str, str, str, str | None]]:
     async with httpx.AsyncClient() as client:
         response = await client.get(f"{API_URL}/plans/")
         response.raise_for_status()
         plans = response.json()
         return [
-            (p['duration'], p['price'], p['duration_display'])
+            (p['duration'], p['price'], p['duration_display'], p.get("discount_price"))
             for p in plans
             if p['vpn_type'] == vpn_type
         ]
@@ -37,7 +35,7 @@ async def buy_subscription_api(telegram_id: int, vpn_type: str, duration: str) -
         matching = [p for p in plans if p['vpn_type'] == vpn_type and p['duration'] == duration]
         if not matching:
             return False, "Такого тарифа не существует.", None
-        
+
         plan_id = matching[0]['id']
         buy_resp = await client.post(
             f"{API_URL}/buy/",

@@ -67,7 +67,7 @@ async def process_topup(callback: CallbackQuery, state: FSMContext):
         amount = int(amount_str)
         payment_link = await create_payment_link(telegram_id=callback.from_user.id, amount=amount)
         await callback.message.answer(
-            f"Вот ваша ссылка для оплаты на {amount} ₽:\n{payment_link}",
+            f"Вот ваша ссылка для оплаты на {amount} $:\n{payment_link}\nсредства поступят на счет в течение 3-5 мин после оплаты",
             reply_markup=end_upbalance
         )
         await callback.answer()
@@ -97,12 +97,12 @@ async def process_custom_amount_input(message: Message, state: FSMContext):
     try:
         amount = int(message.text)
         if amount < 5:
-            await message.answer("Минимальная сумма пополнения — 5 ₽. Попробуйте снова.")
+            await message.answer("Минимальная сумма пополнения — 5 $. Попробуйте снова.")
             return
 
         payment_link = await create_payment_link(telegram_id=message.from_user.id, amount=amount)
         await message.answer(
-            f"Вот ваша ссылка для оплаты на {amount} ₽:\n{payment_link}",
+            f"Вот ваша ссылка для оплаты на {amount} ₽:\n{payment_link} \nсредства поступят на счет в течение 3-5 мин после оплаты",
             reply_markup=end_upbalance
         )
         await state.clear()

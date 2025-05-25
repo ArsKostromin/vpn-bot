@@ -11,14 +11,23 @@ def get_vpn_type_kb(types: list[tuple[str, str]]) -> InlineKeyboardMarkup:
     return kb.as_markup()
 
 
-def get_duration_kb(durations: list[tuple[str, str, str]]) -> InlineKeyboardMarkup:
-    buttons = [
-        [InlineKeyboardButton(
-            text=f"{display} — {price}$",
-            callback_data=f"duration:{code}"
-        )]
-        for code, price, display in durations
-    ]
+def get_duration_kb(durations: list[tuple[str, str, str, int]]) -> InlineKeyboardMarkup:
+    buttons = []
+
+    for code, price, display, discount_percent in durations:
+        if discount_percent > 0:
+            price = float(price)
+            discount_price = price * (1 - discount_percent / 100)
+            text = f"{display} — ~{price:.2f}$~ {discount_price:.2f}$ 🔥"
+        else:
+            text = f"{display} — {price}$"
+
+        buttons.append([
+            InlineKeyboardButton(
+                text=text,
+                callback_data=f"duration:{code}"
+            )
+        ])
 
     buttons.append([
         InlineKeyboardButton(text="⬅️ Назад", callback_data="start_from_button")
@@ -27,22 +36,18 @@ def get_duration_kb(durations: list[tuple[str, str, str]]) -> InlineKeyboardMark
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
-
 def get_insufficient_funds_kb() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="💳 Пополнить баланс", callback_data="balance_up")],
         [InlineKeyboardButton(text="🔙 Назад", callback_data="buy_vpn")]
     ])
-    
-    
-    
+
 
 get_instruktion_kb = InlineKeyboardMarkup(
     inline_keyboard=[
         [
             InlineKeyboardButton(text="Инструкция", url="http://159.198.77.222:8080/"),
         ],
-
         [
             InlineKeyboardButton(text="⬅️ Назад", callback_data="start_from_button"),
         ],
@@ -56,7 +61,7 @@ get_target_vpn = InlineKeyboardMarkup(
             InlineKeyboardButton(text="🌭 Для YouTube и соцсетей", callback_data="target:social"),
         ],
         [
-            InlineKeyboardButton(text="🏴‍☠️ Для торрентов", callback_data="target:torrent"),  # пока такой же
+            InlineKeyboardButton(text="🏴‍☠️ Для торрентов", callback_data="target:torrent"),
         ],
         [
             InlineKeyboardButton(text="🛡 Двойное шифрование (Double VPN)", callback_data="target:double"),
