@@ -9,6 +9,7 @@ from bot.keyboards.vpn_menu import (
     get_insufficient_funds_kb,
     get_instruktion_kb,
     get_country_kb as get_country_kb_func,
+    get_confirmation_kb,
 )
 from bot.services.buy_vpn import (
     get_vpn_types_from_api,
@@ -90,10 +91,44 @@ async def select_duration_by_country(callback: CallbackQuery, state: FSMContext)
 
 
 @router.callback_query(F.data.startswith("duration:"))
-async def complete_subscription(callback: CallbackQuery, state: FSMContext):
+async def show_confirmation(callback: CallbackQuery, state: FSMContext):
     duration = callback.data.split(":")[1]
     data = await state.get_data()
     vpn_type = data["vpn_type"]
+
+    plans = await get_durations_by_type_from_api(vpn_type)
+    selected = next((p for p in plans if p["duration"] == duration), None)
+
+    if not selected:
+        await callback.message.answer("❌ Такой подписки не существует.")
+        await callback.answer()
+        return
+
+    await state.update_data(duration=duration)
+
+    price = selected["discount_price"] if selected["discount_price"] else selected["price"]
+    text = (
+        f"🛒 *Вы выбрали:*\n"
+        f"Тип: `{vpn_type}`\n"
+        f"Срок: *{selected['duration_display']}*\n"
+        f"Цена: *${price:.2f}*\n\n"
+        f"✅ Нажмите *«Оплатить»*, чтобы оформить подписку."
+    )
+
+    await callback.message.answer(
+        text=text,
+        reply_markup=get_confirmation_kb(),
+        parse_mode="Markdown"
+    )
+    await state.set_state(BuyVPN.confirmation)
+    await callback.answer()
+
+
+@router.callback_query(F.data == "confirm_payment")
+async def complete_subscription(callback: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    vpn_type = data["vpn_type"]
+    duration = data["duration"]
 
     success, msg, vless = await buy_subscription_api(
         telegram_id=callback.from_user.id,
@@ -120,5 +155,12 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
         reply_markup = get_instruktion_kb()
 
     await callback.message.answer(msg, parse_mode="HTML", reply_markup=reply_markup)
+    await state.clear()
+    await callback.answer()
+
+
+@router.callback_query(F.data == "cancel_payment")
+async def cancel_subscription(callback: CallbackQuery, state: FSMContext):
+    await callback.message.answer("❌ Покупка отменена.")
     await state.clear()
     await callback.answer()

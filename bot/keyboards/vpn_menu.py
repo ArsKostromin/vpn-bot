@@ -103,3 +103,9 @@ def get_country_kb() -> InlineKeyboardMarkup:
     ]
 
     return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+def get_confirmation_kb() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="✅ Оплатить", callback_data="confirm_payment")],
+        [InlineKeyboardButton(text="❌ Отменить", callback_data="cancel_payment")],
+    ])
