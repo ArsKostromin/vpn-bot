@@ -18,7 +18,7 @@ def get_duration_kb(durations: list[tuple[str, str, str, int]]) -> InlineKeyboar
         if discount_percent > 0:
             price = float(price)
             discount_price = price * (1 - discount_percent / 100)
-            text = f"{display} — ~{price:.2f}$~ {discount_price:.2f}$ 🔥"
+            text = f"{display}—{price:.2f}$~{discount_price:.2f}$"
         else:
             text = f"{display} — {price}$"
 
