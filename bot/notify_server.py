@@ -22,7 +22,7 @@ async def notify_handler(request):
         amount = data["amount"]
         payment_id = data.get("payment_id")
 
-        message = f"✅ Оплата на {amount}₽ прошла успешно!\nID платежа: {payment_id}"
+        message = f"✅ Оплата на {amount}$ прошла успешно!\nID платежа: {payment_id}"
 
         bot = request.app["bot"]
         await bot.send_message(tg_id, message)
