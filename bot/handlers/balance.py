@@ -102,7 +102,7 @@ async def process_custom_amount_input(message: Message, state: FSMContext):
 
         payment_link = await create_payment_link(telegram_id=message.from_user.id, amount=amount)
         await message.answer(
-            f"Вот ваша ссылка для оплаты на {amount} ₽:\n{payment_link} \nсредства поступят на счет в течение 3-5 мин после оплаты",
+            f"Вот ваша ссылка для оплаты на {amount} $:\n{payment_link} \nсредства поступят на счет в течение 3-5 мин после оплаты",
             reply_markup=end_upbalance
         )
         await state.clear()
