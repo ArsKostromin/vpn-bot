@@ -28,12 +28,13 @@ async def my_services_screen(callback: CallbackQuery):
             text = (
                 f"<b>🔹 VPN:</b> {sub['vpn_type']}\n"
                 f"<b>🔹 Длительность:</b> {sub['duration']}\n"
-                f"<b>🔹 Цена:</b> {sub['price']}₽\n"
+                f"<b>🔹 Цена:</b> {sub['price']}$\n"
                 f"<b>🔹 Статус:</b> {status}\n"
                 f"<b>🔹 Начало:</b> {sub['start_date'][:10]}\n"
                 f"<b>🔹 Окончание:</b> {sub['end_date'][:10]}\n\n"
                 f"<b>Нажмите и удерживайте текст ниже, чтобы скопировать VLESS:</b>\n"
                 f"<code>{sub['vless']}</code>"
+                f"Америка"
             )
 
             await callback.message.answer(
