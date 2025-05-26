@@ -1,11 +1,20 @@
 from aiogram import Router, F
-from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
 
 from bot.states.vpn import BuyVPN
-from bot.keyboards.vpn import get_vpn_type_kb, get_duration_kb, get_insufficient_funds_kb, get_instruktion_kb
-from bot.services.vpn import get_vpn_types_from_api, get_durations_by_type_from_api, buy_subscription_api
-
+from bot.keyboards.vpn_menu import (
+    get_vpn_type_kb,
+    get_duration_kb,
+    get_insufficient_funds_kb,
+    get_instruktion_kb,
+    get_country_kb as get_country_kb_func,
+)
+from bot.services.buy_vpn import (
+    get_vpn_types_from_api,
+    get_durations_by_type_from_api,
+    buy_subscription_api
+)
 router = Router()
 
 @router.callback_query(F.data == "buy_vpn")
