@@ -152,7 +152,7 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
             f"<code>{vless}</code>\n\n"
             "Чтобы его использовать, скачайте приложение под вашу платформу."
         )
-        reply_markup = get_instruktion_kb()
+        reply_markup = get_instruktion_kb
 
     await callback.message.answer(msg, parse_mode="HTML", reply_markup=reply_markup)
     await state.clear()
