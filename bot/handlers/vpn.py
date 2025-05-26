@@ -13,7 +13,8 @@ from bot.keyboards.vpn_menu import (
 from bot.services.buy_vpn import (
     get_vpn_types_from_api,
     get_durations_by_type_from_api,
-    buy_subscription_api
+    buy_subscription_api,
+    build_tariff_showcase
 )
 
 router = Router()
@@ -48,16 +49,22 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
             reply_markup=get_country_kb_func()
         )
     else:
-        durations_with_price = await get_durations_by_type_from_api(vpn_type)
+        plans = await get_durations_by_type_from_api(vpn_type)
 
-        if not durations_with_price:
+        if not plans:
             await callback.message.answer("❌ Нет доступных подписок.")
             await callback.answer()
             return
 
+        text = build_tariff_showcase(title=callback.message.text or "Тарифы", plans=plans)
+
         await callback.message.answer(
-            text="Выберите тип подписки:",
-            reply_markup=get_duration_kb(durations_with_price)
+            text=text,
+            reply_markup=get_duration_kb([
+                (p["duration"], str(p["price"]), p["duration_display"], p["discount_percent"])
+                for p in plans
+            ]),
+            parse_mode="Markdown"
         )
         await state.set_state(BuyVPN.duration)
 

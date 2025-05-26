@@ -14,16 +14,24 @@ async def get_vpn_types_from_api() -> list[tuple[str, str]]:
         return list(unique_types)
 
 
-async def get_durations_by_type_from_api(vpn_type: str) -> list[tuple[str, str, str, str | None]]:
+async def get_durations_by_type_from_api(vpn_type: str) -> list[dict]:
     async with httpx.AsyncClient() as client:
         response = await client.get(f"{API_URL}/plans/")
         response.raise_for_status()
         plans = response.json()
         return [
-            (p['duration'], p['price'], p['duration_display'], p.get("discount_price"))
+            {
+                "duration": p["duration"],
+                "duration_display": p["duration_display"],
+                "price": float(p["price"]),
+                "discount_active": p["discount_active"],
+                "discount_percent": p.get("discount_percent", 0),
+                "discount_price": float(p["discount_price"]) if p["discount_price"] else None,
+            }
             for p in plans
             if p['vpn_type'] == vpn_type
         ]
+
 
 
 async def buy_subscription_api(telegram_id: int, vpn_type: str, duration: str) -> tuple[bool, str, str | None]:
@@ -51,3 +59,20 @@ async def buy_subscription_api(telegram_id: int, vpn_type: str, duration: str) -
                 return False, error_data.get("error") or error_data.get("detail", "недостаточно средств"), None
             except Exception:
                 return False, f"Ошибка сервера ({buy_resp.status_code})", None
+
+
+def build_tariff_showcase(title: str, plans: list[dict]) -> str:
+    lines = [f"🤳 {title}", "", "💰 *Лучший VPN по лучшей цене!*", ""]
+
+    for plan in plans:
+        base_price = plan["price"]
+        discount_price = plan.get("discount_price")
+        percent = plan.get("discount_percent", 0)
+        label = plan["duration_display"]
+
+        if discount_price and percent > 0:
+            lines.append(f"├ {label}: ${discount_price:.2f} (-{percent}%)")
+        else:
+            lines.append(f"├ {label}: ${base_price:.2f}")
+
+    return "\n".join(lines)
