@@ -11,21 +11,30 @@ def get_vpn_type_kb(types: list[tuple[str, str]]) -> InlineKeyboardMarkup:
     return kb.as_markup()
 
 
-def get_duration_kb(plans: list[tuple[str, str, str, int]]) -> InlineKeyboardMarkup:
-    builder = InlineKeyboardBuilder()
+def get_duration_kb(durations: list[tuple[str, str, str, int]]) -> InlineKeyboardMarkup:
+    buttons = []
 
-    for duration_code, price, label, discount_percent, discount_price in plans:
-        btn_text = f"{label} – {discount_price}$"
-        if discount_percent and int(discount_percent) > 0:
-            btn_text += f" 🔻{discount_percent}%"
+    for code, price, display, discount_percent in durations:
+        if discount_percent > 0:
+            price = float(price)
+            discount_price = price * (1 - discount_percent / 100)
+            text = f"{display} — ~{price:.2f}$~ {discount_price:.2f}$ 🔥"
+        else:
+            text = f"{display} — {price}$"
 
-        builder.button(
-            text=btn_text,
-            callback_data=f"duration:{duration_code}"
-        )
+        buttons.append([
+            InlineKeyboardButton(
+                text=text,
+                callback_data=f"duration:{code}"
+            )
+        ])
 
-    builder.adjust(2)  # <-- ключевой момент: группирует по 2 в ряд
-    return builder.as_markup()
+    buttons.append([
+        InlineKeyboardButton(text="⬅️ Назад", callback_data="start_from_button")
+    ])
+
+    builder.adjust(2)
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
 def get_insufficient_funds_kb() -> InlineKeyboardMarkup:
