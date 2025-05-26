@@ -66,7 +66,7 @@ def build_tariff_showcase(title: str, plans: list[dict]) -> str:
 
     for plan in plans:
         discount_price = plan.get('price') * (1 - discount_percent / 100)
-        base_price = str(discount_price) + '-' + str(plan.get(discount_percent))
+        base_price = str(discount_price) + '-' + str(plan.get('discount_percent'))
         discount_price = plan.get("discount_price")
         percent = plan.get("discount_percent", 0)
         label = plan["duration_display"]
