@@ -14,8 +14,8 @@ def get_vpn_type_kb(types: list[tuple[str, str]]) -> InlineKeyboardMarkup:
 def get_duration_kb(plans: list[tuple[str, str, str, int]]) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
-    for duration_code, price, label, discount_percent in plans:
-        btn_text = f"{label} – {price}₽"
+    for duration_code, price, label, discount_percent, discount_price in plans:
+        btn_text = f"{label} – {discount_price}$"
         if discount_percent and int(discount_percent) > 0:
             btn_text += f" 🔻{discount_percent}%"
 
