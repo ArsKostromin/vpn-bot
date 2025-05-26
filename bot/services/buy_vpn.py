@@ -70,7 +70,7 @@ def build_tariff_showcase(title: str, plans: list[dict]) -> str:
         percent = plan.get("discount_percent", 0)
         label = plan["duration_display"]
 
-        if percent > 0:
+        if discount_price and percent > 0:
             lines.append(f"├ {label}: ${discount_price:.2f} (-{percent}%)")
         else:
             lines.append(f"├ {label}: ${base_price:.2f}")
