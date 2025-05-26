@@ -65,7 +65,8 @@ def build_tariff_showcase(title: str, plans: list[dict]) -> str:
     lines = [f"🤳 {title}", "", "💰 *Лучший VPN по лучшей цене!*", ""]
 
     for plan in plans:
-        base_price = plan["price"]
+        discount_price = price * (1 - discount_percent / 100)
+        base_price = str(discount_price) + '-'plan.get(discount_percent)
         discount_price = plan.get("discount_price")
         percent = plan.get("discount_percent", 0)
         label = plan["duration_display"]
