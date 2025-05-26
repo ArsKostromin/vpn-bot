@@ -107,6 +107,7 @@ async def show_confirmation(callback: CallbackQuery, state: FSMContext):
     await state.update_data(duration=duration)
 
     price = selected["discount_price"] if selected["discount_price"] else selected["price"]
+
     text = (
         f"🛒 *Вы выбрали:*\n"
         f"Тип: `{vpn_type}`\n"
@@ -115,6 +116,13 @@ async def show_confirmation(callback: CallbackQuery, state: FSMContext):
         f"✅ Нажмите *«Оплатить»*, чтобы оформить подписку."
     )
 
+    if vpn_type == "secure":
+        text += (
+            "\n\n🧠 *Что значат «Одиночное» и «Двойное» шифрование?*\n"
+            "— *Одиночное шифрование* — это стандартная защита и высокая скорость 🔓🚀\n"
+            "— *Двойное шифрование* — повышенная анонимность за счёт маршрутизации через два узла, но скорость ниже 🛡️🔒"
+        )
+
     await callback.message.answer(
         text=text,
         reply_markup=get_confirmation_kb(),
@@ -122,6 +130,7 @@ async def show_confirmation(callback: CallbackQuery, state: FSMContext):
     )
     await state.set_state(BuyVPN.confirmation)
     await callback.answer()
+
 
 
 @router.callback_query(F.data == "confirm_payment")
