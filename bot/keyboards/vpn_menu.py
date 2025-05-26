@@ -1,3 +1,4 @@
+# keyboards/vpn_menu.py
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
@@ -8,6 +9,7 @@ def get_vpn_type_kb(types: list[tuple[str, str]]) -> InlineKeyboardMarkup:
     kb.button(text="⬅️ Назад", callback_data="start_from_button")
     kb.adjust(2)
     return kb.as_markup()
+
 
 def get_duration_kb(durations: list[tuple[str, str, str, int]]) -> InlineKeyboardMarkup:
     buttons = []
@@ -33,11 +35,13 @@ def get_duration_kb(durations: list[tuple[str, str, str, int]]) -> InlineKeyboar
 
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
+
 def get_insufficient_funds_kb() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="💳 Пополнить баланс", callback_data="balance_up")],
         [InlineKeyboardButton(text="🔙 Назад", callback_data="buy_vpn")]
     ])
+
 
 get_instruktion_kb = InlineKeyboardMarkup(
     inline_keyboard=[
@@ -49,6 +53,7 @@ get_instruktion_kb = InlineKeyboardMarkup(
         ],
     ]
 )
+
 
 get_target_vpn = InlineKeyboardMarkup(
     inline_keyboard=[
@@ -69,6 +74,7 @@ get_target_vpn = InlineKeyboardMarkup(
         ],
     ]
 )
+
 
 def get_country_kb() -> InlineKeyboardMarkup:
     buttons = [

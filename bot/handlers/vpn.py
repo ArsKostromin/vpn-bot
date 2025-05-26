@@ -1,85 +1,99 @@
 from aiogram import Router, F
-from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
 
 from bot.states.vpn import BuyVPN
-from keyboards.vpn import get_vpn_type_kb, get_duration_kb, get_insufficient_funds_kb, get_instruktion_kb
-from services.vpn import get_vpn_types_from_api, get_durations_by_type_from_api, buy_subscription_api
+from bot.keyboards.vpn_menu import (
+    get_vpn_type_kb,
+    get_duration_kb,
+    get_insufficient_funds_kb,
+    get_instruktion_kb,
+    get_country_kb as get_country_kb_func,
+)
+from bot.services.buy_vpn import (
+    get_vpn_types_from_api,
+    get_durations_by_type_from_api,
+    buy_subscription_api,
+    build_tariff_showcase
+)
 
 router = Router()
 
+
 @router.callback_query(F.data == "buy_vpn")
-async def choose_vpn_type(callback: CallbackQuery, state: FSMContext):
+async def select_target(callback: CallbackQuery, state: FSMContext):
     vpn_types = await get_vpn_types_from_api()
-    await state.set_state(BuyVPN.vpn_type)
-    await callback.message.edit_text(
-        "Выберите тип VPN:",
-        reply_markup=get_vpn_type_kb(vpn_types)
+    await callback.message.answer(
+        text=(
+            "Выберите VPN по цели использования или стране ⬇️\n\n"
+            "⚠️ Вы получите VPN той страны, где мы гарантируем стабильную работу для выбранного направления.\n\n"
+            "🧠 *Что значат «Одиночное» и «Двойное» шифрование?*\n"
+            "— *Одиночное* шифрование — это стандартная защита и высокая скорость 🔓🚀\n"
+            "— *Двойное* шифрование — повышенная анонимность за счёт маршрутизации через два узла, но скорость ниже 🛡️🔒\n\n"
+            "Если вам нужна конкретная страна VPN – жмите «Выбрать по стране»."
+        ),
+        reply_markup=get_vpn_type_kb(vpn_types),
+        parse_mode="Markdown"
     )
     await callback.answer()
 
 
 @router.callback_query(F.data.startswith("vpn_type:"))
-async def choose_duration(callback: CallbackQuery, state: FSMContext):
+async def select_country_or_duration(callback: CallbackQuery, state: FSMContext):
     vpn_type = callback.data.split(":")[1]
     await state.update_data(vpn_type=vpn_type)
 
-    durations = await get_durations_by_type_from_api(vpn_type)
-    await state.set_state(BuyVPN.duration)
-    await callback.message.edit_text(
-        f"Вы выбрали <b>{vpn_type}</b> VPN.\nТеперь выберите длительность подписки:",
-        reply_markup=get_duration_kb(durations),
-        parse_mode="HTML"
+    if vpn_type == "country":
+        await callback.message.answer(
+            text="Выберите страну для VPN:",
+            reply_markup=get_country_kb_func()
+        )
+    else:
+        plans = await get_durations_by_type_from_api(vpn_type)
+
+        if not plans:
+            await callback.message.answer("❌ Нет доступных подписок.")
+            await callback.answer()
+            return
+
+        text = build_tariff_showcase(title=callback.message.text or "Тарифы", plans=plans)
+
+        await callback.message.answer(
+            text=text,
+            reply_markup=get_duration_kb([
+                (p["duration"], str(p["price"]), p["duration_display"], p["discount_percent"])
+                for p in plans
+            ]),
+            parse_mode="Markdown"
+        )
+        await state.set_state(BuyVPN.duration)
+
+    await callback.answer()
+
+
+@router.callback_query(F.data.startswith("target_country"))
+async def select_duration_by_country(callback: CallbackQuery, state: FSMContext):
+    durations_with_price = await get_durations_by_type_from_api("country")
+
+    if not durations_with_price:
+        await callback.message.answer("❌ Нет доступных подписок.")
+        await callback.answer()
+        return
+
+    await callback.message.answer(
+        text="Выберите тип подписки:",
+        reply_markup=get_duration_kb(durations_with_price)
     )
+    await state.set_state(BuyVPN.duration)
+
     await callback.answer()
 
 
 @router.callback_query(F.data.startswith("duration:"))
-async def preview_subscription(callback: CallbackQuery, state: FSMContext):
+async def complete_subscription(callback: CallbackQuery, state: FSMContext):
     duration = callback.data.split(":")[1]
     data = await state.get_data()
     vpn_type = data["vpn_type"]
-
-    plans = await get_durations_by_type_from_api(vpn_type)
-    plan = next((p for p in plans if p["duration"] == duration), None)
-
-    if not plan:
-        await callback.message.answer("❌ Ошибка при получении тарифа.")
-        await callback.answer()
-        return
-
-    await state.update_data(duration=duration, plan=plan)
-
-    price = plan["discount_price"] or plan["price"]
-    percent = plan["discount_percent"]
-    label = plan["duration_display"]
-    price_line = f"${price:.2f}" + (f" (скидка -{percent}%)" if percent else "")
-
-    text = (
-        f"✅ <b>Подтверждение покупки</b>\n\n"
-        f"🔹 <b>Тип VPN:</b> {vpn_type.capitalize()}\n"
-        f"🕒 <b>Срок:</b> {label}\n"
-        f"💵 <b>Стоимость:</b> {price_line}\n\n"
-        f"🔗 После оплаты подписка активируется автоматически."
-    )
-
-    kb = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton(text="💳 Оплатить", callback_data="confirm_buy")],
-            [InlineKeyboardButton(text="❌ Отменить платёж", callback_data="cancel_buy")]
-        ]
-    )
-
-    await callback.message.edit_text(text, reply_markup=kb, parse_mode="HTML")
-    await state.set_state(BuyVPN.confirmation)
-    await callback.answer()
-
-
-@router.callback_query(F.data == "confirm_buy")
-async def confirm_buy(callback: CallbackQuery, state: FSMContext):
-    data = await state.get_data()
-    vpn_type = data["vpn_type"]
-    duration = data["duration"]
 
     success, msg, vless = await buy_subscription_api(
         telegram_id=callback.from_user.id,
@@ -96,6 +110,7 @@ async def confirm_buy(callback: CallbackQuery, state: FSMContext):
         return
 
     reply_markup = None
+
     if success and vless:
         msg += (
             f"\n\n<b>Нажмите, чтобы скопировать VLESS:</b>\n"
@@ -105,13 +120,5 @@ async def confirm_buy(callback: CallbackQuery, state: FSMContext):
         reply_markup = get_instruktion_kb()
 
     await callback.message.answer(msg, parse_mode="HTML", reply_markup=reply_markup)
-    await state.clear()
-    await callback.answer()
-
-
-@router.callback_query(F.data == "cancel_buy")
-async def cancel_buy(callback: CallbackQuery, state: FSMContext):
-    vpn_types = await get_vpn_types_from_api()
-    await callback.message.answer("❌ Покупка отменена.", reply_markup=get_vpn_type_kb(vpn_types))
     await state.clear()
     await callback.answer()
