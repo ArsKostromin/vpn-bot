@@ -58,7 +58,7 @@ async def process_topup(callback: CallbackQuery, state: FSMContext):
     amount_str = callback.data.split("_")[1]
 
     if amount_str == "custom":
-        await callback.message.answer("Введите сумму пополнения в рублях (например, 250):")
+        await callback.message.answer("Введите сумму пополнения в долларах (например, 250):")
         await state.set_state(TopUpStates.waiting_for_custom_amount)
         await callback.answer()
         return
@@ -86,7 +86,7 @@ async def back_to_main_menu(callback: CallbackQuery):
 # обработка кнопки "💰 Ввести свою сумму" (Робокасса)
 @router.callback_query(F.data == "topup_custom")
 async def process_custom_amount_request(callback: CallbackQuery, state: FSMContext):
-    await callback.message.answer("Введите сумму пополнения в рублях (например, 250):")
+    await callback.message.answer("Введите сумму пополнения в долларах (например, 250):")
     await state.set_state(TopUpStates.waiting_for_custom_amount)
     await callback.answer()
 
