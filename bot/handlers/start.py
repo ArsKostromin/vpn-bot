@@ -74,7 +74,7 @@ async def process_start(
                     "🖥️ Windows: <a href='https://apps.microsoft.com/detail/9pdfnl3qv2s5?hl=ru-RU&gl=RU'>Anonix</a>\n"
                     "🍏 MacOS: <a href='https://apps.apple.com/ru/app/v2box-v2ray-client/id6446814690'>Anonix</a>\n\n"
                     "🔗 Подключите VPN ключ в приложение:\n\n"
-                    f"▪️ реферальная ссылка: https://t.me/fastvpnVPNs_bot?start={link_code}\n\n"
+                    f"▪️ реферальная ссылка: https://t.me/Anonixvpn_vpnBot?start={link_code}\n\n"
                 ),
                 parse_mode=ParseMode.HTML,
                 reply_markup=inline_instruction_buttons
