@@ -3,9 +3,11 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 def get_balance_menu_roboc():
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text=" 1 $", callback_data="topup_1"),
-            InlineKeyboardButton(text="100 $", callback_data="topup_100"),
-            InlineKeyboardButton(text="500 $", callback_data="topup_500"),
+            InlineKeyboardButton(text=" 5 $", callback_data="topup_5"),
+            InlineKeyboardButton(text="15 $", callback_data="topup_15"),
+            InlineKeyboardButton(text="27 $", callback_data="topup_27"),
+            InlineKeyboardButton(text="48 $", callback_data="topup_48"),
+
         ],
         [
             InlineKeyboardButton(text="Назад", callback_data="start_from_button")
@@ -23,7 +25,7 @@ start_balance = InlineKeyboardMarkup(
             InlineKeyboardButton(text="💳 карты и Qкод", callback_data="robokassa"),
         ],
         [
-            InlineKeyboardButton(text="cryptobot", callback_data="cryptobot"),
+            InlineKeyboardButton(text="Крипта", callback_data="cryptobot"),
         ],
         [
             InlineKeyboardButton(text="Telegram stars", url="https://t.me/Anonixvpnpaybot"),
@@ -38,9 +40,10 @@ start_balance = InlineKeyboardMarkup(
 def get_balance_menu():
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="1 $", callback_data="balance_amount_0.01")],
-            [InlineKeyboardButton(text="100 $", callback_data="balance_amount_100")],
-            [InlineKeyboardButton(text="500 $", callback_data="balance_amount_500")],
+            [InlineKeyboardButton(text="5 $", callback_data="balance_amount_5")],
+            [InlineKeyboardButton(text="15 $", callback_data="balance_amount_15")],
+            [InlineKeyboardButton(text="27 $", callback_data="balance_amount_27")],
+            [InlineKeyboardButton(text="48 $", callback_data="balance_amount_48")],
             [InlineKeyboardButton(text="Ввести  сумму", callback_data="cryptotopup_custom")],
             [InlineKeyboardButton(text="Назад", callback_data="start_from_button")],
         ]

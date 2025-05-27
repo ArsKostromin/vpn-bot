@@ -138,7 +138,7 @@ async def balance_up_start(call: CallbackQuery):
 @router.callback_query(F.data.startswith("balance_amount_"))
 async def select_crypto_currency(call: CallbackQuery):
     logging.debug(f"callback_query: {call.data} | from_user={call.from_user.id}")
-    amount = float(call.data.split("_")[-1])
+    amount = int(call.data.split("_")[-1])
     await call.message.edit_text(
         f"Выбери криптовалюту для пополнения на {amount}$:",
         reply_markup=get_crypto_currency_keyboard(amount)
@@ -180,7 +180,7 @@ async def process_custom_crypto_amount_input(message: Message, state: FSMContext
 async def start_crypto_payment(call: CallbackQuery):
     logging.debug(f"callback_query: {call.data} | from_user={call.from_user.id}")
     _, currency, amount = call.data.split("_")
-    amount = float(amount)
+    amount = int(amount)
     order_id = f"user_{call.from_user.id}_{amount}_{uuid.uuid4().hex}"
 
     invoice_data = {
