@@ -180,7 +180,7 @@ async def process_custom_crypto_amount_input(message: Message, state: FSMContext
 async def start_crypto_payment(call: CallbackQuery):
     logging.debug(f"callback_query: {call.data} | from_user={call.from_user.id}")
     _, currency, amount = call.data.split("_")
-    amount = int(amount)
+    amount = float(amount)
     order_id = f"user_{call.from_user.id}_{amount}_{uuid.uuid4().hex}"
 
     invoice_data = {
