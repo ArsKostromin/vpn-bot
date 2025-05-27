@@ -40,7 +40,7 @@ start_balance = InlineKeyboardMarkup(
 def get_balance_menu():
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="1 $", callback_data="balance_amount_1")],
+            [InlineKeyboardButton(text="2 $", callback_data="balance_amount_2")],
             [InlineKeyboardButton(text="15 $", callback_data="balance_amount_15")],
             [InlineKeyboardButton(text="27 $", callback_data="balance_amount_27")],
             [InlineKeyboardButton(text="48 $", callback_data="balance_amount_48")],
