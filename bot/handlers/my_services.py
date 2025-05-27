@@ -34,7 +34,6 @@ async def my_services_screen(callback: CallbackQuery):
                 f"<b>🔹 Окончание:</b> {sub['end_date'][:10]}\n\n"
                 f"<b>Нажмите и удерживайте текст ниже, чтобы скопировать VLESS:</b>\n"
                 f"<code>{sub['vless']}</code>"
-                f"Америка"
             )
 
             await callback.message.answer(
