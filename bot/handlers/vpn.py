@@ -74,19 +74,21 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
 
 @router.callback_query(F.data.startswith("target_country"))
 async def select_duration_by_country(callback: CallbackQuery, state: FSMContext):
-    durations_with_price = await get_durations_by_type_from_api("country")
+    plans = await get_durations_by_type_from_api("country")
 
-    if not durations_with_price:
+    if not plans:
         await callback.message.answer("❌ Нет доступных подписок.")
         await callback.answer()
         return
 
     await callback.message.answer(
         text="Выберите тип подписки:",
-        reply_markup=get_duration_kb(durations_with_price)
+        reply_markup=get_duration_kb([
+            (p["duration"], str(p["price"]), p["duration_display"], p["discount_percent"])
+            for p in plans
+        ])
     )
     await state.set_state(BuyVPN.duration)
-
     await callback.answer()
 
 
