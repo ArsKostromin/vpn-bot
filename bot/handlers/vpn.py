@@ -175,3 +175,36 @@ async def cancel_subscription(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer("❌ Покупка отменена.")
     await state.clear()
     await callback.answer()
+
+
+
+import binascii
+from bot.services.vless_countries import VLESS_COUNTRY_MAP
+
+
+@router.callback_query(F.data.startswith("vless_country:"))
+async def send_vless_by_country(callback: CallbackQuery, state: FSMContext):
+    try:
+        code = callback.data.split(":")[1]
+        country_name = bytes.fromhex(code).decode("utf-8")
+        vless_link = VLESS_COUNTRY_MAP.get(country_name)
+        
+        if not vless_link:
+            await callback.message.answer("❌ VPN для этой страны недоступен.")
+            await callback.answer()
+            return
+
+        text = (
+            f"✅ Ваш VPN для {country_name} готов!\n\n"
+            f"<b>Скопируйте VLESS-ссылку:</b>\n"
+            f"<code>{vless_link}</code>\n\n"
+            f"Инструкция: http://159.198.77.222:8080/"
+        )
+
+        await callback.message.answer(text, parse_mode="HTML")
+    
+    except Exception as e:
+        await callback.message.answer("⚠️ Ошибка при выборе страны.")
+        print(e)
+
+    await callback.answer()

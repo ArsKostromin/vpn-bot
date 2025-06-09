@@ -77,34 +77,20 @@ get_target_vpn = InlineKeyboardMarkup(
 )
 
 
+from bot.services.vless_countries import VLESS_COUNTRY_MAP
+
 def get_country_kb() -> InlineKeyboardMarkup:
-    buttons = [
-        [
-            InlineKeyboardButton(text="🇺🇸 США", callback_data="target_country"),
-            InlineKeyboardButton(text="🇧🇷 Бразилия", callback_data="target_country")
-        ],
-        [
-            InlineKeyboardButton(text="🇩🇪 Германия", callback_data="target_country"),
-            InlineKeyboardButton(text="🇯🇵 Япония", callback_data="target_country")
-        ],
-        [
-            InlineKeyboardButton(text="🇦🇪 ОАЭ", callback_data="target_country"),
-            InlineKeyboardButton(text="🇦🇺 Австралия", callback_data="target_country")
-        ],
-        [
-            InlineKeyboardButton(text="🇷🇺 Россия", callback_data="target_country"),
-            InlineKeyboardButton(text="🇿🇦 ЮАР", callback_data="target_country")
-        ],
-        [
-            InlineKeyboardButton(text="⚙️ Аккаунт", callback_data="account")
-        ],
-        [
-            InlineKeyboardButton(text="🔙 Назад", callback_data="start_from_button")
-        ]
-    ]
-
-    return InlineKeyboardMarkup(inline_keyboard=buttons)
-
+    builder = InlineKeyboardBuilder()
+    
+    for emoji_name in VLESS_COUNTRY_MAP.keys():
+        # чтобы callback был безопасным
+        code = emoji_name.encode("utf-8").hex()
+        builder.button(text=emoji_name, callback_data=f"vless_country:{code}")
+    
+    builder.button(text="⬅️ Назад", callback_data="start_from_button")
+    builder.adjust(2)
+    
+    return builder.as_markup()
 def get_confirmation_kb() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="✅ Оплатить", callback_data="confirm_payment")],
