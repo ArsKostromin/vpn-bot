@@ -1,7 +1,7 @@
 #services/upbalance.py
 import aiohttp
 
-API_URL = "http://server2.anonixvpn.space"
+API_URL = "https://server2.anonixvpn.space"
 # API_URL = "http://backend:8000"
 
 #robocassa(робосаса)
