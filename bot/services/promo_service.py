@@ -3,7 +3,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-API_URL = "https://server2.anonixvpn.space"
+API_URL = "http://server2.anonixvpn.space"
 
 async def get_promo_code_from_api(user_id: int) -> str:
     url = f"{API_URL}/coupon/generate_promo/"
