@@ -8,7 +8,6 @@ from bot.keyboards.vpn_menu import (
     get_duration_kb,
     get_insufficient_funds_kb,
     get_instruktion_kb,
-    get_country_kb as get_country_kb_func,
     get_confirmation_kb,
 )
 from bot.services.buy_vpn import (
@@ -47,7 +46,7 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
     if vpn_type == "country":
         await callback.message.answer(
             text="Выберите страну для VPN:",
-            reply_markup=get_country_kb_func()
+            reply_markup=get_country_kb()
         )
     else:
         plans = await get_durations_by_type_from_api(vpn_type)
@@ -163,7 +162,7 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
             f"<code>{vless}</code>\n\n"
             "Чтобы его использовать, скачайте приложение под вашу платформу."
         )
-        reply_markup = get_instruktion_kb
+        reply_markup = get_instruktion_kb()
 
     await callback.message.answer(msg, parse_mode="HTML", reply_markup=reply_markup)
     await state.clear()
