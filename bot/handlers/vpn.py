@@ -45,9 +45,10 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
     await state.update_data(vpn_type=vpn_type)
 
     if vpn_type == "country":
+        countries = await get_available_countries_from_api()
         await callback.message.answer(
             text="Выберите страну для VPN:",
-            reply_markup=get_country_kb()
+            reply_markup=get_country_kb(countries)
         )
     else:
         plans = await get_durations_by_type_from_api(vpn_type)
@@ -70,6 +71,7 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
         await state.set_state(BuyVPN.duration)
 
     await callback.answer()
+
 
 
 @router.callback_query(F.data.startswith("target_country"))
@@ -207,4 +209,17 @@ async def send_vless_by_country(callback: CallbackQuery, state: FSMContext):
         await callback.message.answer("⚠️ Ошибка при выборе страны.")
         print(e)
 
+    await callback.answer()
+
+
+@router.callback_query(F.data.startswith("vless_country:"))
+async def country_chosen(callback: CallbackQuery, state: FSMContext):
+    country_code = callback.data.split(":")[1]  # Например 'us', 'ru', 'id' и т.д.
+    # Сохраняем выбранную страну в состояние
+    await state.update_data(vpn_country=country_code)
+
+    # Здесь можешь сделать что угодно, например, показать тарифы для этой страны
+    await callback.message.answer(f"Вы выбрали страну VPN: {country_code.upper()}")
+
+    # Продолжай логику: либо сразу покупка, либо выбор тарифа и т.п.
     await callback.answer()
