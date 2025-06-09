@@ -16,6 +16,7 @@ from bot.services.buy_vpn import (
     buy_subscription_api,
     build_tariff_showcase
 )
+from bot.keyboards.vpn_menu import get_country_kb
 
 router = Router()
 
