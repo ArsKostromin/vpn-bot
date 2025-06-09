@@ -1,15 +1,7 @@
+# keyboards/vpn_menu.py
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-
-# Короткие ASCII коды для callback_data вместо ебучего hex
-VLESS_COUNTRY_CODES = {
-    "🇺🇸 США": "us",
-    "🇷🇺 Россия": "ru",
-    "🇮🇩 Индонезия": "id",
-    "🇬🇧 Великобритания": "uk",
-    "🇩🇪 Германия": "de",
-    "🇧🇷 Бразилия": "br"
-}
+from bot.services.vless_countries import COUNTRY_VLESS
 
 def get_vpn_type_kb(types: list[tuple[str, str]]) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
@@ -19,20 +11,32 @@ def get_vpn_type_kb(types: list[tuple[str, str]]) -> InlineKeyboardMarkup:
     kb.adjust(2)
     return kb.as_markup()
 
+
 def get_duration_kb(durations: list[tuple[str, str, str, int]]) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-    for code, price, display, discount_percent in durations:
-        price = float(price)
-        if discount_percent > 0:
-            discount_price = price * (1 - discount_percent / 100)
-            text = f"{display} — {price:.2f}$ ~ {discount_price:.2f}$"
-        else:
-            text = f"{display} — {price:.2f}$"
 
-        builder.button(text=text, callback_data=f"duration:{code}")
-    builder.button(text="⬅️ Назад", callback_data="start_from_button")
-    builder.adjust(2)
+    for code, price, display, discount_percent in durations:
+        if discount_percent > 0:
+            price = float(price)
+            discount_price = price * (1 - discount_percent / 100)
+            text = f"{display}—{price:.2f}$~{discount_price:.2f}$"
+        else:
+            text = f"{display} — {price}$"
+
+        builder.button(
+            text=text,
+            callback_data=f"duration:{code}"
+        )
+
+    builder.button(
+        text="⬅️ Назад",
+        callback_data="start_from_button"
+    )
+
+    builder.adjust(2)  # вот теперь можно
+
     return builder.as_markup()
+
 
 def get_insufficient_funds_kb() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
@@ -40,19 +44,48 @@ def get_insufficient_funds_kb() -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text="🔙 Назад", callback_data="buy_vpn")]
     ])
 
-def get_instruktion_kb() -> InlineKeyboardMarkup:
-    return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Инструкция", url="http://159.198.77.222:8080/")],
-        [InlineKeyboardButton(text="⬅️ Назад", callback_data="start_from_button")]
-    ])
+
+get_instruktion_kb = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="Инструкция", url="http://159.198.77.222:8080/"),
+        ],
+        [
+            InlineKeyboardButton(text="⬅️ Назад", callback_data="start_from_button"),
+        ],
+    ]
+)
+
+
+get_target_vpn = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="🌭 Для YouTube и соцсетей", callback_data="target:social"),
+        ],
+        [
+            InlineKeyboardButton(text="🏴‍☠️ Для торрентов", callback_data="target:torrent"),
+        ],
+        [
+            InlineKeyboardButton(text="🛡 Двойное шифрование (Double VPN)", callback_data="target:double"),
+        ],
+        [
+            InlineKeyboardButton(text="🌐 Выбор по стране", callback_data="country"),
+        ],
+        [
+            InlineKeyboardButton(text="⬅️ Назад", callback_data="start_from_button"),
+        ],
+    ]
+)
+
 
 def get_country_kb() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-    for emoji_name, code in VLESS_COUNTRY_CODES.items():
-        builder.button(text=emoji_name, callback_data=f"vless_country:{code}")
-    builder.button(text="⬅️ Назад", callback_data="start_from_button")
+    for code, data in COUNTRY_VLESS.items():
+        builder.button(text=data["name"], callback_data=f"country:{code}")
+    builder.button(text="🔙 Назад", callback_data="start_from_button")
     builder.adjust(2)
     return builder.as_markup()
+
 
 def get_confirmation_kb() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[

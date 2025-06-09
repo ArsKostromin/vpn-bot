@@ -8,6 +8,7 @@ from bot.keyboards.vpn_menu import (
     get_duration_kb,
     get_insufficient_funds_kb,
     get_instruktion_kb,
+    get_country_kb as get_country_kb_func,
     get_confirmation_kb,
 )
 from bot.services.buy_vpn import (
@@ -16,7 +17,6 @@ from bot.services.buy_vpn import (
     buy_subscription_api,
     build_tariff_showcase
 )
-from bot.keyboards.vpn_menu import get_country_kb
 
 router = Router()
 
@@ -45,10 +45,9 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
     await state.update_data(vpn_type=vpn_type)
 
     if vpn_type == "country":
-        countries = await get_available_countries_from_api()
         await callback.message.answer(
             text="Выберите страну для VPN:",
-            reply_markup=get_country_kb(countries)
+            reply_markup=get_country_kb_func()
         )
     else:
         plans = await get_durations_by_type_from_api(vpn_type)
@@ -71,7 +70,6 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
         await state.set_state(BuyVPN.duration)
 
     await callback.answer()
-
 
 
 @router.callback_query(F.data.startswith("target_country"))
@@ -165,7 +163,7 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
             f"<code>{vless}</code>\n\n"
             "Чтобы его использовать, скачайте приложение под вашу платформу."
         )
-        reply_markup = get_instruktion_kb()
+        reply_markup = get_instruktion_kb
 
     await callback.message.answer(msg, parse_mode="HTML", reply_markup=reply_markup)
     await state.clear()
@@ -177,49 +175,24 @@ async def cancel_subscription(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer("❌ Покупка отменена.")
     await state.clear()
     await callback.answer()
-
-
-
-import binascii
-from bot.services.vless_countries import VLESS_COUNTRY_MAP
-
-
-@router.callback_query(F.data.startswith("vless_country:"))
-async def send_vless_by_country(callback: CallbackQuery, state: FSMContext):
-    try:
-        code = callback.data.split(":")[1]
-        country_name = bytes.fromhex(code).decode("utf-8")
-        vless_link = VLESS_COUNTRY_MAP.get(country_name)
-        
-        if not vless_link:
-            await callback.message.answer("❌ VPN для этой страны недоступен.")
-            await callback.answer()
-            return
-
-        text = (
-            f"✅ Ваш VPN для {country_name} готов!\n\n"
-            f"<b>Скопируйте VLESS-ссылку:</b>\n"
-            f"<code>{vless_link}</code>\n\n"
-            f"Инструкция: http://159.198.77.222:8080/"
-        )
-
-        await callback.message.answer(text, parse_mode="HTML")
     
-    except Exception as e:
-        await callback.message.answer("⚠️ Ошибка при выборе страны.")
-        print(e)
+    
+@router.callback_query(F.data.startswith("country:"))
+async def send_country_vless(callback: CallbackQuery, state: FSMContext):
+    country_code = callback.data.split(":")[1]
+    data = COUNTRY_VLESS.get(country_code)
 
-    await callback.answer()
+    if not data:
+        await callback.message.answer("❌ Конфиг для этой страны не найден.")
+        await callback.answer()
+        return
 
+    msg = (
+        f"🌐 Вы выбрали страну: *{data['name']}*\n\n"
+        f"<b>Скопируйте VLESS:</b>\n<code>{data['vless']}</code>\n\n"
+        "📥 Установите приложение для подключения.\n"
+    )
 
-@router.callback_query(F.data.startswith("vless_country:"))
-async def country_chosen(callback: CallbackQuery, state: FSMContext):
-    country_code = callback.data.split(":")[1]  # Например 'us', 'ru', 'id' и т.д.
-    # Сохраняем выбранную страну в состояние
-    await state.update_data(vpn_country=country_code)
-
-    # Здесь можешь сделать что угодно, например, показать тарифы для этой страны
-    await callback.message.answer(f"Вы выбрали страну VPN: {country_code.upper()}")
-
-    # Продолжай логику: либо сразу покупка, либо выбор тарифа и т.п.
+    await callback.message.answer(msg, parse_mode="HTML", reply_markup=get_instruktion_kb)
+    await state.clear()
     await callback.answer()
