@@ -15,7 +15,7 @@ inline_main_menu = InlineKeyboardMarkup(
         ],
         [
             InlineKeyboardButton(text="💳 Пополнить", callback_data="balance_up"),
-            InlineKeyboardButton(text="🆘 Помощь", url="https://arskostromin.github.io/vpnguide/index.html")
+            InlineKeyboardButton(text="🆘 Помощь", url="https://t.me/Anonixvpnsupportbot")
         ],
         [
             InlineKeyboardButton(text="📝 Отзывы", url="https://t.me/"),
@@ -23,7 +23,7 @@ inline_main_menu = InlineKeyboardMarkup(
         ],
         [
             InlineKeyboardButton(text="🎁 Ввести промокод", callback_data="coupon"),
-            InlineKeyboardButton(text="🤝 Как подключить", url="http://159.198.77.222:8080/"),
+            InlineKeyboardButton(text="🤝 Как подключить", url="https://arskostromin.github.io/vpnguide/index.html"),
         ],
         [
             InlineKeyboardButton(text="📢 Наш канал", callback_data="our_channel"),
