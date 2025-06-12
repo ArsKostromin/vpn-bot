@@ -4,7 +4,7 @@ inline_instruction_buttons = InlineKeyboardMarkup(inline_keyboard=[
     [
         InlineKeyboardButton(
             text="📥 Инструкция", 
-            url="http://159.198.77.222:8080/"
+            url="https://arskostromin.github.io/vpnguide/"
         ),
     ],
     [
