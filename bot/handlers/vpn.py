@@ -17,7 +17,6 @@ from bot.services.buy_vpn import (
     buy_subscription_api,
     build_tariff_showcase
 )
-from bot.services.vless_countries import COUNTRY_VLESS
 
 router = Router()
 
@@ -136,19 +135,16 @@ async def show_confirmation(callback: CallbackQuery, state: FSMContext):
 
 
 
-import random
-
 @router.callback_query(F.data == "confirm_payment")
 async def complete_subscription(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
-    vpn_type = data.get("vpn_type")
-    duration = data.get("duration")
-    country_code = data.get("country_code") if vpn_type == "country" else None
+    vpn_type = data["vpn_type"]
+    duration = data["duration"]
 
-    success, msg, _ = await buy_subscription_api(
+    success, msg, vless = await buy_subscription_api(
         telegram_id=callback.from_user.id,
         vpn_type=vpn_type,
-        duration=duration or "default"
+        duration=duration
     )
 
     if not success and "недостаточно средств" in msg.lower():
@@ -159,27 +155,19 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
         await callback.answer()
         return
 
-    if vpn_type == "country" and country_code:
-        data = COUNTRY_VLESS.get(country_code)
-    else:
-        # Отдаём случайный или любой доступный
-        data = random.choice(list(COUNTRY_VLESS.values()))
+    reply_markup = None
 
-    if not data:
-        await callback.message.answer("❌ Конфиг не найден.")
-        await callback.answer()
-        return
+    if success and vless:
+        msg += (
+            f"\n\n<b>Нажмите, чтобы скопировать VLESS:</b>\n"
+            f"<code>{vless}</code>\n\n"
+            "Чтобы его использовать, скачайте приложение под вашу платформу."
+        )
+        reply_markup = get_instruktion_kb
 
-    msg = (
-        f"✅ Подписка активирована!\n\n"
-        f"<b>Скопируйте VLESS:</b>\n<code>{data['vless']}</code>\n\n"
-        "📥 Установите приложение для подключения."
-    )
-
-    await callback.message.answer(msg, parse_mode="HTML", reply_markup=get_instruktion_kb)
+    await callback.message.answer(msg, parse_mode="HTML", reply_markup=reply_markup)
     await state.clear()
     await callback.answer()
-
 
 
 @router.callback_query(F.data == "cancel_payment")
@@ -187,30 +175,3 @@ async def cancel_subscription(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer("❌ Покупка отменена.")
     await state.clear()
     await callback.answer()
-    
-    
-@router.callback_query(F.data.startswith("country:"))
-async def ask_payment_for_country(callback: CallbackQuery, state: FSMContext):
-    country_code = callback.data.split(":")[1]
-    data = COUNTRY_VLESS.get(country_code)
-
-    if not data:
-        await callback.message.answer("❌ Конфиг для этой страны не найден.")
-        await callback.answer()
-        return
-
-    await state.update_data(vpn_type="country", country_code=country_code)
-
-    msg = (
-        f"🌐 Вы выбрали страну: *{data['name']}*\n\n"
-        f"Чтобы получить конфиг, необходимо оплатить подписку ⬇️"
-    )
-
-    await callback.message.answer(
-        msg,
-        parse_mode="Markdown",
-        reply_markup=get_confirmation_kb()
-    )
-    await state.set_state(BuyVPN.confirmation)
-    await callback.answer()
-
