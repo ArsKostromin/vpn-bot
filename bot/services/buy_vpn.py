@@ -34,41 +34,61 @@ async def get_durations_by_type_from_api(vpn_type: str) -> list[dict]:
 
 
 
+import httpx
+import logging
+
+logger = logging.getLogger(__name__)
+
 async def buy_subscription_api(
     telegram_id: int,
     vpn_type: str,
     duration: str,
     country: str = None
 ) -> tuple[bool, str, str | None]:
-    async with httpx.AsyncClient() as client:
-        response = await client.get(f"{API_URL}/plans/")
-        response.raise_for_status()
-        plans = response.json()
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{API_URL}/plans/")
+            response.raise_for_status()
+            plans = response.json()
 
-        matching = [
-            p for p in plans
-            if p['vpn_type'] == vpn_type and p['duration'] == duration
-               and (vpn_type != "country" or p.get("country") == country)
-        ]
+            logger.info("📦 Получены тарифы: %s", plans)
+            logger.info("🔍 Ищем vpn_type=%s, duration=%s, country=%s", vpn_type, duration, country)
 
-        if not matching:
-            return False, "Такого тарифа не существует.", None
+            matching = [
+                p for p in plans
+                if p['vpn_type'] == vpn_type and p['duration'] == duration
+                   and (vpn_type != "country" or p.get("country", "").lower() == (country or "").lower())
+            ]
 
-        plan_id = matching[0]['id']
-        buy_resp = await client.post(
-            f"{API_URL}/buy/",
-            json={"plan_id": plan_id, "telegram_id": telegram_id}
-        )
+            if not matching:
+                logger.warning("❌ Подходящий тариф не найден! Доступные планы: %s", plans)
+                return False, "Такого тарифа не существует.", None
 
-        if buy_resp.status_code == 201:
-            data = buy_resp.json()
-            return True, data.get("message", "Подписка успешно оформлена."), data.get("vless")
-        else:
-            try:
-                error_data = buy_resp.json()
-                return False, error_data.get("error") or error_data.get("detail", "недостаточно средств"), None
-            except Exception:
-                return False, f"Ошибка сервера ({buy_resp.status_code})", None
+            plan_id = matching[0]['id']
+            logger.info("✅ Найден тариф id=%s", plan_id)
+
+            buy_resp = await client.post(
+                f"{API_URL}/buy/",
+                json={"plan_id": plan_id, "telegram_id": telegram_id}
+            )
+
+            if buy_resp.status_code == 201:
+                data = buy_resp.json()
+                logger.info("🎉 Подписка оформлена: %s", data)
+                return True, data.get("message", "Подписка успешно оформлена."), data.get("vless")
+            else:
+                try:
+                    error_data = buy_resp.json()
+                    logger.error("💥 Ошибка при оформлении: %s", error_data)
+                    return False, error_data.get("error") or error_data.get("detail", "недостаточно средств"), None
+                except Exception as e:
+                    logger.exception("💣 Ошибка при разборе ошибки: %s", e)
+                    return False, f"Ошибка сервера ({buy_resp.status_code})", None
+
+    except Exception as e:
+        logger.exception("🔥 Общая ошибка в buy_subscription_api: %s", e)
+        return False, "Внутренняя ошибка сервера", None
+
 
 
 
