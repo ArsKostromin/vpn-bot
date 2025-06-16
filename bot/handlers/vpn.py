@@ -145,18 +145,18 @@ async def show_confirmation(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 
-
-
 @router.callback_query(F.data == "confirm_payment")
 async def complete_subscription(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     vpn_type = data["vpn_type"]
     duration = data["duration"]
+    country = data.get("country")
 
     success, msg, vless = await buy_subscription_api(
         telegram_id=callback.from_user.id,
         vpn_type=vpn_type,
-        duration=duration
+        duration=duration,
+        country=country
     )
 
     if not success and "недостаточно средств" in msg.lower():
