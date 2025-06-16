@@ -76,3 +76,11 @@ def build_tariff_showcase(title: str, plans: list[dict]) -> str:
             lines.append(f"├ {label}: ${base_price:.2f}")
 
     return "\n".join(lines)
+
+async def get_countries_from_api() -> list[tuple[str, str]]:
+    async with httpx.AsyncClient() as client:
+        response = await client.get(f"{API_URL}/countries/")
+        response.raise_for_status()
+        countries = response.json()
+        unique_types = {(item['code'], item['country']) for item in countries}
+        return list(unique_types)

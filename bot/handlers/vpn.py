@@ -15,7 +15,8 @@ from bot.services.buy_vpn import (
     get_vpn_types_from_api,
     get_durations_by_type_from_api,
     buy_subscription_api,
-    build_tariff_showcase
+    build_tariff_showcase,
+    get_countries_from_api
 )
 
 router = Router()
@@ -74,6 +75,9 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
 
 @router.callback_query(F.data.startswith("target_country"))
 async def select_duration_by_country(callback: CallbackQuery, state: FSMContext):
+    country_code = callback.data.split(":")[1]
+    await state.update_data(country=country_code)
+
     plans = await get_durations_by_type_from_api("country")
 
     if not plans:
@@ -82,8 +86,8 @@ async def select_duration_by_country(callback: CallbackQuery, state: FSMContext)
         return
 
     await callback.message.answer(
-        text="Выберите тип подписки:",
-        reply_markup=get_duration_kb([
+        text=f"Вы выбрали страну: {country_code}\nТеперь выберите длительность:",
+        reply_markup=get_duration_kb([  # стандартная клавиатура с планами
             (p["duration"], str(p["price"]), p["duration_display"], p["discount_percent"])
             for p in plans
         ])
@@ -97,6 +101,7 @@ async def show_confirmation(callback: CallbackQuery, state: FSMContext):
     duration = callback.data.split(":")[1]
     data = await state.get_data()
     vpn_type = data["vpn_type"]
+    country = data.get("country")  # может быть None
 
     plans = await get_durations_by_type_from_api(vpn_type)
     selected = next((p for p in plans if p["duration"] == duration), None)
@@ -113,6 +118,12 @@ async def show_confirmation(callback: CallbackQuery, state: FSMContext):
     text = (
         f"🛒 *Вы выбрали:*\n"
         f"Тип: `{vpn_type}`\n"
+    )
+
+    if country:
+        text += f"Страна: `{country}`\n"
+
+    text += (
         f"Срок: *{selected['duration_display']}*\n"
         f"Цена: *${price:.2f}*\n\n"
         f"✅ Нажмите *«Оплатить»*, чтобы оформить подписку."
@@ -132,6 +143,7 @@ async def show_confirmation(callback: CallbackQuery, state: FSMContext):
     )
     await state.set_state(BuyVPN.confirmation)
     await callback.answer()
+
 
 
 

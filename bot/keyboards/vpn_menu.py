@@ -79,12 +79,14 @@ get_target_vpn = InlineKeyboardMarkup(
 
 
 def get_country_kb() -> InlineKeyboardMarkup:
-    builder = InlineKeyboardBuilder()
-    for code, data in COUNTRY_VLESS.items():
-        builder.button(text=data["name"], callback_data=f"country:{code}")
-    builder.button(text="🔙 Назад", callback_data="start_from_button")
-    builder.adjust(2)
-    return builder.as_markup()
+    kb = InlineKeyboardBuilder()
+    types = await get_countries_from_api()
+
+    for code, display in types:
+        kb.button(text=display, callback_data=f"target_country:{code}")
+    kb.button(text="⬅️ Назад", callback_data="start_from_button")
+    kb.adjust(2)
+    return kb.as_markup()
 
 
 def get_confirmation_kb() -> InlineKeyboardMarkup:
