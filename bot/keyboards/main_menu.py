@@ -18,7 +18,6 @@ inline_main_menu = InlineKeyboardMarkup(
             InlineKeyboardButton(text="🆘 Помощь", url="https://t.me/Anonixvpnsupportbot")
         ],
         [
-            InlineKeyboardButton(text="📝 Отзывы", url="https://t.me/"),
             InlineKeyboardButton(text="ℹ️ О нас", callback_data="about_us"),
         ],
         [
