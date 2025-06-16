@@ -48,7 +48,7 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
     if vpn_type == "country":
         await callback.message.answer(
             text="Выберите страну для VPN:",
-            reply_markup=get_country_kb_func()
+            reply_markup= await get_country_kb_func()
         )
     else:
         plans = await get_durations_by_type_from_api(vpn_type)
