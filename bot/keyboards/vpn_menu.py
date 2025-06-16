@@ -1,7 +1,7 @@
 # keyboards/vpn_menu.py
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from bot.services.vless_countries import COUNTRY_VLESS
+from bot.services.buy_vpn import get_countries_from_api
 
 def get_vpn_type_kb(types: list[tuple[str, str]]) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
