@@ -14,7 +14,7 @@ async def get_vpn_types_from_api() -> list[tuple[str, str]]:
         return list(unique_types)
 
 
-async def get_durations_by_type_from_api(vpn_type: str) -> list[dict]:
+async def get_durations_by_type_from_api(vpn_type: str, country: str = None) -> list[dict]:
     async with httpx.AsyncClient() as client:
         response = await client.get(f"{API_URL}/plans/")
         response.raise_for_status()
@@ -29,7 +29,7 @@ async def get_durations_by_type_from_api(vpn_type: str) -> list[dict]:
                 "discount_price": float(p["discount_price"]) if p["discount_price"] else None,
             }
             for p in plans
-            if p['vpn_type'] == vpn_type
+            if p['vpn_type'] == vpn_type and (vpn_type != "country" or p.get("country") == country)
         ]
 
 
