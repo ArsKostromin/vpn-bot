@@ -47,17 +47,18 @@ async def buy_subscription_api(
 ) -> tuple[bool, str, str | None]:
     try:
         async with httpx.AsyncClient() as client:
+            # Получаем список тарифов
             response = await client.get(f"{API_URL}/plans/")
             response.raise_for_status()
             plans = response.json()
 
             logger.info("📦 Получены тарифы: %s", plans)
-            logger.info("🔍 Ищем vpn_type=%s, duration=%s, country=%s", vpn_type, duration, country)
+            logger.info("🔍 Ищем vpn_type=%s, duration=%s", vpn_type, duration)
 
+            # Фильтруем по типу и длительности (не по стране)
             matching = [
                 p for p in plans
                 if p['vpn_type'] == vpn_type and p['duration'] == duration
-                   and (vpn_type != "country" or p.get("country", "").lower() == (country or "").lower())
             ]
 
             if not matching:
@@ -67,15 +68,30 @@ async def buy_subscription_api(
             plan_id = matching[0]['id']
             logger.info("✅ Найден тариф id=%s", plan_id)
 
+            # Формируем тело запроса на покупку
+            payload = {
+                "plan_id": plan_id,
+                "telegram_id": telegram_id
+            }
+
+            # Если тип country — проверяем, передана ли страна
+            if vpn_type == "country":
+                if not country:
+                    logger.warning("🚫 Не указана страна для тарифа типа country")
+                    return False, "Вы не выбрали страну.", None
+                payload["country"] = country
+
+            # Отправляем запрос на покупку
             buy_resp = await client.post(
                 f"{API_URL}/buy/",
-                json={"plan_id": plan_id, "telegram_id": telegram_id}
+                json=payload
             )
 
             if buy_resp.status_code == 201:
                 data = buy_resp.json()
                 logger.info("🎉 Подписка оформлена: %s", data)
                 return True, data.get("message", "Подписка успешно оформлена."), data.get("vless")
+
             else:
                 try:
                     error_data = buy_resp.json()
