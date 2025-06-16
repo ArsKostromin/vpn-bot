@@ -78,7 +78,7 @@ get_target_vpn = InlineKeyboardMarkup(
 )
 
 
-def get_country_kb() -> InlineKeyboardMarkup:
+async def get_country_kb() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     types = await get_countries_from_api()
 
