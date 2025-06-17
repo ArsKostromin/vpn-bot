@@ -48,7 +48,7 @@ def get_insufficient_funds_kb() -> InlineKeyboardMarkup:
 get_instruktion_kb = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="Инструкция", url="http://159.198.77.222:8080/"),
+            InlineKeyboardButton(text="Инструкция", url="https://arskostromin.github.io/vpnguide/"),
         ],
         [
             InlineKeyboardButton(text="⬅️ Назад", callback_data="start_from_button"),
