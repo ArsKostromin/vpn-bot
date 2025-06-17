@@ -96,7 +96,7 @@ async def process_custom_amount_request(callback: CallbackQuery, state: FSMConte
 async def process_custom_amount_input(message: Message, state: FSMContext):
     try:
         amount = int(message.text)
-        if amount < 5:
+        if amount < 1:
             await message.answer("Минимальная сумма пополнения — 5 $. Попробуйте снова.")
             return
 
@@ -158,7 +158,7 @@ async def process_custom_amount_request_crypto(callback: CallbackQuery, state: F
 async def process_custom_crypto_amount_input(message: Message, state: FSMContext):
     try:
         amount = int(message.text)
-        if amount < 5:
+        if amount < 1:
             await message.answer("Минимальная сумма пополнения — 5 $. Попробуйте снова.")
             return
 
