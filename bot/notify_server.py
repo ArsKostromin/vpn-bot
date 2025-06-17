@@ -27,7 +27,7 @@ async def notify_handler(request):
         bot = request.app["bot"]
         await bot.send_message(tg_id, message)
 
-        logger.info(f"[NOTIFY] Отправлено сообщение пользователю {tg_id} на сумму {amount}₽")
+        logger.info(f"[NOTIFY] Отправлено сообщение пользователю {tg_id} на сумму {amount}$")
 
         return web.json_response({"status": "ok"})
 

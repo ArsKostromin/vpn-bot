@@ -60,7 +60,7 @@ get_instruktion_kb = InlineKeyboardMarkup(
 get_target_vpn = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="🌭 Для YouTube и соцсетей", callback_data="target:social"),
+            InlineKeyboardButton(text="Для YouTube и соцсетей", callback_data="target:social"),
         ],
         [
             InlineKeyboardButton(text="🏴‍☠️ Для торрентов", callback_data="target:torrent"),
