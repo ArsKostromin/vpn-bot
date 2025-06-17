@@ -97,7 +97,7 @@ async def process_custom_amount_input(message: Message, state: FSMContext):
     try:
         amount = int(message.text)
         if amount < 1:
-            await message.answer("Минимальная сумма пополнения — 5 $. Попробуйте снова.")
+            await message.answer("Минимальная сумма пополнения — 1 $. Попробуйте снова.")
             return
 
         payment_link = await create_payment_link(telegram_id=message.from_user.id, amount=amount)
@@ -159,7 +159,7 @@ async def process_custom_crypto_amount_input(message: Message, state: FSMContext
     try:
         amount = int(message.text)
         if amount < 1:
-            await message.answer("Минимальная сумма пополнения — 5 $. Попробуйте снова.")
+            await message.answer("Минимальная сумма пополнения — 1 $. Попробуйте снова.")
             return
 
         await message.answer(
