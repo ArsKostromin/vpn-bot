@@ -45,21 +45,22 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
     vpn_type = callback.data.split(":")[1]
     await state.update_data(vpn_type=vpn_type)
 
-    # Сопоставляем тип с нужным текстом
+    # Текст под тип
     type_to_text = {
         "country": "Выберите страну для вашего VPN ⬇️",
-        "torrents": "Для торрентов ⬇️",
+        "torrents": "Для загрузки файлов ⬇️",
         "socials": "Для соцсетей ⬇️",
         "secure": "Для двойного шифрования ⬇️",
         "serfing": "Для серфинга ⬇️"
     }
 
-    # Получаем текст из словаря
-    text = type_to_text.get(vpn_type.lower().replace("_vpn", ""), "Выберите тариф ⬇️")
+    # Ключ для словаря
+    type_key = vpn_type.lower().replace("_vpn", "")
+    top_text = type_to_text.get(type_key, "Выберите тариф ⬇️")
 
     if vpn_type == "country":
         await callback.message.answer(
-            text=text,
+            text=top_text,
             reply_markup=await get_country_kb_func()
         )
     else:
@@ -70,8 +71,18 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
             await callback.answer()
             return
 
+        # Сначала описание назначения
+        await callback.message.answer(text=top_text)
+
+        # Затем текст со списком тарифов
+        showcase_text = build_tariff_showcase(
+            title=callback.message.text or "Тарифы", plans=plans
+        )
+        await callback.message.answer(text=showcase_text, parse_mode="Markdown")
+
+        # Потом кнопки
         await callback.message.answer(
-            text=text,
+            text="Выберите длительность ⬇️",
             reply_markup=get_duration_kb([
                 (p["duration"], str(p["price"]), p["duration_display"], p["discount_percent"])
                 for p in plans
@@ -81,6 +92,7 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
         await state.set_state(BuyVPN.duration)
 
     await callback.answer()
+
 
 
 @router.callback_query(F.data.startswith("target_country"))
