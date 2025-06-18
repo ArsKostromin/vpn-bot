@@ -72,7 +72,7 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
             return
 
         # Сначала описание назначения
-        await callback.message.answer(text=top_text)
+        await callback.message.edit_text(text=top_text)
 
         # Затем текст со списком тарифов
         showcase_text = build_tariff_showcase(
