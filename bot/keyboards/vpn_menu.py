@@ -7,7 +7,7 @@ def get_vpn_type_kb(types: list[tuple[str, str]]) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     for value, display in types:
         kb.button(text=display, callback_data=f"vpn_type:{value}")
-    kb.button(text="⬅️ Назад", callback_data="start_from_button")
+    kb.button(text="⬅️ Назад", callback_data="buy_vpn")
     kb.adjust(2)
     return kb.as_markup()
 
@@ -30,7 +30,7 @@ def get_duration_kb(durations: list[tuple[str, str, str, int]]) -> InlineKeyboar
 
     builder.button(
         text="⬅️ Назад",
-        callback_data="start_from_button"
+        callback_data="buy_vpn"
     )
 
     builder.adjust(2)  # вот теперь можно
@@ -84,7 +84,7 @@ async def get_country_kb() -> InlineKeyboardMarkup:
 
     for code, display in types:
         kb.button(text=display, callback_data=f"target_country:{code}")
-    kb.button(text="⬅️ Назад", callback_data="start_from_button")
+    kb.button(text="⬅️ Назад", callback_data="buy_vpn")
     kb.adjust(2)
     return kb.as_markup()
 
