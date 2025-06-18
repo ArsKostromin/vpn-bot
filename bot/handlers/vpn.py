@@ -47,7 +47,7 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
 
     if vpn_type == "country":
         await callback.message.answer(
-            text="Выберите страну для VPN:",
+            text="Выберите страну для вашего VPN ⬇️",
             reply_markup= await get_country_kb_func()
         )
     else:
@@ -58,7 +58,19 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
             await callback.answer()
             return
 
-        text = build_tariff_showcase(title=callback.message.text or "Тарифы", plans=plans)
+        # Сопоставляем vpn_type с нужным текстом
+        type_to_text = {
+            "country": "Выберите страну для вашего VPN ⬇️",
+            "torrent": "Для торрентов ⬇️",
+            "social": "Для соцсетей ⬇️",
+            "double": "Для двойного шифрования ⬇️",
+            "surfing": "Для серфинга ⬇️"
+        }
+
+        # Подставляем нужный текст или используем fallback
+        title = type_to_text.get(vpn_type, callback.message.text or "Тарифы")
+
+        text = build_tariff_showcase(title=title, plans=plans)
 
         await callback.message.answer(
             text=text,
