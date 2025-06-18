@@ -67,11 +67,8 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
             "surfing": "Для серфинга ⬇️"
         }
 
-        # Подставляем нужный текст или используем fallback
-        title = type_to_text.get(vpn_type, callback.message.text or "Тарифы")
-
-        # text = build_tariff_showcase(title=title, plans=plans)
-        text = build_tariff_showcase(title=title, plans=plans)
+        # Получаем нужный текст
+        text = type_to_text.get(vpn_type, "Выберите тариф ⬇️")
 
         await callback.message.answer(
             text=text,
