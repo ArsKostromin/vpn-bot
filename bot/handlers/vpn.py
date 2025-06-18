@@ -45,10 +45,22 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
     vpn_type = callback.data.split(":")[1]
     await state.update_data(vpn_type=vpn_type)
 
+    # Сопоставляем тип с нужным текстом
+    type_to_text = {
+        "country": "Выберите страну для вашего VPN ⬇️",
+        "torrent": "Для торрентов ⬇️",
+        "social": "Для соцсетей ⬇️",
+        "double": "Для двойного шифрования ⬇️",
+        "surfing": "Для серфинга ⬇️"
+    }
+
+    # Получаем текст из словаря
+    text = type_to_text.get(vpn_type.lower().replace("_vpn", ""), "Выберите тариф ⬇️")
+
     if vpn_type == "country":
         await callback.message.answer(
-            text="Выберите страну для вашего VPN ⬇️",
-            reply_markup= await get_country_kb_func()
+            text=text,
+            reply_markup=await get_country_kb_func()
         )
     else:
         plans = await get_durations_by_type_from_api(vpn_type)
@@ -57,21 +69,6 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
             await callback.message.answer("❌ Нет доступных подписок.")
             await callback.answer()
             return
-
-        # Нормализуем vpn_type
-        normalized_vpn_type = vpn_type.lower().replace("_vpn", "")
-
-        # Сопоставляем vpn_type с нужным текстом
-        type_to_text = {
-            "country": "Выберите страну для вашего VPN ⬇️",
-            "torrent": "Для торрентов ⬇️",
-            "social": "Для соцсетей ⬇️",
-            "double": "Для двойного шифрования ⬇️",
-            "surfing": "Для серфинга ⬇️"
-        }
-
-        # Получаем нужный текст
-        text = type_to_text.get(normalized_vpn_type, "Выберите тариф ⬇️")
 
         await callback.message.answer(
             text=text,
