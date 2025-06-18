@@ -58,6 +58,9 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
             await callback.answer()
             return
 
+        # Нормализуем vpn_type
+        normalized_vpn_type = vpn_type.lower().replace("_vpn", "")
+
         # Сопоставляем vpn_type с нужным текстом
         type_to_text = {
             "country": "Выберите страну для вашего VPN ⬇️",
@@ -68,7 +71,7 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
         }
 
         # Получаем нужный текст
-        text = type_to_text.get(vpn_type, "Выберите тариф ⬇️")
+        text = type_to_text.get(normalized_vpn_type, "Выберите тариф ⬇️")
 
         await callback.message.answer(
             text=text,
