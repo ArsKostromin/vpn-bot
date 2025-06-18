@@ -54,7 +54,12 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
         "serfing": "Для серфинга ⬇️"
     }
 
-    # Ключ для словаря
+    # Удаляем старое сообщение, чтобы не было лишнего
+    try:
+        await callback.message.delete()
+    except:
+        pass  # если вдруг уже удалено или ошибка — пропускаем
+
     type_key = vpn_type.lower().replace("_vpn", "")
     top_text = type_to_text.get(type_key, "Выберите тариф ⬇️")
 
@@ -71,16 +76,15 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
             await callback.answer()
             return
 
-        # Сначала описание назначения
-        await callback.message.edit_text(text=top_text)
-
-        # Затем текст со списком тарифов
         showcase_text = build_tariff_showcase(
-            title=callback.message.text or "Тарифы", plans=plans
+            title=top_text, plans=plans
         )
-        await callback.message.answer(text=showcase_text, parse_mode="Markdown")
 
-        # Потом кнопки
+        await callback.message.answer(
+            text=showcase_text,
+            parse_mode="Markdown"
+        )
+
         await callback.message.answer(
             text="Выберите длительность ⬇️",
             reply_markup=get_duration_kb([
@@ -89,6 +93,7 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
             ]),
             parse_mode="Markdown"
         )
+
         await state.set_state(BuyVPN.duration)
 
     await callback.answer()
