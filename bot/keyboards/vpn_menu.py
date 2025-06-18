@@ -7,7 +7,7 @@ def get_vpn_type_kb(types: list[tuple[str, str]]) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     for value, display in types:
         kb.button(text=display, callback_data=f"vpn_type:{value}")
-    kb.button(text="⬅️ Назад", callback_data="buy_vpn")
+    kb.button(text="⬅️ Назад", callback_data="start_from_button")
     kb.adjust(2)
     return kb.as_markup()
 
