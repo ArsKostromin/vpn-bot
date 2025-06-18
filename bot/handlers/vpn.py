@@ -48,10 +48,10 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
     # Сопоставляем тип с нужным текстом
     type_to_text = {
         "country": "Выберите страну для вашего VPN ⬇️",
-        "torrent": "Для торрентов ⬇️",
-        "social": "Для соцсетей ⬇️",
-        "double": "Для двойного шифрования ⬇️",
-        "surfing": "Для серфинга ⬇️"
+        "torrents": "Для торрентов ⬇️",
+        "socials": "Для соцсетей ⬇️",
+        "secure": "Для двойного шифрования ⬇️",
+        "serfing": "Для серфинга ⬇️"
     }
 
     # Получаем текст из словаря
