@@ -71,7 +71,7 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
         title = type_to_text.get(vpn_type, callback.message.text or "Тарифы")
 
         # text = build_tariff_showcase(title=title, plans=plans)
-        text = type_to_text.get(vpn_type, callback.message.text or "Тарифы")
+        text = build_tariff_showcase(title=title, plans=plans)
 
         await callback.message.answer(
             text=text,
