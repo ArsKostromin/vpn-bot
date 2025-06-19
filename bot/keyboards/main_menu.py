@@ -7,7 +7,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 inline_main_menu = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="🛡 Купить VPN", callback_data="buy_vpn"),
+            InlineKeyboardButton(text="🛡 Начать пользоваться", callback_data="buy_vpn"),
         ],
         [
             InlineKeyboardButton(text="📦 Мои услуги", callback_data="my_services"),
@@ -21,7 +21,7 @@ inline_main_menu = InlineKeyboardMarkup(
             InlineKeyboardButton(text="ℹ️ О нас", callback_data="about_us"),
         ],
         [
-            InlineKeyboardButton(text="🎁 Ввести промокод", callback_data="coupon"),
+            InlineKeyboardButton(text="🎁 Промокоды", callback_data="coupon"),
             InlineKeyboardButton(text="🤝 Как подключить", url="https://arskostromin.github.io/vpnguide/index.html"),
         ],
         [
