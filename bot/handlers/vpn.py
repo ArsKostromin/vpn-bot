@@ -105,6 +105,10 @@ async def select_duration_by_country(callback: CallbackQuery, state: FSMContext)
     country_code = callback.data.split(":")[1]
     await state.update_data(country=country_code)
 
+    # Получаем отображаемое название страны
+    countries = await get_countries_from_api()
+    country_display = next((name for code, name in countries if code == country_code), country_code)
+
     plans = await get_durations_by_type_from_api("country")
 
     if not plans:
@@ -113,8 +117,8 @@ async def select_duration_by_country(callback: CallbackQuery, state: FSMContext)
         return
 
     await callback.message.answer(
-        text=f"Вы выбрали страну: {country_code}\nТеперь выберите длительность:",
-        reply_markup=get_duration_kb([  # стандартная клавиатура с планами
+        text=f"Вы выбрали страну: {country_display}\nТеперь выберите длительность:",
+        reply_markup=get_duration_kb([
             (p["duration"], str(p["price"]), p["duration_display"], p["discount_percent"])
             for p in plans
         ])
