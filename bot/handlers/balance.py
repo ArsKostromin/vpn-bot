@@ -46,7 +46,7 @@ async def balance_up_callback(call: CallbackQuery):
 @router.callback_query(F.data == "robokassa")
 async def balance_menu_callback(call: CallbackQuery):
     await call.message.answer(
-        "Выберите сумму пополнения:",
+        "💸 Выберите сумму пополнения:",
         reply_markup=get_balance_menu_roboc()
     )
     await call.answer()
