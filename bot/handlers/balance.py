@@ -4,6 +4,7 @@ from aiogram.types import (
     CallbackQuery,
     InlineKeyboardMarkup,
     InlineKeyboardButton,
+    FSInputFile,
 )
 from aiogram.fsm.context import FSMContext
 from bot.keyboards.balance_menu import (
@@ -36,7 +37,7 @@ router = Router()
 async def balance_up_callback(call: CallbackQuery):
     await call.bot.send_photo(
         chat_id=call.message.chat.id,
-        photo = InputFile("bot/media/anonix.jpg"),
+        photo = FSInputFile("bot/media/anonix.jpg"),
         caption="🔥 Выберите способ оплаты",
         reply_markup=start_balance,
     )
