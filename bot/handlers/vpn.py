@@ -45,7 +45,6 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
     vpn_type = callback.data.split(":")[1]
     await state.update_data(vpn_type=vpn_type)
 
-    # Текст под тип
     type_to_text = {
         "country": "Выберите страну для вашего VPN ⬇️",
         "torrents": "Для загрузки файлов ⬇️",
@@ -54,11 +53,10 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
         "serfing": "Для серфинга ⬇️"
     }
 
-    # Удаляем старое сообщение, чтобы не было лишнего
     try:
         await callback.message.delete()
     except:
-        pass  # если вдруг уже удалено или ошибка — пропускаем
+        pass
 
     type_key = vpn_type.lower().replace("_vpn", "")
     top_text = type_to_text.get(type_key, "Выберите тариф ⬇️")
@@ -76,15 +74,9 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
             await callback.answer()
             return
 
-        showcase_text = build_tariff_showcase(
-            title=top_text, plans=plans
-        )
+        showcase_text = build_tariff_showcase(title=top_text, plans=plans)
 
-        await callback.message.answer(
-            text=showcase_text,
-            parse_mode="Markdown"
-        )
-
+        await callback.message.answer(text=showcase_text, parse_mode="Markdown")
         await callback.message.answer(
             text="Выберите длительность ⬇️",
             reply_markup=get_duration_kb([
@@ -99,15 +91,14 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
     await callback.answer()
 
 
-
 @router.callback_query(F.data.startswith("target_country"))
 async def select_duration_by_country(callback: CallbackQuery, state: FSMContext):
     country_code = callback.data.split(":")[1]
-    await state.update_data(country=country_code)
 
-    # Получаем отображаемое название страны
     countries = await get_countries_from_api()
     country_display = next((name for code, name in countries if code == country_code), country_code)
+
+    await state.update_data(country=country_code, country_display=country_display)
 
     plans = await get_durations_by_type_from_api("country")
 
@@ -132,7 +123,8 @@ async def show_confirmation(callback: CallbackQuery, state: FSMContext):
     duration = callback.data.split(":")[1]
     data = await state.get_data()
     vpn_type = data["vpn_type"]
-    country_code = data.get("country")  # может быть None
+    country_code = data.get("country")
+    country_display = data.get("country_display")
 
     plans = await get_durations_by_type_from_api(vpn_type)
     selected = next((p for p in plans if p["duration"] == duration), None)
@@ -151,12 +143,7 @@ async def show_confirmation(callback: CallbackQuery, state: FSMContext):
         f"Тип: `{vpn_type}`\n"
     )
 
-    if country_code:
-        countries = await get_countries_from_api()
-        country_display = next(
-            (name for code, name in countries if code == country_code),
-            country_code  # fallback
-        )
+    if country_display:
         text += f"Страна: `{country_display}`\n"
 
     text += (
@@ -179,7 +166,6 @@ async def show_confirmation(callback: CallbackQuery, state: FSMContext):
     )
     await state.set_state(BuyVPN.confirmation)
     await callback.answer()
-
 
 
 @router.callback_query(F.data == "confirm_payment")
