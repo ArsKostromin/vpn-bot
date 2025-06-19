@@ -3,7 +3,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 def get_balance_menu_roboc():
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text=" 1 $", callback_data="topup_1"),
+            InlineKeyboardButton(text=" 7 $", callback_data="topup_7"),
             InlineKeyboardButton(text="15 $", callback_data="topup_15"),
             InlineKeyboardButton(text="27 $", callback_data="topup_27"),
             InlineKeyboardButton(text="48 $", callback_data="topup_48"),
@@ -39,12 +39,12 @@ start_balance = InlineKeyboardMarkup(
 def get_balance_menu():
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="2 $", callback_data="balance_amount_2"),
+            [InlineKeyboardButton(text="7 $", callback_data="balance_amount_7"),
             InlineKeyboardButton(text="15 $", callback_data="balance_amount_15"),
             InlineKeyboardButton(text="27 $", callback_data="balance_amount_27"),
             InlineKeyboardButton(text="48 $", callback_data="balance_amount_48")],
             
-            [InlineKeyboardButton(text="Ввести  сумму", callback_data="cryptotopup_custom")],
+            [InlineKeyboardButton(text="💰 Ввести  сумму", callback_data="cryptotopup_custom")],
             
             [InlineKeyboardButton(text="Назад", callback_data="balance_up")],
         ]
