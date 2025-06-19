@@ -11,6 +11,7 @@ from bot.keyboards.reply import main_menu_kb
 from bot.services.user_service import register_user_via_api
 from bot.services.telegram_service import is_user_subscribed
 from bot.services.promo_service import get_promo_code_from_api
+from aiogram.types import InputFile
 
 # Настройка логирования
 logger = logging.getLogger(__name__)
@@ -86,7 +87,7 @@ async def process_start(
     logger.info(f"User {user_id} already registered")
     await respond_to.bot.send_photo(
         chat_id=respond_to.chat.id,
-        photo="https://play-lh.googleusercontent.com/BFkf2bgtxsCvsTnR2yw8yuWD3mgpThoyiRoBhoazTqFFMNOmdxGAAqS7vMATyNwelQ",
+        photo = InputFile("bot/media/anonix.jpg"),
         caption = (
             "🔥 Наш VPN обеспечивает высокую скорость без ограничений — смотрите YouTube в высоком качестве без задержек!\n\n"
             "🛡 Двойное шифрование данных (Double VPN) — ваш трафик под надежным шифрованием.\n\n"
