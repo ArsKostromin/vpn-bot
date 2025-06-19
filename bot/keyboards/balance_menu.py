@@ -10,7 +10,7 @@ def get_balance_menu_roboc():
 
         ],
         [
-            InlineKeyboardButton(text="💰 Ввести свою сумму", callback_data="topup_custom")
+            InlineKeyboardButton(text="💰 Ввести сумму", callback_data="topup_custom")
         ],
         [
             InlineKeyboardButton(text="Назад", callback_data="balance_up")
@@ -44,7 +44,7 @@ def get_balance_menu():
             InlineKeyboardButton(text="27 $", callback_data="balance_amount_27"),
             InlineKeyboardButton(text="48 $", callback_data="balance_amount_48")],
             
-            [InlineKeyboardButton(text="💰 Ввести  сумму", callback_data="cryptotopup_custom")],
+            [InlineKeyboardButton(text="💰 Ввести сумму", callback_data="cryptotopup_custom")],
             
             [InlineKeyboardButton(text="Назад", callback_data="balance_up")],
         ]
