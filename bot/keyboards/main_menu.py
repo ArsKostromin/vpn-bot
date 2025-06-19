@@ -10,11 +10,11 @@ inline_main_menu = InlineKeyboardMarkup(
             InlineKeyboardButton(text="🛡 Начать пользоваться", callback_data="buy_vpn"),
         ],
         [
-            InlineKeyboardButton(text="📦 Мои услуги", callback_data="my_services"),
+            InlineKeyboardButton(text="💳 Пополнить", callback_data="balance_up"),
             InlineKeyboardButton(text="⚙️ Аккаунт", callback_data="account"),
         ],
         [
-            InlineKeyboardButton(text="💳 Пополнить", callback_data="balance_up"),
+            InlineKeyboardButton(text="📦 Мои услуги", callback_data="my_services"),
             InlineKeyboardButton(text="🎁 Промокоды", callback_data="coupon"),
             
         ],
