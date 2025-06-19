@@ -120,14 +120,14 @@ async def balance_up_start(call: CallbackQuery):
     logging.debug(f"callback_query: cryptobot | from_user={call.from_user.id}")
     try:
         await call.message.edit_text(
-            "💸 Выбери сумму пополнения:",
+            "💸 Выберите сумму пополнения:",
             reply_markup=get_balance_menu()
         )
     except TelegramBadRequest as e:
         logging.warning(f"TelegramBadRequest: {e}")
         if "there is no text in the message to edit" in str(e):
             await call.message.answer(
-                "💸 Выбери сумму пополнения:",
+                "💸 Выберите сумму пополнения:",
                 reply_markup=get_balance_menu()
             )
         else:
@@ -140,7 +140,7 @@ async def select_crypto_currency(call: CallbackQuery):
     logging.debug(f"callback_query: {call.data} | from_user={call.from_user.id}")
     amount = int(call.data.split("_")[-1])
     await call.message.edit_text(
-        f"Выбери криптовалюту для пополнения на {amount}$:",
+        f"Выберите криптовалюту для пополнения на {amount}$:",
         reply_markup=get_crypto_currency_keyboard(amount)
     )
 
