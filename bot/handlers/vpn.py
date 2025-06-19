@@ -132,7 +132,7 @@ async def show_confirmation(callback: CallbackQuery, state: FSMContext):
     duration = callback.data.split(":")[1]
     data = await state.get_data()
     vpn_type = data["vpn_type"]
-    country = data.get("country")  # может быть None
+    country_code = data.get("country")  # может быть None
 
     plans = await get_durations_by_type_from_api(vpn_type)
     selected = next((p for p in plans if p["duration"] == duration), None)
@@ -151,8 +151,13 @@ async def show_confirmation(callback: CallbackQuery, state: FSMContext):
         f"Тип: `{vpn_type}`\n"
     )
 
-    if country:
-        text += f"Страна: `{country}`\n"
+    if country_code:
+        countries = await get_countries_from_api()
+        country_display = next(
+            (name for code, name in countries if code == country_code),
+            country_code  # fallback
+        )
+        text += f"Страна: `{country_display}`\n"
 
     text += (
         f"Срок: *{selected['duration_display']}*\n"
@@ -174,6 +179,7 @@ async def show_confirmation(callback: CallbackQuery, state: FSMContext):
     )
     await state.set_state(BuyVPN.confirmation)
     await callback.answer()
+
 
 
 @router.callback_query(F.data == "confirm_payment")
