@@ -30,7 +30,7 @@ def get_duration_kb(durations: list[tuple[str, str, str, int]]) -> InlineKeyboar
 
     builder.button(
         text="⬅️ Назад",
-        callback_data="vpn_type:country"
+        callback_data="buy_vpn"
     )
 
     builder.adjust(2)  # вот теперь можно
