@@ -19,15 +19,29 @@ async def notify_handler(request):
     try:
         data = await request.json()
         tg_id = data["tg_id"]
-        amount = data["amount"]
-        payment_id = data.get("payment_id")
-
-        message = f"✅ Оплата на {amount}$ прошла успешно!\nID платежа: {payment_id}"
+        
+        # Определяем тип уведомления
+        notification_type = data.get("type", "payment")
+        
+        if notification_type == "payment":
+            # Старое уведомление о платеже
+            amount = data["amount"]
+            payment_id = data.get("payment_id")
+            message = f"✅ Оплата на {amount}$ прошла успешно!\nID платежа: {payment_id}"
+        elif notification_type == "ban_notification":
+            # Уведомление о бане
+            message = data["message"]
+        elif notification_type == "unban_notification":
+            # Уведомление о разбане
+            message = data["message"]
+        else:
+            # По умолчанию используем message из данных
+            message = data.get("message", "Уведомление")
 
         bot = request.app["bot"]
         await bot.send_message(tg_id, message)
 
-        logger.info(f"[NOTIFY] Отправлено сообщение пользователю {tg_id} на сумму {amount}$")
+        logger.info(f"[NOTIFY] Отправлено сообщение пользователю {tg_id} типа {notification_type}")
 
         return web.json_response({"status": "ok"})
 
