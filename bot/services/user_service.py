@@ -42,9 +42,10 @@ async def register_user_via_api(
                     }
             else:
                 logger.error(f"Ошибка регистрации пользователя {telegram_id}: {e.response.status_code} — {e.response.text}")
+                return None
         except Exception as e:
             logger.error(f"Неизвестная ошибка при регистрации пользователя {telegram_id}: {e}")
-    return None
+            return None
 
 async def get_user_subscriptions(telegram_id: int) -> list[dict]:
     url = f"{API_URL}/user/user-subscriptions/{telegram_id}/"
