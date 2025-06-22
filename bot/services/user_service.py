@@ -33,12 +33,12 @@ async def register_user_via_api(
                     error_data = e.response.json()
                     return {
                         "error": "banned",
-                        "ban_reason": error_data.get("ban_reason", "Причина не указана")
+                        "ban_reason": error_data.get("error", "Пользователь заблокирован")
                     }
                 except:
                     return {
                         "error": "banned",
-                        "ban_reason": "Причина не указана"
+                        "ban_reason": "Пользователь заблокирован"
                     }
             else:
                 logger.error(f"Ошибка регистрации пользователя {telegram_id}: {e.response.status_code} — {e.response.text}")
