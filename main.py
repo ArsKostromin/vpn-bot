@@ -8,7 +8,6 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from bot.handlers import start, vpn, my_services, balance, coupon, menu_callbacks
 from bot.handlers.commands_menu import set_main_menu
 from bot.config import load_config
-from bot.db import init_db
 from bot.notify_server import run_aiohttp_server  # 👈 импорт aiohttp-сервера
 
 # Настройка логгера
@@ -33,7 +32,6 @@ dp.include_router(menu_callbacks.router)
 dp.include_router(coupon.router)
 
 async def main():
-    await init_db(config.db.url)
     await set_main_menu(bot)
 
     # Запуск aiohttp и polling одновременно
