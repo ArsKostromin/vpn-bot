@@ -14,7 +14,7 @@ API_URL = "https://server2.anonixvpn.space"
 async def register_user_via_api(
     telegram_id: int,
     referral_code: str | None = None
-) -> Optional[Tuple[str, bool]]:
+) -> Optional[Tuple[str, bool]] | dict:
     url = f"{API_URL}/user/api/register/"
     payload = {"telegram_id": telegram_id}
     if referral_code:
@@ -27,7 +27,21 @@ async def register_user_via_api(
             data = response.json()
             return data.get("link_code"), data.get("created")
         except httpx.HTTPStatusError as e:
-            logger.error(f"Ошибка регистрации пользователя {telegram_id}: {e.response.status_code} — {e.response.text}")
+            if e.response.status_code == 403:
+                # Пользователь забанен
+                try:
+                    error_data = e.response.json()
+                    return {
+                        "error": "banned",
+                        "ban_reason": error_data.get("ban_reason", "Причина не указана")
+                    }
+                except:
+                    return {
+                        "error": "banned",
+                        "ban_reason": "Причина не указана"
+                    }
+            else:
+                logger.error(f"Ошибка регистрации пользователя {telegram_id}: {e.response.status_code} — {e.response.text}")
         except Exception as e:
             logger.error(f"Неизвестная ошибка при регистрации пользователя {telegram_id}: {e}")
     return None

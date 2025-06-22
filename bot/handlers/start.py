@@ -7,6 +7,7 @@ from aiogram.enums import ParseMode
 from bot.keyboards.main_menu import inline_main_menu
 from bot.keyboards.start_menu import inline_instruction_buttons
 from bot.keyboards.reply import main_menu_kb
+from bot.keyboards.notify_meny import get_support_kb
 
 from bot.services.user_service import register_user_via_api
 from bot.services.telegram_service import is_user_subscribed
@@ -49,6 +50,15 @@ async def process_start(
     
     result = await register_user_via_api(user_id, referral_code)
     logger.info(f"User registration result: {result}")
+
+    # Проверяем, забанен ли пользователь
+    if isinstance(result, dict) and result.get("error") == "banned":
+        ban_reason = result.get("ban_reason", "Причина не указана")
+        await respond_to.answer(
+            text=f"🚫 Ваш аккаунт заблокирован\n\nПричина: {ban_reason}\n\nДля разблокировки обратитесь в поддержку.",
+            reply_markup=get_support_kb
+        )
+        return
 
     # Показать клавиатуру
     await respond_to.answer(
