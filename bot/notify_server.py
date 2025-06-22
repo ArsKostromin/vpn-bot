@@ -1,5 +1,6 @@
 import logging
 from aiohttp import web
+from bot.keyboards.notify_meny import get_support_kb, get_main_menu_kb
 
 # 🔧 Настрой логгер
 logger = logging.getLogger("aiohttp_notify")
@@ -28,18 +29,22 @@ async def notify_handler(request):
             amount = data["amount"]
             payment_id = data.get("payment_id")
             message = f"✅ Оплата на {amount}$ прошла успешно!\nID платежа: {payment_id}"
+            reply_markup = None
         elif notification_type == "ban_notification":
             # Уведомление о бане
             message = data["message"]
+            reply_markup = get_support_kb
         elif notification_type == "unban_notification":
             # Уведомление о разбане
             message = data["message"]
+            reply_markup = get_main_menu_kb
         else:
             # По умолчанию используем message из данных
             message = data.get("message", "Уведомление")
+            reply_markup = None
 
         bot = request.app["bot"]
-        await bot.send_message(tg_id, message)
+        await bot.send_message(tg_id, message, reply_markup=reply_markup)
 
         logger.info(f"[NOTIFY] Отправлено сообщение пользователю {tg_id} типа {notification_type}")
 
