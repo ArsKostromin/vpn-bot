@@ -190,7 +190,7 @@ async def start_crypto_payment(call: CallbackQuery):
         "to_currency": currency.upper(),          # А платёж произойдёт, например, в BTC
         "order_id": order_id,
         "url_callback": "https://server2.anonixvpn.space/payments/api/crypto/webhook/",
-        "url_return": "https://t.me/fastvpnVPNs_bot",
+        "url_return": "https://t.me/Anonixvpn_vpnBot",
         "is_payment_multiple": False,
         "lifetime": 900,
         "is_test": True,

@@ -87,7 +87,7 @@ async def process_start(
                     "🖥️ Windows: <a href='https://apps.microsoft.com/detail/9pdfnl3qv2s5?hl=ru-RU&gl=RU'>Anonix</a>\n"
                     "🍏 MacOS: <a href='https://apps.apple.com/ru/app/v2box-v2ray-client/id6446814690'>Anonix</a>\n\n"
                     "🔗 Наш канал:\n\n"
-                    "https://t.me/anonix_vpn\\n\\n"
+                    "https://t.me/anonix_vpn/"
                 ),
                 parse_mode=ParseMode.HTML,
                 reply_markup=inline_instruction_buttons,
@@ -129,6 +129,7 @@ async def check_subscription_handler(callback: CallbackQuery):
                 "🎉 Спасибо за подписку на канал!\n\n"
                 f"🎁 Вот ваш промокод на +5 дней: `{promo_code}`\n\n"
                 "🚀 Теперь вы можете пользоваться VPN целых 5 дней бесплатно!"
+                "🎯 Чтобы использовать промокод, вам нужно перейти в главное меню, нажать кнопку 'Промокоды' и ввести выданный промокод"
             ),
             parse_mode=ParseMode.MARKDOWN,
             reply_markup=main_menu_kb
