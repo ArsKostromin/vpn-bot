@@ -65,5 +65,5 @@ async def profile_handler(callback: CallbackQuery):
 
     reply_markup = back_to_main_menu
 
-    await callback.message.answer(text, reply_markup=reply_markup)
+    await callback.message.answer(text, reply_markup=reply_markup, disable_web_page_preview=True)
     await callback.answer()
