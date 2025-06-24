@@ -54,7 +54,7 @@ def get_balance_menu():
 end_upbalance = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="посмотреть баланс", callback_data="account"),
+            InlineKeyboardButton(text="Посмотреть баланс", callback_data="account"),
         ],
         [
             InlineKeyboardButton(text="Назад", callback_data="start_from_button")
