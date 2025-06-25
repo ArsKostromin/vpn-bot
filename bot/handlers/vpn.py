@@ -24,7 +24,7 @@ router = Router()
 
 @router.callback_query(F.data == "buy_vpn")
 async def select_target(callback: CallbackQuery, state: FSMContext):
-    vpn_types = await get_vpn_types_from_api()
+    vpn_types = await get_vpn_types_from_api(telegram_id=callback.from_user.id)
     await callback.message.answer(
         text=(
             "Выберите VPN по цели использования или стране ⬇️\n\n"
@@ -67,7 +67,7 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
             reply_markup=await get_country_kb_func()
         )
     else:
-        plans = await get_durations_by_type_from_api(vpn_type)
+        plans = await get_durations_by_type_from_api(vpn_type, telegram_id=callback.from_user.id)
 
         if not plans:
             await callback.message.answer("❌ Нет доступных подписок.")
@@ -80,7 +80,7 @@ async def select_country_or_duration(callback: CallbackQuery, state: FSMContext)
         await callback.message.answer(
             text="Выберите длительность ⬇️",
             reply_markup=get_duration_kb([
-                (p["duration"], str(p["price"]), p["duration_display"], p["discount_percent"])
+                (p["duration"], str(p["current_price"]), p["duration_display"], p["discount_percent"])
                 for p in plans
             ]),
             parse_mode="Markdown"
@@ -100,7 +100,7 @@ async def select_duration_by_country(callback: CallbackQuery, state: FSMContext)
 
     await state.update_data(country=country_code, country_display=country_display)
 
-    plans = await get_durations_by_type_from_api("country")
+    plans = await get_durations_by_type_from_api("country", telegram_id=callback.from_user.id)
 
     if not plans:
         await callback.message.answer("❌ Нет доступных подписок.")
@@ -110,7 +110,7 @@ async def select_duration_by_country(callback: CallbackQuery, state: FSMContext)
     await callback.message.answer(
         text=f"Вы выбрали страну: {country_display}\nТеперь выберите длительность:",
         reply_markup=get_duration_kb([
-            (p["duration"], str(p["price"]), p["duration_display"], p["discount_percent"])
+            (p["duration"], str(p["current_price"]), p["duration_display"], p["discount_percent"])
             for p in plans
         ])
     )
@@ -126,7 +126,7 @@ async def show_confirmation(callback: CallbackQuery, state: FSMContext):
     country_code = data.get("country")
     country_display = data.get("country_display")
 
-    plans = await get_durations_by_type_from_api(vpn_type)
+    plans = await get_durations_by_type_from_api(vpn_type, telegram_id=callback.from_user.id)
     selected = next((p for p in plans if p["duration"] == duration), None)
 
     if not selected:
@@ -136,7 +136,7 @@ async def show_confirmation(callback: CallbackQuery, state: FSMContext):
 
     await state.update_data(duration=duration)
 
-    price = selected["discount_price"] if selected["discount_price"] else selected["price"]
+    price = selected["current_price"]
 
     text = (
         f"🛒 *Вы выбрали:*\n"

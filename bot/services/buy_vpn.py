@@ -5,18 +5,24 @@ API_URL = "https://server2.anonixvpn.space/vpn"
 # API_URL = "http://backend:8000/vpn"
 
 
-async def get_vpn_types_from_api() -> list[tuple[str, str]]:
+async def get_vpn_types_from_api(telegram_id: int = None) -> list[tuple[str, str]]:
     async with httpx.AsyncClient() as client:
-        response = await client.get(f"{API_URL}/plans/")
+        url = f"{API_URL}/plans/"
+        if telegram_id:
+            url += f"?telegram_id={telegram_id}"
+        response = await client.get(url)
         response.raise_for_status()
         plans = response.json()
         unique_types = {(plan['vpn_type'], plan['vpn_type_display']) for plan in plans}
         return list(unique_types)
 
 
-async def get_durations_by_type_from_api(vpn_type: str) -> list[dict]:
+async def get_durations_by_type_from_api(vpn_type: str, telegram_id: int = None) -> list[dict]:
     async with httpx.AsyncClient() as client:
-        response = await client.get(f"{API_URL}/plans/")
+        url = f"{API_URL}/plans/"
+        if telegram_id:
+            url += f"?telegram_id={telegram_id}"
+        response = await client.get(url)
         response.raise_for_status()
         plans = response.json()
         return [
@@ -24,6 +30,9 @@ async def get_durations_by_type_from_api(vpn_type: str) -> list[dict]:
                 "duration": p["duration"],
                 "duration_display": p["duration_display"],
                 "price": float(p["price"]),
+                "current_price": float(p["current_price"]),
+                "display_price": p["display_price"],
+                "has_referral_discount": p.get("has_referral_discount", False),
                 "discount_active": p["discount_active"],
                 "discount_percent": p.get("discount_percent", 0),
                 "discount_price": float(p["discount_price"]) if p["discount_price"] else None,
@@ -113,14 +122,22 @@ def build_tariff_showcase(title: str, plans: list[dict]) -> str:
 
     for plan in plans:
         base_price = plan["price"]
-        discount_price = plan.get("discount_price")
-        percent = plan.get("discount_percent", 0)
+        current_price = plan.get("current_price", base_price)
+        display_price = plan.get("display_price", f"${current_price:.2f}")
+        has_referral_discount = plan.get("has_referral_discount", False)
         label = plan["duration_display"]
 
-        if discount_price and percent > 0:
-            lines.append(f"├ {label}: ${discount_price:.2f} (-{percent}%)")
+        if has_referral_discount:
+            # Если есть скидка реферала, используем display_price
+            lines.append(f"├ {label}: {display_price}")
         else:
-            lines.append(f"├ {label}: ${base_price:.2f}")
+            # Обычное отображение
+            discount_price = plan.get("discount_price")
+            percent = plan.get("discount_percent", 0)
+            if discount_price and percent > 0:
+                lines.append(f"├ {label}: ${discount_price:.2f} (-{percent}%)")
+            else:
+                lines.append(f"├ {label}: ${base_price:.2f}")
 
     return "\n".join(lines)
 
