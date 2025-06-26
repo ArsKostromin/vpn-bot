@@ -23,6 +23,9 @@ async def create_payment_link(telegram_id: int, amount: int) -> str:
 
 #крипта
 async def create_crypto_payment(telegram_id: int, amount: int, asset: str = "TON"):
+    """
+    Создание криптоплатежа с возвратом информации о кошельке и QR-коде
+    """
     async with aiohttp.ClientSession() as session:
         async with session.post(
             url=f"{API_URL}/payments/api/crypto/create/",
@@ -31,8 +34,16 @@ async def create_crypto_payment(telegram_id: int, amount: int, asset: str = "TON
         ) as response:
             data = await response.json()
             if response.status == 200:
-                return data.get("payment_url")
-            raise Exception(data.get("error", "Не удалось создать платёж"))
+                # Возвращаем полную информацию о платеже
+                return {
+                    "payment_url": data.get("payment_url"),
+                    "wallet_info": data.get("wallet_info", {}),
+                    "success": True
+                }
+            return {
+                "error": data.get("error", "Не удалось создать платёж"),
+                "success": False
+            }
 
 
 #telegram stars

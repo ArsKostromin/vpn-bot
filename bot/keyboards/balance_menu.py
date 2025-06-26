@@ -79,3 +79,28 @@ def get_crypto_currency_keyboard(amount: int) -> InlineKeyboardMarkup:
         keyboard.append(row)
 
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
+
+def get_qr_code_keyboard(address: str, qr_code: str, amount: str, currency: str) -> InlineKeyboardMarkup:
+    """
+    Клавиатура для отображения QR-кода с кнопками копирования
+    """
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="📋 Скопировать адрес", 
+                    callback_data="copy_address"
+                ),
+                InlineKeyboardButton(
+                    text="📱 Скопировать QR", 
+                    callback_data="copy_qr"
+                )
+            ],
+            [
+                InlineKeyboardButton(text="🔄 Проверить оплату", callback_data="check_payment"),
+            ],
+            [
+                InlineKeyboardButton(text="Назад", callback_data="balance_up")
+            ],
+        ]
+    )

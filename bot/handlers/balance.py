@@ -13,6 +13,7 @@ from bot.keyboards.balance_menu import (
     start_balance,
     get_balance_menu_roboc,
     end_upbalance,
+    get_qr_code_keyboard,
 )
 from bot.services.upbalance import (
     create_payment_link,
@@ -25,7 +26,7 @@ import traceback
 from bot.states.upbalance import TopUpStates, CryptoTopUpStates
 from aiogram.exceptions import TelegramBadRequest
 import asyncio
-from bot.services.cryptomus import make_request, check_invoice_paid
+from bot.services.cryptomus import make_request, check_invoice_paid, extract_wallet_info
 import uuid
 
 
@@ -178,7 +179,7 @@ async def process_custom_crypto_amount_input(message: Message, state: FSMContext
 
 # запуск криптоплатежа
 @router.callback_query(F.data.startswith("crypto_"))
-async def start_crypto_payment(call: CallbackQuery):
+async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
     logging.debug(f"callback_query: {call.data} | from_user={call.from_user.id}")
     _, currency, amount = call.data.split("_")
     amount = int(amount)
@@ -217,15 +218,195 @@ async def start_crypto_payment(call: CallbackQuery):
             invoice_data=invoice_data
         )
         logging.info(f"Cryptomus response: {response}")
-        invoice_url = response["result"]["url"]
-        invoice_uuid = response["result"]["uuid"]
+        
+        # Извлекаем информацию о кошельке
+        wallet_info = extract_wallet_info(response)
+        
+        if wallet_info.get("address") and wallet_info.get("qr_code"):
+            # Сохраняем информацию о кошельке в состоянии
+            await state.update_data(
+                wallet_address=wallet_info['address'],
+                wallet_qr_code=wallet_info['qr_code'],
+                payment_amount=wallet_info['amount'],
+                payment_currency=wallet_info['currency'],
+                payment_uuid=wallet_info.get('uuid'),
+                original_amount=amount,
+                original_currency=currency
+            )
+            await state.set_state(CryptoTopUpStates.waiting_for_payment)
+            
+            # Проверяем, является ли QR-код URL-ом
+            qr_code = wallet_info['qr_code']
+            is_qr_url = qr_code.startswith('http')
+            
+            if is_qr_url:
+                # Отправляем QR-код как изображение
+                try:
+                    await call.message.answer_photo(
+                        photo=qr_code,
+                        caption=(
+                            f"💳 Оплата {amount}$ в {currency.upper()}\n\n"
+                            f"🏦 Адрес кошелька:\n"
+                            f"`{wallet_info['address']}`\n\n"
+                            f"💰 Сумма к оплате: {wallet_info['amount']} {wallet_info['currency']}\n\n"
+                            f"⏰ Время на оплату: 15 минут\n"
+                            f"✅ После оплаты баланс пополнится автоматически"
+                        ),
+                        parse_mode="Markdown"
+                    )
+                    
+                    # Создаем специальную клавиатуру для QR-кода
+                    qr_keyboard = get_qr_code_keyboard(
+                        address=wallet_info['address'],
+                        qr_code=wallet_info['qr_code'],
+                        amount=wallet_info['amount'],
+                        currency=wallet_info['currency']
+                    )
+                    
+                    await call.message.answer(
+                        "📱 Используйте кнопки ниже для копирования:",
+                        reply_markup=qr_keyboard
+                    )
+                except Exception as e:
+                    logging.error(f"Ошибка при отправке QR-кода как изображения: {e}")
+                    # Fallback на текстовый формат
+                    qr_message = (
+                        f"💳 Оплата {amount}$ в {currency.upper()}\n\n"
+                        f"📱 QR-код для оплаты:\n"
+                        f"`{qr_code}`\n\n"
+                        f"🏦 Адрес кошелька:\n"
+                        f"`{wallet_info['address']}`\n\n"
+                        f"💰 Сумма к оплате: {wallet_info['amount']} {wallet_info['currency']}\n\n"
+                        f"⏰ Время на оплату: 15 минут\n"
+                        f"✅ После оплаты баланс пополнится автоматически"
+                    )
+                    
+                    # Создаем специальную клавиатуру для QR-кода
+                    qr_keyboard = get_qr_code_keyboard(
+                        address=wallet_info['address'],
+                        qr_code=wallet_info['qr_code'],
+                        amount=wallet_info['amount'],
+                        currency=wallet_info['currency']
+                    )
+                    
+                    await call.message.edit_text(
+                        qr_message,
+                        reply_markup=qr_keyboard,
+                        parse_mode="Markdown"
+                    )
+            else:
+                # Отправляем QR-код как текст
+                qr_message = (
+                    f"💳 Оплата {amount}$ в {currency.upper()}\n\n"
+                    f"📱 QR-код для оплаты:\n"
+                    f"`{qr_code}`\n\n"
+                    f"🏦 Адрес кошелька:\n"
+                    f"`{wallet_info['address']}`\n\n"
+                    f"💰 Сумма к оплате: {wallet_info['amount']} {wallet_info['currency']}\n\n"
+                    f"⏰ Время на оплату: 15 минут\n"
+                    f"✅ После оплаты баланс пополнится автоматически"
+                )
+                
+                # Создаем специальную клавиатуру для QR-кода
+                qr_keyboard = get_qr_code_keyboard(
+                    address=wallet_info['address'],
+                    qr_code=wallet_info['qr_code'],
+                    amount=wallet_info['amount'],
+                    currency=wallet_info['currency']
+                )
+                
+                await call.message.edit_text(
+                    qr_message,
+                    reply_markup=qr_keyboard,
+                    parse_mode="Markdown"
+                )
+            
+            # Запускаем проверку оплаты
+            if wallet_info.get("uuid"):
+                asyncio.create_task(check_invoice_paid(wallet_info["uuid"], call.message, state))
+        else:
+            # Fallback на старый способ с ссылкой
+            invoice_url = response["result"]["url"]
+            invoice_uuid = response["result"]["uuid"]
 
-        asyncio.create_task(check_invoice_paid(invoice_uuid, call.message))
+            asyncio.create_task(check_invoice_paid(invoice_uuid, call.message, state))
 
-        await call.message.edit_text(
-            f"🔗 Вот твоя ссылка для оплаты:\n\n{invoice_url}",
-            reply_markup=end_upbalance
-        )
+            await call.message.edit_text(
+                f"🔗 Вот твоя ссылка для оплаты:\n\n{invoice_url}",
+                reply_markup=end_upbalance
+            )
     except Exception as e:
         logging.error(f"❌ Ошибка при создании платежа: {e}", exc_info=True)
         await call.message.answer(f"❌ Ошибка при создании платежа: {e}")
+
+
+# Обработчик копирования адреса кошелька
+@router.callback_query(F.data == "copy_address")
+async def copy_wallet_address(call: CallbackQuery, state: FSMContext):
+    try:
+        # Получаем данные из состояния
+        data = await state.get_data()
+        wallet_address = data.get('wallet_address')
+        
+        if wallet_address:
+            # В реальном приложении здесь можно использовать clipboard API
+            # Пока просто показываем адрес в уведомлении
+            await call.answer(f"Адрес: {wallet_address}", show_alert=True)
+        else:
+            await call.answer("Адрес не найден", show_alert=True)
+    except Exception as e:
+        await call.answer("Ошибка при копировании", show_alert=True)
+
+
+# Обработчик копирования QR-кода
+@router.callback_query(F.data == "copy_qr")
+async def copy_qr_code(call: CallbackQuery, state: FSMContext):
+    try:
+        # Получаем данные из состояния
+        data = await state.get_data()
+        wallet_qr_code = data.get('wallet_qr_code')
+        
+        if wallet_qr_code:
+            # В реальном приложении здесь можно использовать clipboard API
+            # Пока просто показываем QR-код в уведомлении
+            await call.answer(f"QR-код: {wallet_qr_code}", show_alert=True)
+        else:
+            await call.answer("QR-код не найден", show_alert=True)
+    except Exception as e:
+        await call.answer("Ошибка при копировании", show_alert=True)
+
+
+# Обработчик проверки оплаты
+@router.callback_query(F.data == "check_payment")
+async def check_payment_status(call: CallbackQuery, state: FSMContext):
+    try:
+        data = await state.get_data()
+        payment_uuid = data.get('payment_uuid')
+        
+        if payment_uuid:
+            await call.answer("Проверяем статус оплаты...", show_alert=True)
+            
+            # Проверяем статус через API
+            try:
+                invoice_data = await make_request(
+                    url="https://api.cryptomus.com/v1/payment/info",
+                    invoice_data={"uuid": payment_uuid},
+                )
+                
+                status = invoice_data["result"].get("payment_status")
+                
+                if status in ("paid", "paid_over"):
+                    await call.message.answer("✅ Оплата прошла успешно! Баланс пополнен.")
+                    await state.clear()
+                elif status == "pending":
+                    await call.message.answer("⏳ Платёж в обработке. Попробуйте проверить позже.")
+                else:
+                    await call.message.answer(f"❌ Статус платежа: {status}\nПлатёж ещё не поступил.")
+                    
+            except Exception as e:
+                logging.error(f"Ошибка при проверке статуса: {e}")
+                await call.message.answer("❌ Ошибка при проверке статуса. Попробуйте позже.")
+        else:
+            await call.answer("Информация о платеже не найдена", show_alert=True)
+    except Exception as e:
+        await call.answer("Ошибка при проверке", show_alert=True)
