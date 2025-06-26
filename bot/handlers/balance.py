@@ -263,15 +263,7 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
                     image_data = base64.b64decode(base64_data)
                     logging.info(f"Размер изображения: {len(image_data)} байт")
                     
-                    # Создаем специальную клавиатуру для QR-кода
-                    qr_keyboard = get_qr_code_keyboard(
-                        address=wallet_info['address'],
-                        qr_code=wallet_info['qr_code'],
-                        amount=wallet_info['amount'],
-                        currency=wallet_info['currency']
-                    )
-                    
-                    # Отправляем изображение из памяти с клавиатурой
+                    # Отправляем изображение из памяти с клавиатурой end_upbalance
                     logging.info("Отправляем фото...")
                     await call.message.answer_photo(
                         photo=BufferedInputFile(image_data, filename="qr_code.png"),
@@ -284,7 +276,7 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
                             f"✅ После оплаты баланс пополнится автоматически"
                         ),
                         parse_mode="Markdown",
-                        reply_markup=qr_keyboard
+                        reply_markup=end_upbalance
                     )
                     logging.info("Фото отправлено успешно")
                 except Exception as e:
@@ -303,28 +295,15 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
                         f"✅ После оплаты баланс пополнится автоматически"
                     )
                     
-                    qr_keyboard = get_qr_code_keyboard(
-                        address=wallet_info['address'],
-                        qr_code=wallet_info['qr_code'],
-                        amount=wallet_info['amount'],
-                        currency=wallet_info['currency']
-                    )
-                    
                     await call.message.edit_text(
                         qr_message,
-                        reply_markup=qr_keyboard,
+                        reply_markup=end_upbalance,
                         parse_mode="Markdown"
                     )
             elif is_http_url:
                 # Обычный URL
                 logging.info("Обрабатываем HTTP URL")
                 try:
-                    qr_keyboard = get_qr_code_keyboard(
-                        address=wallet_info['address'],
-                        qr_code=wallet_info['qr_code'],
-                        amount=wallet_info['amount'],
-                        currency=wallet_info['currency']
-                    )
                     await call.message.answer_photo(
                         photo=qr_code,
                         caption=(
@@ -336,7 +315,7 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
                             f"✅ После оплаты баланс пополнится автоматически"
                         ),
                         parse_mode="Markdown",
-                        reply_markup=qr_keyboard
+                        reply_markup=end_upbalance
                     )
                 except Exception as e:
                     logging.error(f"Ошибка при отправке QR-кода как изображения: {e}")
@@ -352,16 +331,9 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
                         f"✅ После оплаты баланс пополнится автоматически"
                     )
                     
-                    qr_keyboard = get_qr_code_keyboard(
-                        address=wallet_info['address'],
-                        qr_code=wallet_info['qr_code'],
-                        amount=wallet_info['amount'],
-                        currency=wallet_info['currency']
-                    )
-                    
                     await call.message.edit_text(
                         qr_message,
-                        reply_markup=qr_keyboard,
+                        reply_markup=end_upbalance,
                         parse_mode="Markdown"
                     )
             else:
@@ -378,17 +350,9 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
                     f"✅ После оплаты баланс пополнится автоматически"
                 )
                 
-                # Создаем специальную клавиатуру для QR-кода
-                qr_keyboard = get_qr_code_keyboard(
-                    address=wallet_info['address'],
-                    qr_code=wallet_info['qr_code'],
-                    amount=wallet_info['amount'],
-                    currency=wallet_info['currency']
-                )
-                
                 await call.message.edit_text(
                     qr_message,
-                    reply_markup=qr_keyboard,
+                    reply_markup=end_upbalance,
                     parse_mode="Markdown"
                 )
             
