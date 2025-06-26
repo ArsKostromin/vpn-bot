@@ -235,9 +235,9 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
             )
             await state.set_state(CryptoTopUpStates.waiting_for_payment)
             
-            # Проверяем, является ли QR-код URL-ом
+            # Проверяем, является ли QR-код URL-ом или data URL
             qr_code = wallet_info['qr_code']
-            is_qr_url = qr_code.startswith('http')
+            is_qr_url = qr_code.startswith('http') or qr_code.startswith('data:image')
             
             if is_qr_url:
                 # Отправляем QR-код как изображение
@@ -281,7 +281,6 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
                         f"✅ После оплаты баланс пополнится автоматически"
                     )
                     
-                    # Создаем специальную клавиатуру для QR-кода
                     qr_keyboard = get_qr_code_keyboard(
                         address=wallet_info['address'],
                         qr_code=wallet_info['qr_code'],
