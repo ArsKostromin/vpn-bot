@@ -5,6 +5,7 @@ from aiogram.types import (
     InlineKeyboardMarkup,
     InlineKeyboardButton,
     FSInputFile,
+    BufferedInputFile,
 )
 from aiogram.fsm.context import FSMContext
 from bot.keyboards.balance_menu import (
@@ -262,33 +263,21 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
                     image_data = base64.b64decode(base64_data)
                     logging.info(f"Размер изображения: {len(image_data)} байт")
                     
-                    # Создаем временный файл
-                    with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as temp_file:
-                        temp_file.write(image_data)
-                        temp_file_path = temp_file.name
-                        logging.info(f"Создан временный файл: {temp_file_path}")
-                    
-                    try:
-                        # Отправляем файл как фото
-                        logging.info("Отправляем фото...")
-                        await call.message.answer_photo(
-                            photo=FSInputFile(temp_file_path),
-                            caption=(
-                                f"💳 Оплата {amount}$ в {currency.upper()}\n\n"
-                                f"🏦 Адрес кошелька:\n"
-                                f"`{wallet_info['address']}`\n\n"
-                                f"💰 Сумма к оплате: {wallet_info['amount']} {wallet_info['currency']}\n\n"
-                                f"⏰ Время на оплату: 15 минут\n"
-                                f"✅ После оплаты баланс пополнится автоматически"
-                            ),
-                            parse_mode="Markdown"
-                        )
-                        logging.info("Фото отправлено успешно")
-                    finally:
-                        # Удаляем временный файл
-                        if os.path.exists(temp_file_path):
-                            os.unlink(temp_file_path)
-                            logging.info(f"Временный файл удален: {temp_file_path}")
+                    # Отправляем изображение из памяти
+                    logging.info("Отправляем фото...")
+                    await call.message.answer_photo(
+                        photo=BufferedInputFile(image_data, filename="qr_code.png"),
+                        caption=(
+                            f"💳 Оплата {amount}$ в {currency.upper()}\n\n"
+                            f"🏦 Адрес кошелька:\n"
+                            f"`{wallet_info['address']}`\n\n"
+                            f"💰 Сумма к оплате: {wallet_info['amount']} {wallet_info['currency']}\n\n"
+                            f"⏰ Время на оплату: 15 минут\n"
+                            f"✅ После оплаты баланс пополнится автоматически"
+                        ),
+                        parse_mode="Markdown"
+                    )
+                    logging.info("Фото отправлено успешно")
                     
                     # Создаем специальную клавиатуру для QR-кода
                     qr_keyboard = get_qr_code_keyboard(
