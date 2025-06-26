@@ -44,9 +44,7 @@ async def make_request(url: str, invoice_data: dict):
     encoded_data = base64.b64encode(
         json.dumps(invoice_data).encode("utf-8")
     ).decode("utf-8")
-    
-    # Используем SHA256 для подписи (Cryptomus требует SHA256)
-    signature = hashlib.sha256(
+    signature = hashlib.md5(
         f"{encoded_data}{CRYPTOMUS_API_KEY}".encode("utf-8")
     ).hexdigest()
 
