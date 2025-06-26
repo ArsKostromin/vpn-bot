@@ -28,6 +28,14 @@ from aiogram.exceptions import TelegramBadRequest
 import asyncio
 from bot.services.cryptomus import make_request, check_invoice_paid, extract_wallet_info
 import uuid
+import base64
+import hashlib
+import json
+import aiohttp
+import urllib.parse
+import tempfile
+import os
+from io import BytesIO
 
 
 router = Router()
@@ -242,18 +250,49 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
             if is_qr_url:
                 # Отправляем QR-код как изображение
                 try:
-                    await call.message.answer_photo(
-                        photo=qr_code,
-                        caption=(
-                            f"💳 Оплата {amount}$ в {currency.upper()}\n\n"
-                            f"🏦 Адрес кошелька:\n"
-                            f"`{wallet_info['address']}`\n\n"
-                            f"💰 Сумма к оплате: {wallet_info['amount']} {wallet_info['currency']}\n\n"
-                            f"⏰ Время на оплату: 15 минут\n"
-                            f"✅ После оплаты баланс пополнится автоматически"
-                        ),
-                        parse_mode="Markdown"
-                    )
+                    if qr_code.startswith('data:image'):
+                        # Конвертируем base64 в файл
+                        # Убираем префикс data:image/png;base64,
+                        base64_data = qr_code.split(',')[1]
+                        image_data = base64.b64decode(base64_data)
+                        
+                        # Создаем временный файл
+                        with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as temp_file:
+                            temp_file.write(image_data)
+                            temp_file_path = temp_file.name
+                        
+                        try:
+                            # Отправляем файл как фото
+                            await call.message.answer_photo(
+                                photo=temp_file_path,
+                                caption=(
+                                    f"💳 Оплата {amount}$ в {currency.upper()}\n\n"
+                                    f"🏦 Адрес кошелька:\n"
+                                    f"`{wallet_info['address']}`\n\n"
+                                    f"💰 Сумма к оплате: {wallet_info['amount']} {wallet_info['currency']}\n\n"
+                                    f"⏰ Время на оплату: 15 минут\n"
+                                    f"✅ После оплаты баланс пополнится автоматически"
+                                ),
+                                parse_mode="Markdown"
+                            )
+                        finally:
+                            # Удаляем временный файл
+                            if os.path.exists(temp_file_path):
+                                os.unlink(temp_file_path)
+                    else:
+                        # Обычный URL
+                        await call.message.answer_photo(
+                            photo=qr_code,
+                            caption=(
+                                f"💳 Оплата {amount}$ в {currency.upper()}\n\n"
+                                f"🏦 Адрес кошелька:\n"
+                                f"`{wallet_info['address']}`\n\n"
+                                f"💰 Сумма к оплате: {wallet_info['amount']} {wallet_info['currency']}\n\n"
+                                f"⏰ Время на оплату: 15 минут\n"
+                                f"✅ После оплаты баланс пополнится автоматически"
+                            ),
+                            parse_mode="Markdown"
+                        )
                     
                     # Создаем специальную клавиатуру для QR-кода
                     qr_keyboard = get_qr_code_keyboard(
@@ -269,7 +308,7 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
                     )
                 except Exception as e:
                     logging.error(f"Ошибка при отправке QR-кода как изображения: {e}")
-                    # Fallback на текстовый формат
+                    # Отправляем QR-код как текст
                     qr_message = (
                         f"💳 Оплата {amount}$ в {currency.upper()}\n\n"
                         f"📱 QR-код для оплаты:\n"
@@ -281,6 +320,7 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
                         f"✅ После оплаты баланс пополнится автоматически"
                     )
                     
+                    # Создаем специальную клавиатуру для QR-кода
                     qr_keyboard = get_qr_code_keyboard(
                         address=wallet_info['address'],
                         qr_code=wallet_info['qr_code'],
@@ -293,32 +333,6 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
                         reply_markup=qr_keyboard,
                         parse_mode="Markdown"
                     )
-            else:
-                # Отправляем QR-код как текст
-                qr_message = (
-                    f"💳 Оплата {amount}$ в {currency.upper()}\n\n"
-                    f"📱 QR-код для оплаты:\n"
-                    f"`{qr_code}`\n\n"
-                    f"🏦 Адрес кошелька:\n"
-                    f"`{wallet_info['address']}`\n\n"
-                    f"💰 Сумма к оплате: {wallet_info['amount']} {wallet_info['currency']}\n\n"
-                    f"⏰ Время на оплату: 15 минут\n"
-                    f"✅ После оплаты баланс пополнится автоматически"
-                )
-                
-                # Создаем специальную клавиатуру для QR-кода
-                qr_keyboard = get_qr_code_keyboard(
-                    address=wallet_info['address'],
-                    qr_code=wallet_info['qr_code'],
-                    amount=wallet_info['amount'],
-                    currency=wallet_info['currency']
-                )
-                
-                await call.message.edit_text(
-                    qr_message,
-                    reply_markup=qr_keyboard,
-                    parse_mode="Markdown"
-                )
             
             # Запускаем проверку оплаты
             if wallet_info.get("uuid"):
