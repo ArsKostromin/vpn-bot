@@ -263,7 +263,15 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
                     image_data = base64.b64decode(base64_data)
                     logging.info(f"Размер изображения: {len(image_data)} байт")
                     
-                    # Отправляем изображение из памяти
+                    # Создаем специальную клавиатуру для QR-кода
+                    qr_keyboard = get_qr_code_keyboard(
+                        address=wallet_info['address'],
+                        qr_code=wallet_info['qr_code'],
+                        amount=wallet_info['amount'],
+                        currency=wallet_info['currency']
+                    )
+                    
+                    # Отправляем изображение из памяти с клавиатурой
                     logging.info("Отправляем фото...")
                     await call.message.answer_photo(
                         photo=BufferedInputFile(image_data, filename="qr_code.png"),
@@ -275,22 +283,10 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
                             f"⏰ Время на оплату: 15 минут\n"
                             f"✅ После оплаты баланс пополнится автоматически"
                         ),
-                        parse_mode="Markdown"
-                    )
-                    logging.info("Фото отправлено успешно")
-                    
-                    # Создаем специальную клавиатуру для QR-кода
-                    qr_keyboard = get_qr_code_keyboard(
-                        address=wallet_info['address'],
-                        qr_code=wallet_info['qr_code'],
-                        amount=wallet_info['amount'],
-                        currency=wallet_info['currency']
-                    )
-                    
-                    await call.message.answer(
-                        "📱 Используйте кнопки ниже для копирования:",
+                        parse_mode="Markdown",
                         reply_markup=qr_keyboard
                     )
+                    logging.info("Фото отправлено успешно")
                 except Exception as e:
                     logging.error(f"Ошибка при отправке QR-кода как изображения: {e}")
                     logging.error(f"Тип ошибки: {type(e)}")
@@ -323,6 +319,12 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
                 # Обычный URL
                 logging.info("Обрабатываем HTTP URL")
                 try:
+                    qr_keyboard = get_qr_code_keyboard(
+                        address=wallet_info['address'],
+                        qr_code=wallet_info['qr_code'],
+                        amount=wallet_info['amount'],
+                        currency=wallet_info['currency']
+                    )
                     await call.message.answer_photo(
                         photo=qr_code,
                         caption=(
@@ -333,19 +335,7 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
                             f"⏰ Время на оплату: 15 минут\n"
                             f"✅ После оплаты баланс пополнится автоматически"
                         ),
-                        parse_mode="Markdown"
-                    )
-                    
-                    # Создаем специальную клавиатуру для QR-кода
-                    qr_keyboard = get_qr_code_keyboard(
-                        address=wallet_info['address'],
-                        qr_code=wallet_info['qr_code'],
-                        amount=wallet_info['amount'],
-                        currency=wallet_info['currency']
-                    )
-                    
-                    await call.message.answer(
-                        "📱 Используйте кнопки ниже для копирования:",
+                        parse_mode="Markdown",
                         reply_markup=qr_keyboard
                     )
                 except Exception as e:
