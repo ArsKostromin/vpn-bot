@@ -272,7 +272,7 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
                         # Отправляем файл как фото
                         logging.info("Отправляем фото...")
                         await call.message.answer_photo(
-                            photo=temp_file_path,
+                            photo=FSInputFile(temp_file_path),
                             caption=(
                                 f"💳 Оплата {amount}$ в {currency.upper()}\n\n"
                                 f"🏦 Адрес кошелька:\n"
