@@ -70,10 +70,12 @@ def extract_wallet_info(response_data: dict) -> dict:
     """
     try:
         result = response_data.get("result", {})
-        payment_address = result.get("payment_address", "")
-        payment_amount = result.get("payment_amount", "")
-        payment_currency = result.get("payment_currency", "")
-        qr_code = result.get("qr_code", "")
+        
+        # Адрес кошелька может быть в разных полях
+        payment_address = result.get("payment_address", "") or result.get("address", "")
+        payment_amount = result.get("payment_amount", "") or result.get("payer_amount", "")
+        payment_currency = result.get("payment_currency", "") or result.get("payer_currency", "")
+        qr_code = result.get("qr_code", "") or result.get("address_qr_code", "")
         
         # Проверяем, что у нас есть адрес
         if not payment_address:
