@@ -248,20 +248,29 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
             is_data_url = qr_code.startswith('data:image')
             is_http_url = qr_code.startswith('http')
             
+            logging.info(f"QR-код: {qr_code[:50]}...")
+            logging.info(f"is_data_url: {is_data_url}")
+            logging.info(f"is_http_url: {is_http_url}")
+            
             if is_data_url:
                 # Конвертируем base64 в файл
+                logging.info("Обрабатываем data URL")
                 try:
                     # Убираем префикс data:image/png;base64,
                     base64_data = qr_code.split(',')[1]
+                    logging.info(f"Base64 данные: {base64_data[:50]}...")
                     image_data = base64.b64decode(base64_data)
+                    logging.info(f"Размер изображения: {len(image_data)} байт")
                     
                     # Создаем временный файл
                     with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as temp_file:
                         temp_file.write(image_data)
                         temp_file_path = temp_file.name
+                        logging.info(f"Создан временный файл: {temp_file_path}")
                     
                     try:
                         # Отправляем файл как фото
+                        logging.info("Отправляем фото...")
                         await call.message.answer_photo(
                             photo=temp_file_path,
                             caption=(
@@ -274,10 +283,12 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
                             ),
                             parse_mode="Markdown"
                         )
+                        logging.info("Фото отправлено успешно")
                     finally:
                         # Удаляем временный файл
                         if os.path.exists(temp_file_path):
                             os.unlink(temp_file_path)
+                            logging.info(f"Временный файл удален: {temp_file_path}")
                     
                     # Создаем специальную клавиатуру для QR-кода
                     qr_keyboard = get_qr_code_keyboard(
@@ -293,6 +304,8 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
                     )
                 except Exception as e:
                     logging.error(f"Ошибка при отправке QR-кода как изображения: {e}")
+                    logging.error(f"Тип ошибки: {type(e)}")
+                    logging.error(f"Детали ошибки: {str(e)}")
                     # Fallback на текстовый формат
                     qr_message = (
                         f"💳 Оплата {amount}$ в {currency.upper()}\n\n"
@@ -319,6 +332,7 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
                     )
             elif is_http_url:
                 # Обычный URL
+                logging.info("Обрабатываем HTTP URL")
                 try:
                     await call.message.answer_photo(
                         photo=qr_code,
@@ -373,6 +387,7 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
                     )
             else:
                 # Отправляем QR-код как текст
+                logging.info("Обрабатываем текстовый QR-код")
                 qr_message = (
                     f"💳 Оплата {amount}$ в {currency.upper()}\n\n"
                     f"📱 QR-код для оплаты:\n"
