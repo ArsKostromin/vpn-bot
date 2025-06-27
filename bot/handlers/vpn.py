@@ -149,7 +149,8 @@ async def show_confirmation(callback: CallbackQuery, state: FSMContext):
     text += (
         f"Срок: *{selected['duration_display']}*\n"
         f"Цена: *${price:.2f}*\n\n"
-        f"✅ Нажмите *«Оплатить»*, чтобы оформить подписку."
+        f"✅ Нажмите *«Оплатить»*, чтобы оформить подписку.\n"
+        f"\n⚡️ *У подписки включено автопродление!*\n"
     )
 
     if vpn_type == "secure":
