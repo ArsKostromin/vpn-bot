@@ -1,9 +1,9 @@
 from aiogram import Router, F
 from aiogram.types import CallbackQuery, FSInputFile
 from aiogram.exceptions import TelegramBadRequest
-from bot.keyboards.my_services_keyboard import my_services_menu, not_subscription
+from bot.keyboards.my_services_keyboard import my_services_menu, not_subscription, get_autorenew_keyboard
 from .start import process_start 
-from bot.services.user_service import get_user_subscriptions, get_user_info
+from bot.services.user_service import get_user_subscriptions, get_user_info, toggle_autorenew
 from bot.keyboards.back_menu import back_to_main_menu
 
 router = Router()
@@ -30,7 +30,8 @@ async def my_services_screen(callback: CallbackQuery):
                 f"<b>🔹 Цена:</b> {sub['price']}$\n"
                 f"<b>🔹 Статус:</b> {status}\n"
                 f"<b>🔹 Начало:</b> {sub['start_date'][:10]}\n"
-                f"<b>🔹 Окончание:</b> {sub['end_date'][:10]}\n\n"
+                f"<b>🔹 Окончание:</b> {sub['end_date'][:10]}\n"
+                f"<b>🔹 Автопродление:</b> {'Включено' if sub.get('auto_renew') else 'Выключено'}\n\n"
                 f"<b>Нажмите и удерживайте текст ниже, чтобы скопировать VLESS:</b>\n"
                 f"<code>{sub['vless']}</code>"
             )
@@ -38,7 +39,7 @@ async def my_services_screen(callback: CallbackQuery):
             await callback.message.answer(
                 text,
                 parse_mode="HTML",
-                reply_markup=back_to_main_menu
+                reply_markup=get_autorenew_keyboard(sub['id'], sub.get('auto_renew', False))
             )
 
     await callback.answer()
@@ -67,3 +68,16 @@ async def profile_handler(callback: CallbackQuery):
 
     await callback.message.answer(text, reply_markup=reply_markup, disable_web_page_preview=True)
     await callback.answer()
+
+@router.callback_query(F.data.startswith("toggle_autorenew:"))
+async def toggle_autorenew_handler(callback: CallbackQuery):
+    subscription_id = int(callback.data.split(":")[1])
+    user_id = callback.from_user.id
+    result = await toggle_autorenew(subscription_id, user_id)
+    if result is None:
+        await callback.message.answer("Ошибка при изменении автопродления. Попробуйте позже.")
+        await callback.answer()
+        return
+    auto_renew = result.get("auto_renew", False)
+    await callback.message.edit_reply_markup(reply_markup=get_autorenew_keyboard(subscription_id, auto_renew))
+    await callback.answer(f"Автопродление {'включено' if auto_renew else 'отключено'}.")

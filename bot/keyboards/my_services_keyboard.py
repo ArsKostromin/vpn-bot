@@ -37,3 +37,15 @@ not_subscription = InlineKeyboardMarkup(
 #         ],
 #     ]
 # )
+
+def get_autorenew_keyboard(subscription_id, auto_renew):
+    if auto_renew:
+        text = "❌ Отключить автопродление"
+    else:
+        text = "✅ Включить автопродление"
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text=text, callback_data=f"toggle_autorenew:{subscription_id}")],
+            [InlineKeyboardButton(text="⬅️ Назад", callback_data="start_from_button")]
+        ]
+    )

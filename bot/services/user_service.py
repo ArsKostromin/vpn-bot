@@ -73,3 +73,14 @@ async def get_user_info(telegram_id: int) -> dict:
         except Exception as e:
             logger.error(f"Неизвестная ошибка при получении информации о пользователе {telegram_id}: {e}")
     return {}
+
+async def toggle_autorenew(subscription_id: int, telegram_id: int) -> dict | None:
+    url = f"{API_URL}/user/toggle-autorenew/{subscription_id}/"
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.post(url, json={"telegram_id": telegram_id})
+            response.raise_for_status()
+            return response.json()
+        except Exception as e:
+            logger.error(f"Ошибка при переключении автопродления: {e}")
+            return None
