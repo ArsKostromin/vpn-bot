@@ -79,11 +79,11 @@ async def process_topup(callback: CallbackQuery, state: FSMContext):
         payment_link = await create_payment_link(telegram_id=callback.from_user.id, amount=amount)
         await callback.message.answer(
             f"""Вот ваша ссылка для оплаты на {amount} $:
-            {payment_link}
-            Средства поступят на счет в течение 3-5 мин после оплаты.
+{payment_link}
+Средства поступят на счет в течение 3-5 мин после оплаты.
 
-            Нажимая "Оплатить", я/Я даю согласие на регулярные списания, на обработку персональных данных и принимаю условия публичной оферты (ссылка на оферту).
-            """
+Нажимая "Оплатить", я/Я даю согласие на регулярные списания, на обработку персональных данных и принимаю условия публичной оферты (ссылка на оферту).
+"""
         )
         await callback.answer()
     except Exception:
@@ -118,11 +118,11 @@ async def process_custom_amount_input(message: Message, state: FSMContext):
         payment_link = await create_payment_link(telegram_id=message.from_user.id, amount=amount)
         await message.answer(
             f"""Вот ваша ссылка для оплаты на {amount} $:
-            {payment_link}
-            Средства поступят на счет в течение 3-5 мин после оплаты.
+{payment_link}
+Средства поступят на счет в течение 3-5 мин после оплаты.
 
-            Нажимая "Оплатить", я/Я даю согласие на регулярные списания, на обработку персональных данных и принимаю условия публичной оферты (ссылка на оферту).
-            """
+Нажимая "Оплатить", я/Я даю согласие на регулярные списания, на обработку персональных данных и принимаю условия публичной оферты (ссылка на оферту).
+"""
         )
         await state.clear()
     except ValueError:
