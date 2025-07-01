@@ -75,7 +75,7 @@ async def process_topup(callback: CallbackQuery, state: FSMContext):
         return
 
     try:
-        amount = int(amount_str)
+        amount = float(amount_str)
         payment_link = await create_payment_link(telegram_id=callback.from_user.id, amount=amount)
         await callback.message.answer(
             f"""Вот ваша ссылка для оплаты на {amount} $:\n{payment_link}\nСредства поступят на счет в течение 3-5 мин после оплаты.\n\nНажимая \"Оплатить\", я даю согласие на регулярные списания, на обработку персональных данных и принимаю условия публичной [оферты](https://docs.robokassa.ru/media/1550/%D0%BE%D1%84%D0%B5%D1%80%D1%82%D0%B0-itv.pdf).\n""",
@@ -106,9 +106,9 @@ async def process_custom_amount_request(callback: CallbackQuery, state: FSMConte
 @router.message(TopUpStates.waiting_for_custom_amount)
 async def process_custom_amount_input(message: Message, state: FSMContext):
     try:
-        amount = int(message.text)
-        if amount < 1:
-            await message.answer("Минимальная сумма пополнения — 1 $. Попробуйте снова.")
+        amount = float(message.text)
+        if amount < 0.1:
+            await message.answer("Минимальная сумма пополнения — 0.1 $. Попробуйте снова.")
             return
 
         payment_link = await create_payment_link(telegram_id=message.from_user.id, amount=amount)
@@ -118,7 +118,7 @@ async def process_custom_amount_input(message: Message, state: FSMContext):
         )
         await state.clear()
     except ValueError:
-        await message.answer("Пожалуйста, введите число. Пример: 150")
+        await message.answer("Пожалуйста, введите число. Пример: 0.1 или 150")
     except Exception as e:
         logging.error(traceback.format_exc())
         await message.answer("Ошибка при создании платежа. Попробуйте позже.")

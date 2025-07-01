@@ -5,7 +5,7 @@ API_URL = "https://server2.anonixvpn.space"
 # API_URL = "http://backend:8000"
 
 #robocassa(робосаса)
-async def create_payment_link(telegram_id: int, amount: int) -> str:
+async def create_payment_link(telegram_id: int, amount: float) -> str:
     url = f"{API_URL}/payments/create-payment/"
     data = {
         "telegram_id": telegram_id,
