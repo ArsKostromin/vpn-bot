@@ -3,7 +3,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 def get_balance_menu_roboc():
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text=" 0.1 $", callback_data="topup_0.1"),
+            InlineKeyboardButton(text=" 7 $", callback_data="topup_7"),
             InlineKeyboardButton(text="15 $", callback_data="topup_15"),
             InlineKeyboardButton(text="27 $", callback_data="topup_27"),
             InlineKeyboardButton(text="48 $", callback_data="topup_48"),
