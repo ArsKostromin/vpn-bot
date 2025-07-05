@@ -173,9 +173,10 @@ async def process_custom_crypto_amount_input(message: Message, state: FSMContext
             await message.answer("Минимальная сумма пополнения — 1 $. Попробуйте снова.")
             return
 
+        # Показываем меню выбора криптовалюты для пользовательской суммы
         await message.answer(
-            f"""Вот ваша ссылка для оплаты на {amount} $:\n{payment_link}\nСредства поступят на счет в течение 3-5 мин после оплаты.\n\nНажимая \"Оплатить\", я даю согласие на регулярные списания, на обработку персональных данных и принимаю условия публичной [оферты](https://docs.robokassa.ru/media/1550/%D0%BE%D1%84%D0%B5%D1%80%D1%82%D0%B0-itv.pdf).\n""",
-            parse_mode="Markdown"
+            f"Выберите криптовалюту для пополнения на {amount}$:",
+            reply_markup=get_crypto_currency_keyboard(amount)
         )
         await state.clear()
     except ValueError:
