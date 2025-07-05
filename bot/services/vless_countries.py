@@ -17,7 +17,7 @@ COUNTRY_VLESS = {
     },
     "germany": {
         "name": "🇩🇪 Германия",
-        "vless": "vless://74b741f9-ea44-4f16-8599-90bcc31ae3cc@germany.anonixvpn.space:443?encryption=none&security=tls&type=ws&host=germany.anonixvpn.space&path=%2Fws#germany"
+        "vless": "vless://74b741f9-ea44-4f16-8599-90bcc31ae3cc@us-la.anonixvpn.space:443?encryption=none&security=tls&type=ws&host=us-la.anonixvpn.space&path=%2Fws#germany"
     },
     "uk": {
         "name": "🇬🇧 Великобритания",
