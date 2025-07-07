@@ -53,7 +53,7 @@ async def buy_subscription_api(
     vpn_type: str,
     duration: str,
     country: str = None
-) -> tuple[bool, str, str | None]:
+) -> tuple[bool, str, str | None, str | None]:
     try:
         async with httpx.AsyncClient() as client:
             # Получаем список тарифов
@@ -72,7 +72,7 @@ async def buy_subscription_api(
 
             if not matching:
                 logger.warning("❌ Подходящий тариф не найден! Доступные планы: %s", plans)
-                return False, "Такого тарифа не существует.", None
+                return False, "Такого тарифа не существует.", None, None
 
             plan_id = matching[0]['id']
             logger.info("✅ Найден тариф id=%s", plan_id)
@@ -87,7 +87,7 @@ async def buy_subscription_api(
             if vpn_type == "country":
                 if not country:
                     logger.warning("🚫 Не указана страна для тарифа типа country")
-                    return False, "Вы не выбрали страну.", None
+                    return False, "Вы не выбрали страну.", None, None
                 payload["country"] = country
 
             # Отправляем запрос на покупку
@@ -105,14 +105,14 @@ async def buy_subscription_api(
                 try:
                     error_data = buy_resp.json()
                     logger.error("💥 Ошибка при оформлении: %s", error_data)
-                    return False, error_data.get("error") or error_data.get("detail", "недостаточно средств"), None
+                    return False, error_data.get("error") or error_data.get("detail", "недостаточно средств"), None, None
                 except Exception as e:
                     logger.exception("💣 Ошибка при разборе ошибки: %s", e)
-                    return False, f"Ошибка сервера ({buy_resp.status_code})", None
+                    return False, f"Ошибка сервера ({buy_resp.status_code})", None, None
 
     except Exception as e:
         logger.exception("🔥 Общая ошибка в buy_subscription_api: %s", e)
-        return False, "Внутренняя ошибка сервера", None
+        return False, "Внутренняя ошибка сервера", None, None
 
 
 
