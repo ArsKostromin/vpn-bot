@@ -177,7 +177,7 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
     duration = data["duration"]
     country = data.get("country")
 
-    success, msg, vless = await buy_subscription_api(
+    success, msg, vless, server_country = await buy_subscription_api(
         telegram_id=callback.from_user.id,
         vpn_type=vpn_type,
         duration=duration,
@@ -195,6 +195,8 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
     reply_markup = None
 
     if success and vless:
+        if server_country:
+            msg = f"Подписка успешно оформлена ({server_country})"
         msg += (
             f"\n\n<b>Нажмите, чтобы скопировать VLESS:</b>\n"
             f"<code>{vless}</code>\n\n"

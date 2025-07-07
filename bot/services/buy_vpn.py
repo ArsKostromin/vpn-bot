@@ -99,7 +99,7 @@ async def buy_subscription_api(
             if buy_resp.status_code == 201:
                 data = buy_resp.json()
                 logger.info("🎉 Подписка оформлена: %s", data)
-                return True, data.get("message", "Подписка успешно оформлена."), data.get("vless")
+                return True, data.get("message", "Подписка успешно оформлена."), data.get("vless"), data.get("server_country")
 
             else:
                 try:

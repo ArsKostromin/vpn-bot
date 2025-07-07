@@ -49,6 +49,7 @@ get_instruktion_kb = InlineKeyboardMarkup(
     inline_keyboard=[
         [
             InlineKeyboardButton(text="Инструкция", url="https://arskostromin.github.io/vpnguide/"),
+            InlineKeyboardButton(text="❓ Задать вопрос", url="https://t.me/Anonixvpnsupportbot"),
         ],
         [
             InlineKeyboardButton(text="⬅️ Назад", callback_data="start_from_button"),
@@ -94,3 +95,5 @@ def get_confirmation_kb() -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text="✅ Оплатить", callback_data="confirm_payment")],
         [InlineKeyboardButton(text="❌ Отменить", callback_data="buy_vpn")],
     ])
+
+

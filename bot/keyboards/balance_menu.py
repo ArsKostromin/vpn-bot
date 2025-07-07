@@ -21,7 +21,7 @@ def get_balance_menu_roboc():
 start_balance = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="💳 Карты и QR-код", callback_data="robokassa"),
+            InlineKeyboardButton(text="💳 Карты", callback_data="robokassa"),
         ],
         [
             InlineKeyboardButton(text="Крипта", callback_data="cryptobot"),
