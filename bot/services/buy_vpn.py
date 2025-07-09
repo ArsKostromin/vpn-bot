@@ -36,6 +36,7 @@ async def get_durations_by_type_from_api(vpn_type: str, telegram_id: int = None)
                 "discount_active": p["discount_active"],
                 "discount_percent": p.get("discount_percent", 0),
                 "discount_price": float(p["discount_price"]) if p["discount_price"] else None,
+                "vpn_type_display": p["vpn_type_display"],
             }
             for p in plans
             if p['vpn_type'] == vpn_type
