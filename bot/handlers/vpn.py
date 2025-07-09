@@ -140,7 +140,7 @@ async def show_confirmation(callback: CallbackQuery, state: FSMContext):
 
     text = (
         f"🛒 *Вы выбрали:*\n"
-        f"Тип: `{vpn_type}`\n"
+        f"Тип: *{selected['vpn_type_display']}*\n"
     )
 
     if country_display:
