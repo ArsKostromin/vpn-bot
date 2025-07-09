@@ -26,7 +26,7 @@ async def my_services_screen(callback: CallbackQuery):
         for sub in subscriptions:
             status = "✅ Активна" if sub['is_active'] else "❌ Неактивна"
             text = (
-                f"<b>🔹 VPN:</b> {sub['get_vpn_type_display']}\n"
+                f"<b>🔹 VPN:</b> {sub['vpn_type_display']}\n"
                 f"<b>🔹 Цена:</b> {sub['price']}$\n"
                 f"<b>🔹 Статус:</b> {status}\n"
                 f"<b>🔹 Начало:</b> {sub['start_date'][:10]}\n"
