@@ -19,34 +19,47 @@ routes = web.RouteTableDef()
 async def notify_handler(request):
     try:
         data = await request.json()
-        tg_id = data["tg_id"]
-        
-        # Определяем тип уведомления
         notification_type = data.get("type", "payment")
-        
+
+        bot = request.app["bot"]
+
+        if notification_type == "notification":
+            tg_ids = data.get("tg_ids")
+            message = data.get("message", "Уведомление")
+            image_url = data.get("image_url")
+            if not tg_ids or not isinstance(tg_ids, list):
+                return web.json_response({"error": "tg_ids должен быть списком"}, status=400)
+            for tg_id in tg_ids:
+                try:
+                    if image_url:
+                        await bot.send_photo(tg_id, image_url, caption=message)
+                    else:
+                        await bot.send_message(tg_id, message)
+                    logger.info(f"[NOTIFY] Отправлено уведомление пользователю {tg_id}")
+                except Exception as e:
+                    logger.error(f"[NOTIFY] Ошибка отправки пользователю {tg_id}: {e}")
+            return web.json_response({"status": "ok"})
+
+        # --- старые типы ---
+        tg_id = data.get("tg_id")
         if notification_type == "payment":
-            # Старое уведомление о платеже
             amount = data["amount"]
             payment_id = data.get("payment_id")
             message = f"✅ Оплата на {amount}$ прошла успешно!\nID платежа: {payment_id}"
             reply_markup = None
         elif notification_type == "ban_notification":
-            # Уведомление о бане
             message = data["message"]
             reply_markup = get_support_kb
         elif notification_type == "unban_notification":
-            # Уведомление о разбане
             message = data["message"]
             reply_markup = get_main_menu_kb
         else:
-            # По умолчанию используем message из данных
             message = data.get("message", "Уведомление")
             reply_markup = None
 
-        bot = request.app["bot"]
-        await bot.send_message(tg_id, message, reply_markup=reply_markup)
-
-        logger.info(f"[NOTIFY] Отправлено сообщение пользователю {tg_id} типа {notification_type}")
+        if tg_id:
+            await bot.send_message(tg_id, message, reply_markup=reply_markup)
+            logger.info(f"[NOTIFY] Отправлено сообщение пользователю {tg_id} типа {notification_type}")
 
         return web.json_response({"status": "ok"})
 
