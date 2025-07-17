@@ -19,6 +19,7 @@ routes = web.RouteTableDef()
 async def notify_handler(request):
     try:
         data = await request.json()
+        logger.info(f"[NOTIFY] Получены данные: {data}")
         notification_type = data.get("type", "payment")
 
         bot = request.app["bot"]
@@ -27,17 +28,25 @@ async def notify_handler(request):
             tg_ids = data.get("tg_ids")
             message = data.get("message", "Уведомление")
             image_url = data.get("image_url")
+            logger.info(f"[NOTIFY] Итоговый image_url: {image_url}")
             if not tg_ids or not isinstance(tg_ids, list):
+                logger.error("[NOTIFY] tg_ids должен быть списком")
                 return web.json_response({"error": "tg_ids должен быть списком"}, status=400)
             for tg_id in tg_ids:
                 try:
                     if image_url:
-                        await bot.send_photo(tg_id, image_url, caption=message)
+                        if isinstance(image_url, str) and image_url.startswith("http"):
+                            await bot.send_photo(tg_id, image_url, caption=message)
+                            logger.info(f"[NOTIFY] Фото успешно отправлено пользователю {tg_id}: {image_url}")
+                        else:
+                            logger.warning(f"[NOTIFY] Некорректный image_url для пользователя {tg_id}: {image_url}. Отправляю только текст.")
+                            await bot.send_message(tg_id, message)
+                            logger.info(f"[NOTIFY] Текст успешно отправлен пользователю {tg_id} (без фото)")
                     else:
                         await bot.send_message(tg_id, message)
-                    logger.info(f"[NOTIFY] Отправлено уведомление пользователю {tg_id}")
+                        logger.info(f"[NOTIFY] Текст успешно отправлен пользователю {tg_id} (без фото)")
                 except Exception as e:
-                    logger.error(f"[NOTIFY] Ошибка отправки пользователю {tg_id}: {e}")
+                    logger.error(f"[NOTIFY] Ошибка отправки пользователю {tg_id}: {e}", exc_info=True)
             return web.json_response({"status": "ok"})
 
         # --- старые типы ---
