@@ -1,6 +1,7 @@
 from aiogram import Router, F
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup
 from aiogram.fsm.context import FSMContext
+import logging
 
 from bot.states.vpn import BuyVPN
 from bot.keyboards.vpn_menu import (
@@ -185,6 +186,7 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
     )
 
     if not success and "недостаточно средств" in msg.lower():
+        logging.warning(f"[VPN] Недостаточно средств для оплаты. user={callback.from_user.id}, vpn_type={vpn_type}, duration={duration}, country={country}")
         # Сохраняем последнее сообщение об оплате для дублирования после пополнения
         data = await state.get_data()
         # Формируем текст и клавиатуру как в show_confirmation
@@ -213,6 +215,7 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
             )
         from aiogram.types import InlineKeyboardMarkup
         kb = get_confirmation_kb()
+        logging.warning(f"[VPN] Сохраняем сообщение для дублирования: user={callback.from_user.id}, text={text}, reply_markup={kb}")
         await state.update_data(
             last_payment_message_text=text,
             last_payment_message_markup=kb.model_dump_json()
