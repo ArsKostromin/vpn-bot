@@ -107,9 +107,10 @@ async def notify_handler(request):
         return web.json_response({"error": str(e)}, status=500)
 
 
-async def run_aiohttp_server(bot_instance):
+async def run_aiohttp_server(bot_instance, dispatcher_instance):
     app = web.Application()
     app["bot"] = bot_instance
+    app["storage"] = dispatcher_instance.storage
     app.add_routes(routes)
 
     runner = web.AppRunner(app)
