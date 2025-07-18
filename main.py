@@ -23,7 +23,8 @@ bot = Bot(
 )
 
 # Создание диспетчера
-dp = Dispatcher(storage=MemoryStorage())
+storage = MemoryStorage()
+dp = Dispatcher(storage=storage)
 dp.include_router(start.router)
 dp.include_router(vpn.router)
 dp.include_router(my_services.router)
@@ -36,7 +37,7 @@ async def main():
 
     # Запуск aiohttp и polling одновременно
     await asyncio.gather(
-        run_aiohttp_server(bot),     # 🚀 aiohttp сервер
+        run_aiohttp_server(bot, storage),     # 🚀 aiohttp сервер
         dp.start_polling(bot)        # 🟢 запуск бота
     )
 
