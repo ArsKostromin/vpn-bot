@@ -416,6 +416,7 @@ async def copy_qr_code(call: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "check_payment")
 async def check_payment_status(call: CallbackQuery, state: FSMContext):
     try:
+        logging.warning(f"FSM before payment check: {await state.get_data()}")
         data = await state.get_data()
         payment_uuid = data.get('payment_uuid')
         
@@ -434,10 +435,12 @@ async def check_payment_status(call: CallbackQuery, state: FSMContext):
                 if status in ("paid", "paid_over"):
                     # --- ВОССТАНОВЛЕНИЕ ПАНЕЛИ ПОКУПКИ VPN ---
                     vpn_data = await state.get_data()
+                    logging.warning(f"FSM before restore_vpn_purchase_panel: {vpn_data}")
                     if vpn_data.get("restore_after_topup"):
                         from bot.handlers.vpn import restore_vpn_purchase_panel
                         await restore_vpn_purchase_panel(call.message, state)
                         await state.update_data(restore_after_topup=False)
+                        logging.warning(f"FSM after restore_vpn_purchase_panel: {await state.get_data()}")
                         return
                     # --- /ВОССТАНОВЛЕНИЕ ---
                     await call.message.answer("✅ Оплата прошла успешно! Баланс пополнен.")
