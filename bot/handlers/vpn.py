@@ -222,8 +222,9 @@ async def handle_balance_up(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     await state.update_data(restore_after_topup=True)
     await state.set_state(BuyVPN.waiting_for_topup)
-    await callback.message.answer(
-        "💳 Для пополнения баланса перейдите в раздел 'Баланс' в главном меню или используйте соответствующую команду. После пополнения вернитесь сюда, чтобы завершить покупку.")
+    # Вместо текста вызываем стандартное меню пополнения
+    from bot.handlers.balance import balance_up_callback
+    await balance_up_callback(callback)
     await callback.answer()
 
 
