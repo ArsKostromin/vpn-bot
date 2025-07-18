@@ -77,7 +77,7 @@ async def notify_handler(request):
                 from bot.handlers.vpn import restore_vpn_purchase_panel
                 # Получаем FSM для пользователя
                 storage = request.app["storage"]
-                state = FSMContext.from_user(storage, user_id=int(tg_id), chat_id=int(tg_id))
+                state = FSMContext(storage=storage, user_id=int(tg_id), chat_id=int(tg_id))
                 data = await state.get_data()
                 if data.get("restore_after_topup"):
                     # Имитация message для restore_vpn_purchase_panel
