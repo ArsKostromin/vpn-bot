@@ -1,8 +1,6 @@
 import logging
 from aiohttp import web
 from bot.keyboards.notify_meny import get_support_kb, get_main_menu_kb
-from bot.handlers.balance import robokassa_payment_success
-from aiogram.fsm.context import FSMContext
 
 # 🔧 Настрой логгер
 logger = logging.getLogger("aiohttp_notify")
@@ -69,11 +67,8 @@ async def notify_handler(request):
             reply_markup = None
 
         if tg_id:
-            # Для успешной оплаты Робокассы вызываем возврат на оплату VPN
-            fsm_context = FSMContext(bot=bot, chat_id=tg_id, user_id=tg_id)
-            sent_message = await bot.send_message(tg_id, message, reply_markup=reply_markup)
-            await robokassa_payment_success(sent_message, fsm_context)
-            logger.info(f"[NOTIFY] Отправлено сообщение пользователю {tg_id} типа {notification_type} и вызван возврат на оплату VPN")
+            await bot.send_message(tg_id, message, reply_markup=reply_markup)
+            logger.info(f"[NOTIFY] Отправлено сообщение пользователю {tg_id} типа {notification_type}")
 
         return web.json_response({"status": "ok"})
 

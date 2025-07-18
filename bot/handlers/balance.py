@@ -37,7 +37,6 @@ import urllib.parse
 import tempfile
 import os
 from io import BytesIO
-from bot.handlers.vpn import show_confirmation_with_params
 
 
 router = Router()
@@ -434,7 +433,6 @@ async def check_payment_status(call: CallbackQuery, state: FSMContext):
                 
                 if status in ("paid", "paid_over"):
                     await call.message.answer("✅ Оплата прошла успешно! Баланс пополнен.")
-                    await try_return_to_vpn_payment(call.message, state)
                     await state.clear()
                 elif status == "pending":
                     await call.message.answer("⏳ Платёж в обработке. Попробуйте проверить позже.")
@@ -448,10 +446,3 @@ async def check_payment_status(call: CallbackQuery, state: FSMContext):
             await call.answer("Информация о платеже не найдена", show_alert=True)
     except Exception as e:
         await call.answer("Ошибка при проверке", show_alert=True)
-
-
-# --- Добавьте этот обработчик после подтверждения оплаты Робокассы ---
-async def robokassa_payment_success(message: Message, state: FSMContext):
-    await message.answer("✅ Оплата прошла успешно! Баланс пополнен.")
-    await try_return_to_vpn_payment(message, state)
-    await state.clear()
