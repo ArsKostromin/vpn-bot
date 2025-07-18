@@ -432,6 +432,14 @@ async def check_payment_status(call: CallbackQuery, state: FSMContext):
                 status = invoice_data["result"].get("payment_status")
                 
                 if status in ("paid", "paid_over"):
+                    # --- ВОССТАНОВЛЕНИЕ ПАНЕЛИ ПОКУПКИ VPN ---
+                    vpn_data = await state.get_data()
+                    if vpn_data.get("restore_after_topup"):
+                        from bot.handlers.vpn import restore_vpn_purchase_panel
+                        await restore_vpn_purchase_panel(call.message, state)
+                        await state.update_data(restore_after_topup=False)
+                        return
+                    # --- /ВОССТАНОВЛЕНИЕ ---
                     await call.message.answer("✅ Оплата прошла успешно! Баланс пополнен.")
                     await state.clear()
                 elif status == "pending":

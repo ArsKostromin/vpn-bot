@@ -214,3 +214,98 @@ async def cancel_subscription(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer("❌ Покупка отменена.")
     await state.clear()
     await callback.answer()
+
+
+@router.callback_query(F.data == "balance_up")
+async def handle_balance_up(callback: CallbackQuery, state: FSMContext):
+    # Сохраняем все текущие данные покупки и переводим в состояние ожидания пополнения
+    data = await state.get_data()
+    await state.update_data(restore_after_topup=True)
+    await state.set_state(BuyVPN.waiting_for_topup)
+    await callback.message.answer(
+        "💳 Для пополнения баланса перейдите в раздел 'Баланс' в главном меню или используйте соответствующую команду. После пополнения вернитесь сюда, чтобы завершить покупку.")
+    await callback.answer()
+
+
+async def restore_vpn_purchase_panel(message, state: FSMContext):
+    data = await state.get_data()
+    vpn_type = data.get("vpn_type")
+    duration = data.get("duration")
+    country = data.get("country")
+    country_display = data.get("country_display")
+
+    if not vpn_type:
+        await message.answer("Ошибка восстановления покупки. Попробуйте начать заново.")
+        await state.clear()
+        return
+
+    # Если есть duration, значит пользователь был на этапе подтверждения
+    if duration:
+        plans = await get_durations_by_type_from_api(vpn_type, telegram_id=message.from_user.id)
+        selected = next((p for p in plans if p["duration"] == duration), None)
+        if not selected:
+            await message.answer("❌ Такой подписки не существует.")
+            await state.clear()
+            return
+        price = selected["current_price"]
+        text = (
+            f"🛒 *Вы выбрали:*\n"
+            f"Тип: *{selected['vpn_type_display']}*\n"
+        )
+        if country_display:
+            text += f"Страна: `{country_display}`\n"
+        text += (
+            f"Срок: *{selected['duration_display']}*\n"
+            f"Цена: *${price:.2f}*\n\n"
+            f"✅ Нажмите *«Оплатить»*, чтобы оформить подписку.\n"
+            f"\n⚡️ *У подписки включено автопродление!*\n"
+            f"Вы можете отключить автопродление в разделе 'Мои услуги'."
+        )
+        if vpn_type == "secure":
+            text += (
+                "\n\n🧠 *Что значат «Одиночное» и «Двойное» шифрование?*\n"
+                "— *Одиночное шифрование* — это стандартная защита и высокая скорость 🔓🚀\n"
+                "— *Двойное шифрование* — повышенная анонимность за счёт маршрутизации через два узла, но скорость ниже 🛡️🔒"
+            )
+        await message.answer(
+            text=text,
+            reply_markup=get_confirmation_kb(),
+            parse_mode="Markdown"
+        )
+        await state.set_state(BuyVPN.confirmation)
+        return
+
+    # Если есть только vpn_type (и возможно страна), значит пользователь был на этапе выбора длительности
+    if vpn_type == "country" and country:
+        plans = await get_durations_by_type_from_api("country", telegram_id=message.from_user.id)
+        if not plans:
+            await message.answer("❌ Нет доступных подписок.")
+            await state.clear()
+            return
+        await message.answer(
+            text=f"Вы выбрали страну: {country_display}\nТеперь выберите длительность:",
+            reply_markup=get_duration_kb([
+                (p["duration"], str(p["current_price"]), p["duration_display"], p["discount_percent"])
+                for p in plans
+            ])
+        )
+        await state.set_state(BuyVPN.duration)
+        return
+    else:
+        plans = await get_durations_by_type_from_api(vpn_type, telegram_id=message.from_user.id)
+        if not plans:
+            await message.answer("❌ Нет доступных подписок.")
+            await state.clear()
+            return
+        showcase_text = build_tariff_showcase(title="Выберите тариф ⬇️", plans=plans)
+        await message.answer(text=showcase_text, parse_mode="Markdown")
+        await message.answer(
+            text="Выберите длительность ⬇️",
+            reply_markup=get_duration_kb([
+                (p["duration"], str(p["current_price"]), p["duration_display"], p["discount_percent"])
+                for p in plans
+            ]),
+            parse_mode="Markdown"
+        )
+        await state.set_state(BuyVPN.duration)
+        return
