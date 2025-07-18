@@ -38,6 +38,7 @@ import tempfile
 import os
 from io import BytesIO
 from bot.handlers.vpn import show_confirmation_with_params
+from bot.handlers.vpn import try_return_to_vpn_payment
 
 
 router = Router()
