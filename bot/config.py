@@ -30,4 +30,4 @@ CRYPTOMUS_MERCHANT_UUID = "59fc86a1-d195-4df8-8d17-3d6b06d2fe48"
 BASE_BACKEND_URL = "https://server2.anonixvpn.space/payments/api/crypto/webhook/"
 
 
-CHANNEL_USERNAME = "hyitamhyisiam"
+CHANNEL_USERNAME = "@hyitamhyisiam"
