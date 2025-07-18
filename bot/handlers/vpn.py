@@ -169,6 +169,40 @@ async def show_confirmation(callback: CallbackQuery, state: FSMContext):
     await state.set_state(BuyVPN.confirmation)
     await callback.answer()
 
+# --- Новая функция для повторного показа подтверждения ---
+async def show_confirmation_with_params(message, state, vpn_type, duration, country, country_display=None):
+    plans = await get_durations_by_type_from_api(vpn_type, telegram_id=message.from_user.id)
+    selected = next((p for p in plans if p["duration"] == duration), None)
+    if not selected:
+        await message.answer("❌ Такой подписки не существует.")
+        return
+
+    text = (
+        f"🛒 *Вы выбрали:*\n"
+        f"Тип: *{selected['vpn_type_display']}*\n"
+    )
+    if country_display:
+        text += f"Страна: `{country_display}`\n"
+    text += (
+        f"Срок: *{selected['duration_display']}*\n"
+        f"Цена: *${selected['current_price']:.2f}*\n\n"
+        f"✅ Нажмите *«Оплатить»*, чтобы оформить подписку.\n"
+        f"\n⚡️ *У подписки включено автопродление!*\n"
+        f"Вы можете отключить автопродление в разделе 'Мои услуги'."
+    )
+    if vpn_type == "secure":
+        text += (
+            "\n\n🧠 *Что значат «Одиночное» и «Двойное» шифрование?*\n"
+            "— *Одиночное шифрование* — это стандартная защита и высокая скорость 🔓🚀\n"
+            "— *Двойное шифрование* — повышенная анонимность за счёт маршрутизации через два узла, но скорость ниже 🛡️🔒"
+        )
+    await message.answer(
+        text=text,
+        reply_markup=get_confirmation_kb(),
+        parse_mode="Markdown"
+    )
+    await state.set_state(BuyVPN.confirmation)
+
 
 @router.callback_query(F.data == "confirm_payment")
 async def complete_subscription(callback: CallbackQuery, state: FSMContext):
@@ -185,6 +219,14 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
     )
 
     if not success and "недостаточно средств" in msg.lower():
+        # Сохраняем параметры для повторной попытки
+        await state.update_data(
+            waiting_for_payment=True,
+            last_vpn_type=vpn_type,
+            last_duration=duration,
+            last_country=country,
+            last_country_display=data.get("country_display")
+        )
         await callback.message.answer(
             text="❌ Недостаточно средств для оформления подписки.",
             reply_markup=get_insufficient_funds_kb()
