@@ -203,6 +203,17 @@ async def show_confirmation_with_params(message, state, vpn_type, duration, coun
     )
     await state.set_state(BuyVPN.confirmation)
 
+# --- Функция для возврата пользователя на страницу оплаты VPN ---
+async def try_return_to_vpn_payment(message, state):
+    data = await state.get_data()
+    if data.get("waiting_for_payment"):
+        vpn_type = data.get("last_vpn_type")
+        duration = data.get("last_duration")
+        country = data.get("last_country")
+        country_display = data.get("last_country_display")
+        await show_confirmation_with_params(message, state, vpn_type, duration, country, country_display)
+        await state.update_data(waiting_for_payment=False)
+
 
 @router.callback_query(F.data == "confirm_payment")
 async def complete_subscription(callback: CallbackQuery, state: FSMContext):

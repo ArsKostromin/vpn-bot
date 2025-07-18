@@ -453,6 +453,8 @@ async def check_payment_status(call: CallbackQuery, state: FSMContext):
 
 # --- Добавьте этот обработчик после подтверждения оплаты Робокассы ---
 async def robokassa_payment_success(message: Message, state: FSMContext):
-    await message.answer("✅ Оплата прошла успешно! Баланс пополнен.")
+    data = await state.get_data()
+    if not data.get("waiting_for_payment"):
+        await message.answer("✅ Оплата прошла успешно! Баланс пополнен.")
     await try_return_to_vpn_payment(message, state)
     await state.clear()
