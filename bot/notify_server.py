@@ -75,9 +75,12 @@ async def notify_handler(request):
                 from aiogram.fsm.context import FSMContext
                 from aiogram.types import Chat
                 from bot.handlers.vpn import restore_vpn_purchase_panel
+                from aiogram.fsm.storage.base import StorageKey
                 # Получаем FSM для пользователя
                 storage = request.app["storage"]
-                state = FSMContext(storage=storage, user_id=int(tg_id), chat_id=int(tg_id))
+                bot_id = (await bot.me()).id
+                key = StorageKey(bot_id=bot_id, chat_id=int(tg_id), user_id=int(tg_id))
+                state = FSMContext(storage, key=key)
                 data = await state.get_data()
                 if data.get("restore_after_topup"):
                     # Имитация message для restore_vpn_purchase_panel
