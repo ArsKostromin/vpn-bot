@@ -9,6 +9,12 @@ inline_instruction_buttons = InlineKeyboardMarkup(inline_keyboard=[
     ],
     [
         InlineKeyboardButton(
+            text="Наш канал", 
+            url="https://t.me/anonix_vpn/"
+        ),
+    ],
+    [
+        InlineKeyboardButton(
             text="🤖 Перейти в бота", 
             callback_data="start_from_button"
         ),

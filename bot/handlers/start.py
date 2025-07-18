@@ -80,14 +80,7 @@ async def process_start(
                     f"✅ Добро пожаловать в Anonix, <b>{respond_to.from_user.full_name}</b>!\n\n"
                     "🔧 Настройте VPN в 3 клика!\n\n"
                     "🎁 Получи 5 дней VPN бесплатно:\n\n"
-                    "📢 Чтобы получить <b>бесплатную подписку</b>, подпишитесь на наш канал, нажмите «✅ Я подписался», и вы получите промо-код, который нужно будет активировать в главном меню.👇\n\n"
-                    "📲 Установите приложение для вашей OS:\n\n"
-                    "🍏 iOS: <a href='https://apps.apple.com/ru/app/v2raytun/id6476628951'>Anonix</a>\n"
-                    "🤖 Android: <a href='https://play.google.com/store/apps/details?id=app.hiddify.com&hl=ru&pli=1'>Anonix</a>\n"
-                    "🖥️ Windows: <a href='https://apps.microsoft.com/detail/9pdfnl3qv2s5?hl=ru-RU&gl=RU'>Anonix</a>\n"
-                    "🍏 MacOS: <a href='https://apps.apple.com/ru/app/v2box-v2ray-client/id6446814690'>Anonix</a>\n\n"
-                    "🔗 Наш канал:\n\n"
-                    "https://t.me/anonix_vpn/"
+                    "📢 Чтобы получить <b>бесплатную подписку</b>, подпишитесь на наш канал, нажмите «✅ Я подписался»"
                 ),
                 parse_mode=ParseMode.HTML,
                 reply_markup=inline_instruction_buttons,
