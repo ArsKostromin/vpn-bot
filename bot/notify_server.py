@@ -1,6 +1,9 @@
 import logging
 from aiohttp import web
 from bot.keyboards.notify_meny import get_support_kb, get_main_menu_kb
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.storage.base import StorageKey
+from aiogram.types import InlineKeyboardMarkup
 
 # 🔧 Настрой логгер
 logger = logging.getLogger("aiohttp_notify")
@@ -69,6 +72,26 @@ async def notify_handler(request):
         if tg_id:
             await bot.send_message(tg_id, message, reply_markup=reply_markup)
             logger.info(f"[NOTIFY] Отправлено сообщение пользователю {tg_id} типа {notification_type}")
+
+            # --- Дублирование сообщения об оплате из FSM ---
+            try:
+                bot_id = (await bot.me()).id
+                key = StorageKey(bot_id=bot_id, chat_id=int(tg_id), user_id=int(tg_id))
+                state = FSMContext(storage, key=key)
+                data = await state.get_data()
+                if data.get("last_payment_message_text") and data.get("last_payment_message_markup"):
+                    kb = InlineKeyboardMarkup.model_validate_json(data["last_payment_message_markup"])
+                    await bot.send_message(
+                        tg_id,
+                        data["last_payment_message_text"],
+                        reply_markup=kb,
+                        parse_mode="Markdown"
+                    )
+                    await state.update_data(last_payment_message_text=None, last_payment_message_markup=None)
+                    logger.info(f"[NOTIFY] Дублировано сообщение об оплате для пользователя {tg_id}")
+            except Exception as e:
+                logger.error(f"[NOTIFY] Ошибка при дублировании сообщения об оплате: {e}", exc_info=True)
+            # --- /Дублирование ---
 
         return web.json_response({"status": "ok"})
 

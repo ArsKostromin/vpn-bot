@@ -1,5 +1,5 @@
 from aiogram import Router, F
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, InlineKeyboardMarkup
 from aiogram.fsm.context import FSMContext
 
 from bot.states.vpn import BuyVPN
@@ -185,6 +185,38 @@ async def complete_subscription(callback: CallbackQuery, state: FSMContext):
     )
 
     if not success and "недостаточно средств" in msg.lower():
+        # Сохраняем последнее сообщение об оплате для дублирования после пополнения
+        data = await state.get_data()
+        # Формируем текст и клавиатуру как в show_confirmation
+        plans = await get_durations_by_type_from_api(vpn_type, telegram_id=callback.from_user.id)
+        selected = next((p for p in plans if p["duration"] == duration), None)
+        price = selected["current_price"] if selected else 0
+        text = (
+            f"🛒 *Вы выбрали:*\n"
+            f"Тип: *{selected['vpn_type_display']}*\n"
+        )
+        country_display = data.get("country_display")
+        if country_display:
+            text += f"Страна: `{country_display}`\n"
+        text += (
+            f"Срок: *{selected['duration_display']}*\n"
+            f"Цена: *${price:.2f}*\n\n"
+            f"✅ Нажмите *«Оплатить»*, чтобы оформить подписку.\n"
+            f"\n⚡️ *У подписки включено автопродление!*\n"
+            f"Вы можете отключить автопродление в разделе 'Мои услуги'."
+        )
+        if vpn_type == "secure":
+            text += (
+                "\n\n🧠 *Что значат «Одиночное» и «Двойное» шифрование?*\n"
+                "— *Одиночное шифрование* — это стандартная защита и высокая скорость 🔓🚀\n"
+                "— *Двойное шифрование* — повышенная анонимность за счёт маршрутизации через два узла, но скорость ниже 🛡️🔒"
+            )
+        from aiogram.types import InlineKeyboardMarkup
+        kb = get_confirmation_kb()
+        await state.update_data(
+            last_payment_message_text=text,
+            last_payment_message_markup=kb.model_dump_json()
+        )
         await callback.message.answer(
             text="❌ Недостаточно средств для оформления подписки.",
             reply_markup=get_insufficient_funds_kb()
