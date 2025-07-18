@@ -70,6 +70,35 @@ async def notify_handler(request):
             await bot.send_message(tg_id, message, reply_markup=reply_markup)
             logger.info(f"[NOTIFY] Отправлено сообщение пользователю {tg_id} типа {notification_type}")
 
+            # --- ВОССТАНОВЛЕНИЕ ПАНЕЛИ ПОКУПКИ VPN ---
+            try:
+                from aiogram.fsm.storage.memory import MemoryStorage
+                from aiogram.fsm.context import FSMContext
+                from aiogram.types import Chat
+                from bot.handlers.vpn import restore_vpn_purchase_panel
+                # Получаем FSM для пользователя
+                storage = bot.dispatcher.storage
+                if isinstance(storage, MemoryStorage):
+                    state = FSMContext(storage, chat=Chat(id=int(tg_id), type="private"), user=Chat(id=int(tg_id), type="private"))
+                    data = await state.get_data()
+                    if data.get("restore_after_topup"):
+                        # Имитация message для restore_vpn_purchase_panel
+                        class DummyMessage:
+                            def __init__(self, bot, chat_id):
+                                self.bot = bot
+                                self.chat = Chat(id=chat_id, type="private")
+                                self.from_user = Chat(id=chat_id, type="private")
+                                self.message_id = None
+                            async def answer(self, *args, **kwargs):
+                                await bot.send_message(self.chat.id, *args, **kwargs)
+                        dummy_message = DummyMessage(bot, int(tg_id))
+                        await restore_vpn_purchase_panel(dummy_message, state)
+                        await state.update_data(restore_after_topup=False)
+                        logger.info(f"[NOTIFY] Восстановлена панель покупки VPN для пользователя {tg_id}")
+            except Exception as e:
+                logger.error(f"[NOTIFY] Ошибка при восстановлении панели покупки VPN: {e}", exc_info=True)
+            # --- /ВОССТАНОВЛЕНИЕ ---
+
         return web.json_response({"status": "ok"})
 
     except Exception as e:
