@@ -70,36 +70,6 @@ async def notify_handler(request):
             await bot.send_message(tg_id, message, reply_markup=reply_markup)
             logger.info(f"[NOTIFY] Отправлено сообщение пользователю {tg_id} типа {notification_type}")
 
-            # --- ВОССТАНОВЛЕНИЕ ПАНЕЛИ ПОКУПКИ VPN ---
-            try:
-                from aiogram.fsm.context import FSMContext
-                from aiogram.types import Chat
-                from bot.handlers.vpn import restore_vpn_purchase_panel
-                from aiogram.fsm.storage.base import StorageKey
-                # Получаем FSM для пользователя
-                storage = request.app["storage"]
-                bot_id = (await bot.me()).id
-                key = StorageKey(bot_id=bot_id, chat_id=int(tg_id), user_id=int(tg_id))
-                state = FSMContext(storage, key=key)
-                data = await state.get_data()
-                if data.get("restore_after_topup"):
-                    # Имитация message для restore_vpn_purchase_panel
-                    class DummyMessage:
-                        def __init__(self, bot, chat_id):
-                            self.bot = bot
-                            self.chat = type('Chat', (), {'id': chat_id, 'type': 'private'})()
-                            self.from_user = type('User', (), {'id': chat_id})()
-                            self.message_id = None
-                        async def answer(self, *args, **kwargs):
-                            await bot.send_message(self.chat.id, *args, **kwargs)
-                    dummy_message = DummyMessage(bot, int(tg_id))
-                    await restore_vpn_purchase_panel(dummy_message, state)
-                    await state.update_data(restore_after_topup=False)
-                    logger.info(f"[NOTIFY] Восстановлена панель покупки VPN для пользователя {tg_id}")
-            except Exception as e:
-                logger.error(f"[NOTIFY] Ошибка при восстановлении панели покупки VPN: {e}", exc_info=True)
-            # --- /ВОССТАНОВЛЕНИЕ ---
-
         return web.json_response({"status": "ok"})
 
     except Exception as e:
@@ -107,10 +77,9 @@ async def notify_handler(request):
         return web.json_response({"error": str(e)}, status=500)
 
 
-async def run_aiohttp_server(bot_instance, dispatcher_instance):
+async def run_aiohttp_server(bot_instance):
     app = web.Application()
     app["bot"] = bot_instance
-    app["storage"] = dispatcher_instance.storage  # <--- сохраняем storage
     app.add_routes(routes)
 
     runner = web.AppRunner(app)
