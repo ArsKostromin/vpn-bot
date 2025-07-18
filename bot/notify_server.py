@@ -25,6 +25,8 @@ async def notify_handler(request):
         notification_type = data.get("type", "payment")
 
         bot = request.app["bot"]
+        storage = request.app["storage"]
+        logger.info(f"[NOTIFY] bot: {bot}, storage: {storage}")
 
         if notification_type == "notification":
             tg_ids = data.get("tg_ids")
@@ -69,18 +71,23 @@ async def notify_handler(request):
             reply_markup = None
 
         if tg_id:
-            # Для успешной оплаты Робокассы вызываем возврат на оплату VPN
-            fsm_context = FSMContext(
-                storage=bot.dispatcher.storage,
-                key=StorageKey(
-                    chat_id=tg_id,
-                    user_id=tg_id,
-                    bot_id=bot.id
+            logger.info(f"[NOTIFY] Начинаю обработку FSMContext для пользователя {tg_id}")
+            try:
+                fsm_context = FSMContext(
+                    storage=storage,
+                    key=StorageKey(
+                        chat_id=tg_id,
+                        user_id=tg_id,
+                        bot_id=bot.id
+                    )
                 )
-            )
-            sent_message = await bot.send_message(tg_id, message, reply_markup=reply_markup)
-            await robokassa_payment_success(sent_message, fsm_context)
-            logger.info(f"[NOTIFY] Отправлено сообщение пользователю {tg_id} типа {notification_type} и вызван возврат на оплату VPN")
+                logger.info(f"[NOTIFY] FSMContext создан: {fsm_context}")
+                sent_message = await bot.send_message(tg_id, message, reply_markup=reply_markup)
+                logger.info(f"[NOTIFY] Сообщение отправлено пользователю {tg_id}")
+                await robokassa_payment_success(sent_message, fsm_context)
+                logger.info(f"[NOTIFY] Вызван robokassa_payment_success для пользователя {tg_id}")
+            except Exception as e:
+                logger.error(f"[NOTIFY] Ошибка при работе с FSMContext или robokassa_payment_success: {e}", exc_info=True)
 
         return web.json_response({"status": "ok"})
 
@@ -89,9 +96,10 @@ async def notify_handler(request):
         return web.json_response({"error": str(e)}, status=500)
 
 
-async def run_aiohttp_server(bot_instance):
+async def run_aiohttp_server(bot_instance, storage):
     app = web.Application()
     app["bot"] = bot_instance
+    app["storage"] = storage
     app.add_routes(routes)
 
     runner = web.AppRunner(app)
