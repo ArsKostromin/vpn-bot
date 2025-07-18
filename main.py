@@ -36,8 +36,8 @@ async def main():
 
     # Запуск aiohttp и polling одновременно
     await asyncio.gather(
-        run_aiohttp_server(bot, dp),     # обязательно передаём dispatcher
-        dp.start_polling(bot)
+        run_aiohttp_server(bot),     # 🚀 aiohttp сервер
+        dp.start_polling(bot)        # 🟢 запуск бота
     )
 
 if __name__ == "__main__":

@@ -1,9 +1,6 @@
 import logging
 from aiohttp import web
 from bot.keyboards.notify_meny import get_support_kb, get_main_menu_kb
-from aiogram.fsm.context import FSMContext
-from aiogram.fsm.storage.base import StorageKey
-from aiogram.types import InlineKeyboardMarkup
 
 # 🔧 Настрой логгер
 logger = logging.getLogger("aiohttp_notify")
@@ -23,7 +20,6 @@ async def notify_handler(request):
     try:
         data = await request.json()
         logger.info(f"[NOTIFY] Получены данные: {data}")
-        logger.warning(f"[NOTIFY] Получены данные: {data}")
         notification_type = data.get("type", "payment")
 
         bot = request.app["bot"]
@@ -73,32 +69,6 @@ async def notify_handler(request):
         if tg_id:
             await bot.send_message(tg_id, message, reply_markup=reply_markup)
             logger.info(f"[NOTIFY] Отправлено сообщение пользователю {tg_id} типа {notification_type}")
-            logger.warning(f"[NOTIFY] Отправлено сообщение пользователю {tg_id} типа {notification_type}")
-
-            # --- Дублирование сообщения об оплате из FSM ---
-            try:
-                storage = request.app["storage"]
-                bot_id = (await bot.me()).id
-                key = StorageKey(bot_id=bot_id, chat_id=int(tg_id), user_id=int(tg_id))
-                state = FSMContext(storage, key=key)
-                data = await state.get_data()
-                logger.warning(f"[NOTIFY] FSM перед дублированием: {data}")
-                if data.get("last_payment_message_text") and data.get("last_payment_message_markup"):
-                    kb = InlineKeyboardMarkup.model_validate_json(data["last_payment_message_markup"])
-                    logger.warning(f"[NOTIFY] Дублируем сообщение: user={tg_id}, text={data['last_payment_message_text']}, reply_markup={kb}")
-                    await bot.send_message(
-                        tg_id,
-                        data["last_payment_message_text"],
-                        reply_markup=kb,
-                        parse_mode="Markdown"
-                    )
-                    await state.update_data(last_payment_message_text=None, last_payment_message_markup=None)
-                    logger.warning(f"[NOTIFY] Очищено состояние last_payment_message_text/markup для пользователя {tg_id}")
-                    logger.info(f"[NOTIFY] Дублировано сообщение об оплате для пользователя {tg_id}")
-            except Exception as e:
-                logger.warning(f"[NOTIFY] Ошибка при дублировании сообщения об оплате: {e}", exc_info=True)
-                logger.error(f"[NOTIFY] Ошибка при дублировании сообщения об оплате: {e}", exc_info=True)
-            # --- /Дублирование ---
 
         return web.json_response({"status": "ok"})
 
@@ -107,10 +77,9 @@ async def notify_handler(request):
         return web.json_response({"error": str(e)}, status=500)
 
 
-async def run_aiohttp_server(bot_instance, dispatcher_instance):
+async def run_aiohttp_server(bot_instance):
     app = web.Application()
     app["bot"] = bot_instance
-    app["storage"] = dispatcher_instance.storage
     app.add_routes(routes)
 
     runner = web.AppRunner(app)
