@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)  # Можно поставить DEBUG на разработке
 
 
-API_URL = "https://server2.anonixvpn.space"
+API_URL = "https://admin.byebyefbi.com"
 # API_URL = "http://backend:8000"
 
 
