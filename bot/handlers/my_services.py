@@ -57,10 +57,12 @@ async def profile_handler(callback: CallbackQuery):
 
     balance = user_info.get('balance', 0)
     link_code = user_info.get('link_code', 'Нет')
+    referrals_count = user_info.get('referrals_count', 0)
 
     text = (
         f"💼 Ваш профиль:\n\n"
         f"▪️ Баланс: {balance}$\n"
+        f"▪️ Рефералов: {referrals_count}\n"
         f"▪️ Реферальная ссылка: https://t.me/Anonixvpn1Bot?start={link_code}"
     )
 
