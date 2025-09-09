@@ -81,7 +81,7 @@ async def process_topup(callback: CallbackQuery, state: FSMContext):
         await callback.message.answer(
             f"""Вот ваша ссылка для оплаты на {amount} $:\n\nСредства поступят на счет в течение 3-5 мин после оплаты.\n\nНажимая \"Оплатить\", я даю согласие на регулярные списания, на обработку персональных данных и принимаю условия публичной [оферты](https://docs.robokassa.ru/media/1550/%D0%BE%D1%84%D0%B5%D1%80%D1%82%D0%B0-itv.pdf).\n""",
             parse_mode="Markdown",
-            reply_markup=get_payment_keyboard(payment_link),
+            reply_markup=get_payment_keyboard(payment_link, amount),
             disable_web_page_preview=True
         )
         await callback.answer()
@@ -118,7 +118,7 @@ async def process_custom_amount_input(message: Message, state: FSMContext):
         await message.answer(
             f"""Вот ваша ссылка для оплаты на {amount} $:\n{payment_link}\nСредства поступят на счет в течение 3-5 мин после оплаты.\n\nНажимая \"Оплатить\", я даю согласие на регулярные списания, на обработку персональных данных и принимаю условия публичной [оферты](https://docs.robokassa.ru/media/1550/%D0%BE%D1%84%D0%B5%D1%80%D1%82%D0%B0-itv.pdf).\n""",
             parse_mode="Markdown",
-            reply_markup=get_payment_keyboard(payment_link),
+            reply_markup=get_payment_keyboard(payment_link, amount),
             disable_web_page_preview=True
         )
         await state.clear()
