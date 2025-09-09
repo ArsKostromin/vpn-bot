@@ -109,15 +109,10 @@ def get_payment_keyboard(payment_link: str) -> InlineKeyboardMarkup:
     """
     Клавиатура для оплаты с кнопками 'Оплатить' и 'Назад'
     """
-    if amount:
-        button_text = f"💳 Оплатить"
-    else:
-        button_text = "💳 Оплатить"
-    
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text=button_text, url=payment_link)
+                InlineKeyboardButton(text="💳 Оплатить", url=payment_link)
             ],
             [
                 InlineKeyboardButton(text="Назад", callback_data="balance_up")
