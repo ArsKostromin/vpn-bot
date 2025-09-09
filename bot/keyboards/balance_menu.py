@@ -104,3 +104,18 @@ def get_qr_code_keyboard(address: str, qr_code: str, amount: str, currency: str)
             ],
         ]
     )
+
+def get_payment_keyboard(payment_link: str) -> InlineKeyboardMarkup:
+    """
+    Клавиатура для оплаты с кнопками 'Оплатить' и 'Назад'
+    """
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="💳 Оплатить", url=payment_link)
+            ],
+            [
+                InlineKeyboardButton(text="Назад", callback_data="balance_up")
+            ],
+        ]
+    )

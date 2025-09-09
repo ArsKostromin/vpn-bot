@@ -15,6 +15,7 @@ from bot.keyboards.balance_menu import (
     get_balance_menu_roboc,
     end_upbalance,
     get_qr_code_keyboard,
+    get_payment_keyboard,
 )
 from bot.services.upbalance import (
     create_payment_link,
@@ -79,7 +80,8 @@ async def process_topup(callback: CallbackQuery, state: FSMContext):
         payment_link = await create_payment_link(telegram_id=callback.from_user.id, amount=amount)
         await callback.message.answer(
             f"""Вот ваша ссылка для оплаты на {amount} $:\n{payment_link}\nСредства поступят на счет в течение 3-5 мин после оплаты.\n\nНажимая \"Оплатить\", я даю согласие на регулярные списания, на обработку персональных данных и принимаю условия публичной [оферты](https://docs.robokassa.ru/media/1550/%D0%BE%D1%84%D0%B5%D1%80%D1%82%D0%B0-itv.pdf).\n""",
-            parse_mode="Markdown"
+            parse_mode="Markdown",
+            reply_markup=get_payment_keyboard(payment_link)
         )
         await callback.answer()
     except Exception:
@@ -114,7 +116,8 @@ async def process_custom_amount_input(message: Message, state: FSMContext):
         payment_link = await create_payment_link(telegram_id=message.from_user.id, amount=amount)
         await message.answer(
             f"""Вот ваша ссылка для оплаты на {amount} $:\n{payment_link}\nСредства поступят на счет в течение 3-5 мин после оплаты.\n\nНажимая \"Оплатить\", я даю согласие на регулярные списания, на обработку персональных данных и принимаю условия публичной [оферты](https://docs.robokassa.ru/media/1550/%D0%BE%D1%84%D0%B5%D1%80%D1%82%D0%B0-itv.pdf).\n""",
-            parse_mode="Markdown"
+            parse_mode="Markdown",
+            reply_markup=get_payment_keyboard(payment_link)
         )
         await state.clear()
     except ValueError:
