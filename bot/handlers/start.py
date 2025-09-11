@@ -63,10 +63,8 @@ async def process_start(
         return
 
     # Показать клавиатуру
-    await respond_to.answer(
-        text=" "
-        reply_markup=main_menu_kb
-    )
+    await respond_to.edit_reply_markup(reply_markup=main_menu_kb)
+
 
     if result:
         link_code, created = result
