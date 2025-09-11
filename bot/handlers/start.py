@@ -64,7 +64,7 @@ async def process_start(
 
     # Показать клавиатуру
     await respond_to.answer(
-        text=""
+        text=" "
         reply_markup=main_menu_kb
     )
 
