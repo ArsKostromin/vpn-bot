@@ -62,10 +62,13 @@ async def process_start(
         logger.info(f"Сообщение о бане отправлено пользователю {user_id}")
         return
 
-    # Показать клавиатуру
-    await respond_to.edit_reply_markup(reply_markup=main_menu_kb)
+    # Показываем главное меню сразу (без текста)
+    await respond_to.answer(
+        text="⠀",  # невидимый символ, чтобы не падало
+        reply_markup=main_menu_kb
+    )
 
-
+    # Если пользователь только что зарегистрирован
     if result:
         link_code, created = result
 
