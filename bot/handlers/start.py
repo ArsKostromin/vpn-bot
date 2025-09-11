@@ -64,7 +64,7 @@ async def process_start(
 
     # Показываем главное меню сразу (без текста)
     await respond_to.answer(
-        text="⠀",  # невидимый символ, чтобы не падало
+        text="меню:⠀",  # невидимый символ, чтобы не падало
         reply_markup=main_menu_kb
     )
 
