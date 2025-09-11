@@ -8,3 +8,5 @@ services:
     volumes:
       - .:/app
     command: ["python", "main.py"]
+    ports:
+      - "8081:8081"
