@@ -62,9 +62,9 @@ async def process_start(
         logger.info(f"Сообщение о бане отправлено пользователю {user_id}")
         return
 
-    # Показываем главное меню сразу (reply-клавиатура закрепится), затем удалим служебное сообщение после основного ответа
+    # Показываем главное меню сразу (reply-клавиатура закрепится). Текст делаем невидимым символом.
     msg = await respond_to.answer(
-        text="меню:⠀",  
+        text="\u200B",  
         reply_markup=main_menu_kb
     )
 
@@ -87,13 +87,6 @@ async def process_start(
                 reply_markup=inline_instruction_buttons,
                 disable_web_page_preview=True
             )
-            try:
-                # Небольшая задержка, чтобы клавиатура успела закрепиться у клиента
-                import asyncio
-                await asyncio.sleep(0.2)
-                await msg.delete()
-            except Exception as e:
-                logger.warning(f"Не удалось удалить служебное сообщение меню: {e}")
             return
 
     # Пользователь уже зарегистрирован
@@ -112,12 +105,7 @@ async def process_start(
         reply_markup=inline_main_menu,
         parse_mode=ParseMode.HTML
     )
-    try:
-        import asyncio
-        await asyncio.sleep(0.2)
-        await msg.delete()
-    except Exception as e:
-        logger.warning(f"Не удалось удалить служебное сообщение меню: {e}")
+    # Сообщение не удаляем, чтобы reply-клавиатура осталась закреплённой
 
 
 @router.callback_query(F.data == "check_subscription")
