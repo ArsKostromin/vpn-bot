@@ -95,6 +95,11 @@ async def process_start(
 
     # Пользователь уже зарегистрирован
     logger.info(f"User {user_id} already registered")
+    # Включаем реплай-клавиатуру отдельным сообщением
+    await respond_to.answer(
+        text="\u200B",
+        reply_markup=main_menu_kb
+    )
     await respond_to.bot.send_photo(
         chat_id=respond_to.chat.id,
         photo = FSInputFile("bot/media/anonix.jpg"),
