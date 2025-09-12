@@ -106,7 +106,6 @@ async def process_start(
     )
 
 
-
 @router.callback_query(F.data == "check_subscription")
 async def check_subscription_handler(callback: CallbackQuery):
     user_id = callback.from_user.id
