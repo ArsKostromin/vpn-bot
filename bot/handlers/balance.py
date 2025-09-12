@@ -16,6 +16,7 @@ from bot.keyboards.balance_menu import (
     end_upbalance,
     get_qr_code_keyboard,
     get_payment_keyboard,
+    get_payment_keyboard_by_method,
 )
 from bot.services.upbalance import (
     create_payment_link,
@@ -54,20 +55,21 @@ async def balance_up_callback(call: CallbackQuery):
     )
 
 
-# 💳 Меню Робокассы
-@router.callback_query(F.data == "robokassa")
+# 💳 Робокасса: выбор метода
+@router.callback_query(F.data.in_({"robokassa_rec", "robokassa_sbp"}))
 async def balance_menu_callback(call: CallbackQuery):
+    method = "rec" if call.data == "robokassa_rec" else "sbp"
     await call.message.answer(
         "💸 Выберите сумму пополнения:",
-        reply_markup=get_balance_menu_roboc()
+        reply_markup=get_balance_menu_roboc(method)
     )
     await call.answer()
 
 
-# 🧾 Обработка выбора суммы для Робокассы
-@router.callback_query(F.data.startswith("topup_"))
+# 🧾 Обработка выбора суммы для Робокассы (с учетом метода)
+@router.callback_query(F.data.regexp(r"^topup_(rec|sbp)_(.+)$"))
 async def process_topup(callback: CallbackQuery, state: FSMContext):
-    amount_str = callback.data.split("_")[1]
+    _, method, amount_str = callback.data.split("_", 2)
 
     if amount_str == "custom":
         await callback.message.answer("Введите сумму пополнения в долларах (например, 250):")
@@ -81,7 +83,7 @@ async def process_topup(callback: CallbackQuery, state: FSMContext):
         await callback.message.answer(
             f"""Нажмите на кнопку для оплаты на {amount} $:\n\nСредства поступят на счет в течение 3-5 мин после оплаты.\n\nНажимая \"Оплатить\", я даю согласие на регулярные списания, на обработку персональных данных и принимаю условия публичной [оферты](https://docs.robokassa.ru/media/1550/%D0%BE%D1%84%D0%B5%D1%80%D1%82%D0%B0-itv.pdf).\n""",
             parse_mode="Markdown",
-            reply_markup=get_payment_keyboard(payment_link),
+            reply_markup=get_payment_keyboard_by_method(payment_link, method),
             disable_web_page_preview=True
         )
         await callback.answer()
@@ -98,8 +100,10 @@ async def back_to_main_menu(callback: CallbackQuery):
 
 
 # обработка кнопки "💰 Ввести свою сумму" (Робокасса)
-@router.callback_query(F.data == "topup_custom")
+@router.callback_query(F.data.regexp(r"^topup_(rec|sbp)_custom$"))
 async def process_custom_amount_request(callback: CallbackQuery, state: FSMContext):
+    _, method, _ = callback.data.split("_")
+    await state.update_data(robokassa_method=method)
     await callback.message.answer("Введите сумму пополнения в долларах (например, 250):")
     await state.set_state(TopUpStates.waiting_for_custom_amount)
     await callback.answer()
@@ -114,11 +118,13 @@ async def process_custom_amount_input(message: Message, state: FSMContext):
             await message.answer("Минимальная сумма пополнения — 0.1 $. Попробуйте снова.")
             return
 
+        data = await state.get_data()
+        method = data.get("robokassa_method", "rec")
         payment_link = await create_payment_link(telegram_id=message.from_user.id, amount=amount)
         await message.answer(
             f"""Нажмите на кнопку оплаты на {amount} $:\n{payment_link}\nСредства поступят на счет в течение 3-5 мин после оплаты.\n\nНажимая \"Оплатить\", я даю согласие на регулярные списания, на обработку персональных данных и принимаю условия публичной [оферты](https://docs.robokassa.ru/media/1550/%D0%BE%D1%84%D0%B5%D1%80%D1%82%D0%B0-itv.pdf).\n""",
             parse_mode="Markdown",
-            reply_markup=get_payment_keyboard(payment_link),
+            reply_markup=get_payment_keyboard_by_method(payment_link, method),
             disable_web_page_preview=True
         )
         await state.clear()
