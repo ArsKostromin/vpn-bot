@@ -20,9 +20,6 @@ logging.basicConfig(level=logging.INFO)
 
 router = Router()
 
-# Пользователи, которым уже высылалась reply-клавиатура "меню:"
-keyboard_sent_users: set[int] = set()
-
 @router.message(CommandStart())  # Объединённый хендлер
 async def cmd_start(message: Message, command: CommandObject):
     referral_code = command.args if command.args else None
@@ -33,15 +30,6 @@ async def cmd_start(message: Message, command: CommandObject):
 @router.message(F.text == "Главное меню")
 async def main_menu_button_pressed(message: Message):
     logger.info(f"'Главное меню' button pressed by {message.from_user.id}")
-    if message.from_user.id not in keyboard_sent_users:
-        try:
-            await message.answer(
-                text="Авторизация...",
-                reply_markup=main_menu_kb
-            )
-            keyboard_sent_users.add(message.from_user.id)
-        except Exception as e:
-            logger.warning(f"Не удалось отправить служебное сообщение для клавиатуры: {e}")
     await process_start(message.from_user.id, message.from_user.username, message)
 
 
@@ -74,23 +62,17 @@ async def process_start(
         logger.info(f"Сообщение о бане отправлено пользователю {user_id}")
         return
 
-    # Не отправляем служебное сообщение тут, чтобы не спамить. См. логика выше/ниже.
+    # Показываем главное меню сразу, а сообщение делаем невидимым (сразу удаляем)
+    msg = await respond_to.answer(
+        text="меню:⠀",  
+        reply_markup=main_menu_kb
+    )
 
     # Если пользователь только что зарегистрирован
     if result:
         link_code, created = result
 
         if created:
-            if user_id not in keyboard_sent_users:
-                try:
-                    await respond_to.answer(
-                        text="меню:",
-                        reply_markup=main_menu_kb
-                    )
-                    keyboard_sent_users.add(user_id)
-                except Exception as e:
-                    logger.warning(f"Не удалось отправить служебное сообщение для клавиатуры: {e}")
-
             is_subscribed = await is_user_subscribed(respond_to.bot, user_id)
             logger.info(f"New user {user_id} is subscribed: {is_subscribed}")
 
@@ -109,37 +91,20 @@ async def process_start(
 
     # Пользователь уже зарегистрирован
     logger.info(f"User {user_id} already registered")
-    try:
-        await respond_to.bot.send_photo(
-            chat_id=respond_to.chat.id,
-            photo = FSInputFile("bot/media/anonix.jpg"),
-            caption = (
-                "🔥 Наш VPN обеспечивает высокую скорость без ограничений — смотрите YouTube в высоком качестве без задержек!\n\n"
-                "📱 Telegram и WhatsApp работают без задержек и зависаний.\n\n"
-                "🛡 Двойное шифрование данных (Double VPN) — ваш трафик под надежным шифрованием.\n\n"
-                "🕵️ Полная анонимность — никто не отследит вашу активность.\n\n"
-                "💥 Лучшая цена на рынке, не перегружаем сервера ради выгоды!\n\n"
-                "✅ Подключайтесь: https://t.me/anonix_vpn"
-            ),
-            reply_markup=inline_main_menu,
-            parse_mode=ParseMode.HTML,
-            request_timeout=30.0
-        )
-    except Exception as e:
-        logger.warning(f"Не удалось отправить фото (таймаут/сеть): {e}. Шлём текстовый фолбэк.")
-        await respond_to.answer(
-            text=(
-                "🔥 Наш VPN обеспечивает высокую скорость без ограничений — смотрите YouTube в высоком качестве без задержек!\n\n"
-                "📱 Telegram и WhatsApp работают без задержек и зависаний.\n\n"
-                "🛡 Двойное шифрование данных (Double VPN) — ваш трафик под надежным шифрованием.\n\n"
-                "🕵️ Полная анонимность — никто не отследит вашу активность.\n\n"
-                "💥 Лучшая цена на рынке, не перегружаем сервера ради выгоды!\n\n"
-                "✅ Подключайтесь: https://t.me/anonix_vpn"
-            ),
-            reply_markup=inline_main_menu,
-            parse_mode=ParseMode.HTML,
-            disable_web_page_preview=True
-        )
+    await respond_to.bot.send_photo(
+        chat_id=respond_to.chat.id,
+        photo = FSInputFile("bot/media/anonix.jpg"),
+        caption = (
+            "🔥 Наш VPN обеспечивает высокую скорость без ограничений — смотрите YouTube в высоком качестве без задержек!\n\n"
+            "🛡 Двойное шифрование данных (Double VPN) — ваш трафик под надежным шифрованием.\n\n"
+            "🕵️ Полная анонимность — никто не отследит вашу активность.\n\n"
+            "💥 Лучшая цена на рынке, не перегружаем сервера ради выгоды!\n\n"
+            "✅ Подключайтесь: https://t.me/anonix_vpn"
+        ),
+        reply_markup=inline_main_menu,
+        parse_mode=ParseMode.HTML
+    )
+
 
 @router.callback_query(F.data == "check_subscription")
 async def check_subscription_handler(callback: CallbackQuery):
