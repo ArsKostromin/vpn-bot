@@ -67,10 +67,6 @@ async def process_start(
         text="меню:⠀",  
         reply_markup=main_menu_kb
     )
-    try:
-        await msg.delete()
-    except Exception as e:
-        logger.warning(f"Не удалось удалить служебное сообщение меню: {e}")
 
     # Если пользователь только что зарегистрирован
     if result:
@@ -95,11 +91,6 @@ async def process_start(
 
     # Пользователь уже зарегистрирован
     logger.info(f"User {user_id} already registered")
-    # Включаем реплай-клавиатуру отдельным сообщением
-    await respond_to.answer(
-        text="\u200B",
-        reply_markup=main_menu_kb
-    )
     await respond_to.bot.send_photo(
         chat_id=respond_to.chat.id,
         photo = FSInputFile("bot/media/anonix.jpg"),
