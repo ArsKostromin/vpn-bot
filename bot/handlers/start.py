@@ -36,7 +36,7 @@ async def main_menu_button_pressed(message: Message):
     if message.from_user.id not in keyboard_sent_users:
         try:
             await message.answer(
-                text="меню:",
+                text="Авторизация...",
                 reply_markup=main_menu_kb
             )
             keyboard_sent_users.add(message.from_user.id)
