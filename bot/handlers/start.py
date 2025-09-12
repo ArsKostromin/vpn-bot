@@ -62,15 +62,11 @@ async def process_start(
         logger.info(f"Сообщение о бане отправлено пользователю {user_id}")
         return
 
-    # Показываем главное меню сразу, а сообщение делаем невидимым (сразу удаляем)
+    # Показываем главное меню сразу (reply-клавиатура закрепится), затем удалим служебное сообщение после основного ответа
     msg = await respond_to.answer(
         text="меню:⠀",  
         reply_markup=main_menu_kb
     )
-    try:
-        await msg.delete()
-    except Exception as e:
-        logger.warning(f"Не удалось удалить служебное сообщение меню: {e}")
 
     # Если пользователь только что зарегистрирован
     if result:
@@ -91,11 +87,18 @@ async def process_start(
                 reply_markup=inline_instruction_buttons,
                 disable_web_page_preview=True
             )
+            try:
+                # Небольшая задержка, чтобы клавиатура успела закрепиться у клиента
+                import asyncio
+                await asyncio.sleep(0.2)
+                await msg.delete()
+            except Exception as e:
+                logger.warning(f"Не удалось удалить служебное сообщение меню: {e}")
             return
 
     # Пользователь уже зарегистрирован
     logger.info(f"User {user_id} already registered")
-    await respond_to.bot.send_photo(
+    sent_photo = await respond_to.bot.send_photo(
         chat_id=respond_to.chat.id,
         photo = FSInputFile("bot/media/anonix.jpg"),
         caption = (
@@ -109,6 +112,12 @@ async def process_start(
         reply_markup=inline_main_menu,
         parse_mode=ParseMode.HTML
     )
+    try:
+        import asyncio
+        await asyncio.sleep(0.2)
+        await msg.delete()
+    except Exception as e:
+        logger.warning(f"Не удалось удалить служебное сообщение меню: {e}")
 
 
 @router.callback_query(F.data == "check_subscription")
