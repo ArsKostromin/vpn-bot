@@ -28,6 +28,9 @@ start_balance = InlineKeyboardMarkup(
             InlineKeyboardButton(text="Картой с автопродлением(выгодно)", callback_data="robokassa_rec"),
         ],
         [
+            InlineKeyboardButton(text="Крипта", callback_data="cryptobot"),
+        ],
+        [
             InlineKeyboardButton(text="Назад", callback_data="start_from_button")
         ],
     ]
