@@ -67,6 +67,10 @@ async def process_start(
         text="меню:⠀",  
         reply_markup=main_menu_kb
     )
+    try:
+        await msg.delete()
+    except Exception as e:
+        logger.warning(f"Не удалось удалить служебное сообщение меню: {e}")
 
     # Если пользователь только что зарегистрирован
     if result:
