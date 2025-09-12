@@ -20,6 +20,9 @@ logging.basicConfig(level=logging.INFO)
 
 router = Router()
 
+# Пользователи, которым уже высылалась reply-клавиатура "меню:"
+keyboard_sent_users: set[int] = set()
+
 @router.message(CommandStart())  # Объединённый хендлер
 async def cmd_start(message: Message, command: CommandObject):
     referral_code = command.args if command.args else None
@@ -30,6 +33,15 @@ async def cmd_start(message: Message, command: CommandObject):
 @router.message(F.text == "Главное меню")
 async def main_menu_button_pressed(message: Message):
     logger.info(f"'Главное меню' button pressed by {message.from_user.id}")
+    if message.from_user.id not in keyboard_sent_users:
+        try:
+            await message.answer(
+                text="меню:",
+                reply_markup=main_menu_kb
+            )
+            keyboard_sent_users.add(message.from_user.id)
+        except Exception as e:
+            logger.warning(f"Не удалось отправить служебное сообщение для клавиатуры: {e}")
     await process_start(message.from_user.id, message.from_user.username, message)
 
 
@@ -62,17 +74,23 @@ async def process_start(
         logger.info(f"Сообщение о бане отправлено пользователю {user_id}")
         return
 
-    # Показываем главное меню сразу, а сообщение делаем невидимым (сразу удаляем)
-    msg = await respond_to.answer(
-        text="меню:⠀",  
-        reply_markup=main_menu_kb
-    )
+    # Не отправляем служебное сообщение тут, чтобы не спамить. См. логика выше/ниже.
 
     # Если пользователь только что зарегистрирован
     if result:
         link_code, created = result
 
         if created:
+            if user_id not in keyboard_sent_users:
+                try:
+                    await respond_to.answer(
+                        text="меню:",
+                        reply_markup=main_menu_kb
+                    )
+                    keyboard_sent_users.add(user_id)
+                except Exception as e:
+                    logger.warning(f"Не удалось отправить служебное сообщение для клавиатуры: {e}")
+
             is_subscribed = await is_user_subscribed(respond_to.bot, user_id)
             logger.info(f"New user {user_id} is subscribed: {is_subscribed}")
 
