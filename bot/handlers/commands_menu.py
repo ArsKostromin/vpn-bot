@@ -13,10 +13,11 @@ async def set_main_menu(bot: Bot) -> bool:
         BotCommand(command="aboutus", description="О нас ℹ️"),
     ]
 
-    attempts = 5
+    attempts = 3
     for attempt in range(1, attempts + 1):
         try:
-            await bot.set_my_commands(commands)
+            # Дадим больше времени Telegram на ответ
+            await bot.set_my_commands(commands, request_timeout=30.0)
             return True
         except (TelegramServerError, TelegramNetworkError) as e:
             delay = min(2 ** attempt, 30)
