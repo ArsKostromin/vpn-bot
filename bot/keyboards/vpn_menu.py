@@ -15,7 +15,22 @@ def get_vpn_type_kb(types: list[tuple[str, str]]) -> InlineKeyboardMarkup:
 def get_duration_kb(durations: list[tuple[str, str, str, int]]) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
-    for code, price, display, discount_percent in durations:
+    def _rank_by_display(display: str) -> int:
+        text = display.lower().strip()
+        if "меся" in text:
+            if text.startswith("1"):
+                return 0
+            if text.startswith("3"):
+                return 1
+            if text.startswith("6"):
+                return 2
+        if ("год" in text or "года" in text or "лет" in text) and text.startswith("1"):
+            return 3
+        return 99
+
+    durations_sorted = sorted(durations, key=lambda item: _rank_by_display(item[2]))
+
+    for code, price, display, discount_percent in durations_sorted:
         if discount_percent > 0:
             price = float(price)
             text = f"{display}—{price:.2f}$"
