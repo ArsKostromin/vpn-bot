@@ -62,11 +62,15 @@ async def process_start(
         logger.info(f"Сообщение о бане отправлено пользователю {user_id}")
         return
 
-    # Показываем главное меню сразу (без текста)
-    await respond_to.answer(
-        text="меню:⠀",  # невидимый символ, чтобы не падало
+    # Показываем главное меню сразу, а сообщение делаем невидимым (сразу удаляем)
+    msg = await respond_to.answer(
+        text="меню:⠀",  
         reply_markup=main_menu_kb
     )
+    try:
+        await msg.delete()
+    except Exception as e:
+        logger.warning(f"Не удалось удалить служебное сообщение меню: {e}")
 
     # Если пользователь только что зарегистрирован
     if result:

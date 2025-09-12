@@ -112,10 +112,10 @@ def get_payment_keyboard(payment_link: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text="💳 Оплатить", url=payment_link)
+                InlineKeyboardButton(text="💳 Оплатить с автопродлением(выгодно)", url=payment_link+"&Recurring=true")
             ],
                         [
-                InlineKeyboardButton(text="💳 Оплатить с автопродлением", url=payment_link+"&Recurring=true")
+                InlineKeyboardButton(text="💳 Оплатить с сбп", url=payment_link)
             ],
             [
                 InlineKeyboardButton(text="Назад", callback_data="balance_up")
