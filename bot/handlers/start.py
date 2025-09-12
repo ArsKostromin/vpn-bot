@@ -62,22 +62,17 @@ async def process_start(
         logger.info(f"Сообщение о бане отправлено пользователю {user_id}")
         return
 
-    msg = None
+    # Показываем главное меню сразу, а сообщение делаем невидимым (сразу удаляем)
+    msg = await respond_to.answer(
+        text="меню:⠀",  
+        reply_markup=main_menu_kb
+    )
 
     # Если пользователь только что зарегистрирован
     if result:
         link_code, created = result
 
         if created:
-            # Только при первой регистрации отправляем служебное сообщение,
-            # чтобы закрепить reply-клавиатуру один раз
-            try:
-                msg = await respond_to.answer(
-                    text="Меню",
-                    reply_markup=main_menu_kb
-                )
-            except Exception as e:
-                logger.warning(f"Не удалось отправить служебное сообщение для клавиатуры: {e}")
             is_subscribed = await is_user_subscribed(respond_to.bot, user_id)
             logger.info(f"New user {user_id} is subscribed: {is_subscribed}")
 
@@ -96,7 +91,7 @@ async def process_start(
 
     # Пользователь уже зарегистрирован
     logger.info(f"User {user_id} already registered")
-    sent_photo = await respond_to.bot.send_photo(
+    await respond_to.bot.send_photo(
         chat_id=respond_to.chat.id,
         photo = FSInputFile("bot/media/anonix.jpg"),
         caption = (
@@ -110,7 +105,6 @@ async def process_start(
         reply_markup=inline_main_menu,
         parse_mode=ParseMode.HTML
     )
-    # Сообщение не удаляем, чтобы reply-клавиатура осталась закреплённой
 
 
 @router.callback_query(F.data == "check_subscription")
