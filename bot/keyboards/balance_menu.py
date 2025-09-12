@@ -22,10 +22,10 @@ def get_balance_menu_roboc(method: str = "rec"):
 start_balance = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="QR-код СБП", callback_data="robokassa_sbp"),
+            InlineKeyboardButton(text="Карта(выгодно)", callback_data="robokassa_rec"),
         ],
         [
-            InlineKeyboardButton(text="Картой с автопродлением(выгодно)", callback_data="robokassa_rec"),
+            InlineKeyboardButton(text="QR-код СБП", callback_data="robokassa_sbp"),
         ],
         [
             InlineKeyboardButton(text="Крипта", callback_data="cryptobot"),
@@ -116,7 +116,7 @@ def get_payment_keyboard(payment_link: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text="💳 Оплатить с автопродлением(выгодно)", url=payment_link+"&Recurring=true")
+                InlineKeyboardButton(text="💳 карта(выгодно)", url=payment_link+"&Recurring=true")
             ],
                         [
                 InlineKeyboardButton(text="💳 Оплатить с сбп", url=payment_link)
@@ -131,7 +131,7 @@ def get_payment_keyboard_by_method(payment_link: str, method: str) -> InlineKeyb
     if method == "rec":
         return InlineKeyboardMarkup(
             inline_keyboard=[
-                [InlineKeyboardButton(text="💳 Оплатить с автопродлением(выгодно)", url=payment_link+"&Recurring=true")],
+                [InlineKeyboardButton(text="💳 карта(выгодно)", url=payment_link+"&Recurring=true")],
                 [InlineKeyboardButton(text="Назад", callback_data="balance_up")],
             ]
         )
