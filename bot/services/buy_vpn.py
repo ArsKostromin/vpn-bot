@@ -121,7 +121,34 @@ async def buy_subscription_api(
 def build_tariff_showcase(title: str, plans: list[dict]) -> str:
     lines = [f"🤳 {title}", "", "💰 *Лучший VPN по лучшей цене!*", ""]
 
-    for plan in plans:
+    def _rank(plan: dict) -> int:
+        dur = str(plan.get("duration", "")).lower().strip()
+        label = str(plan.get("duration_display", "")).lower().strip()
+
+        mapping = {
+            "1m": 0,
+            "3m": 1,
+            "6m": 2,
+            "12m": 3,
+            "1y": 3,
+        }
+        if dur in mapping:
+            return mapping[dur]
+
+        if "меся" in label:
+            if label.startswith("1"):
+                return 0
+            if label.startswith("3"):
+                return 1
+            if label.startswith("6"):
+                return 2
+        if ("год" in label or "года" in label or "лет" in label) and label.startswith("1"):
+            return 3
+        return 99
+
+    plans_sorted = sorted(plans, key=_rank)
+
+    for plan in plans_sorted:
         base_price = plan["price"]
         current_price = plan.get("current_price", base_price)
         display_price = plan.get("display_price", f"${current_price:.2f}")
