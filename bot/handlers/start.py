@@ -72,7 +72,7 @@ async def process_start(
         if created:
             # Отправляем служебное сообщение с reply-клавиатурой один раз при регистрации
             msg = await respond_to.answer(
-                text="\u2800",
+                text="Меню",
                 reply_markup=main_menu_kb
             )
             is_subscribed = await is_user_subscribed(respond_to.bot, user_id)
@@ -97,7 +97,7 @@ async def process_start(
     if ensure_keyboard and msg is None:
         try:
             msg = await respond_to.answer(
-                text="\u2800",
+                text="Меню",
                 reply_markup=main_menu_kb
             )
         except Exception as e:
