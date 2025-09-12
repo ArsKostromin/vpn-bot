@@ -30,7 +30,7 @@ async def cmd_start(message: Message, command: CommandObject):
 @router.message(F.text == "Главное меню")
 async def main_menu_button_pressed(message: Message):
     logger.info(f"'Главное меню' button pressed by {message.from_user.id}")
-    await process_start(message.from_user.id, message.from_user.username, message)
+    await process_start(message.from_user.id, message.from_user.username, message, ensure_keyboard=True)
 
 
 @router.callback_query(F.data == "start_from_button")
@@ -44,7 +44,8 @@ async def process_start(
     user_id: int,
     username: str,
     respond_to: Message,
-    referral_code: str | None = None
+    referral_code: str | None = None,
+    ensure_keyboard: bool = False
 ):
     logger.info(f"Processing start for user {user_id} (username: {username}), referral: {referral_code}")
     
@@ -62,17 +63,18 @@ async def process_start(
         logger.info(f"Сообщение о бане отправлено пользователю {user_id}")
         return
 
-    # Показываем главное меню сразу (reply-клавиатура закрепится). Текст делаем невидимым символом.
-    msg = await respond_to.answer(
-        text="\u200B",  
-        reply_markup=main_menu_kb
-    )
+    msg = None
 
     # Если пользователь только что зарегистрирован
     if result:
         link_code, created = result
 
         if created:
+            # Отправляем служебное сообщение с reply-клавиатурой один раз при регистрации
+            msg = await respond_to.answer(
+                text="\u2800",
+                reply_markup=main_menu_kb
+            )
             is_subscribed = await is_user_subscribed(respond_to.bot, user_id)
             logger.info(f"New user {user_id} is subscribed: {is_subscribed}")
 
@@ -91,6 +93,15 @@ async def process_start(
 
     # Пользователь уже зарегистрирован
     logger.info(f"User {user_id} already registered")
+    # При явном нажатии "Главное меню" можем переустановить reply-клавиатуру
+    if ensure_keyboard and msg is None:
+        try:
+            msg = await respond_to.answer(
+                text="\u2800",
+                reply_markup=main_menu_kb
+            )
+        except Exception as e:
+            logger.warning(f"Не удалось отправить служебное сообщение для клавиатуры: {e}")
     sent_photo = await respond_to.bot.send_photo(
         chat_id=respond_to.chat.id,
         photo = FSInputFile("bot/media/anonix.jpg"),
