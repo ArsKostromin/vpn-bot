@@ -174,5 +174,12 @@ async def get_countries_from_api() -> list[tuple[str, str]]:
         response = await client.get(f"{API_URL}/countries/")
         response.raise_for_status()
         countries = response.json()
-        unique_types = {(item['name'], item['country']) for item in countries}
-        return list(unique_types)
+        # Возвращаем пары (код_сервера, "Страна — XX%")
+        result = []
+        for item in countries:
+            name = item.get('name')
+            country = item.get('country')
+            load = int(item.get('load_percent', 0))
+            label = f"{country} — {load}%"
+            result.append((name, label))
+        return result
