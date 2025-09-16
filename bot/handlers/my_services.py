@@ -67,6 +67,7 @@ async def profile_handler(callback: CallbackQuery):
 
     text = (
         f"💼 Ваш профиль:\n\n"
+        f"▪️ Telegram ID: {user_id}\n"
         f"▪️ Баланс: {balance}$\n"
         f"▪️ Рефералов: {referrals_count}\n"
         f"▪️ Реферальная ссылка: https://t.me/Anonixvpn1Bot?start={link_code}"
