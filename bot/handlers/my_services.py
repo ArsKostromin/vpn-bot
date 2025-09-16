@@ -6,6 +6,8 @@ from .start import process_start
 from bot.services.user_service import get_user_subscriptions, get_user_info, toggle_autorenew
 from bot.keyboards.back_menu import back_to_main_menu
 
+from decimal import Decimal
+
 router = Router()
 
 @router.callback_query(F.data == "my_services")
@@ -25,9 +27,13 @@ async def my_services_screen(callback: CallbackQuery):
     else:
         for sub in subscriptions:
             status = "✅ Активна" if sub['is_active'] else "❌ Неактивна"
+            try:
+                price_display = f"{Decimal(str(sub.get('price'))).quantize(Decimal('0.00'))}"
+            except Exception:
+                price_display = str(sub.get('price'))
             text = (
                 f"<b>🔹 VPN:</b> {sub['vpn_type_display']}\n"
-                f"<b>🔹 Цена:</b> {sub['price']}$\n"
+                f"<b>🔹 Цена:</b> {price_display}$\n"
                 f"<b>🔹 Статус:</b> {status}\n"
                 f"<b>🔹 Начало:</b> {sub['start_date'][:10]}\n"
                 f"<b>🔹 Окончание:</b> {sub['end_date'][:10]}\n"
