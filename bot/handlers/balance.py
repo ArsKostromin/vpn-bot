@@ -211,7 +211,7 @@ async def start_crypto_payment(call: CallbackQuery, state: FSMContext):
         "currency": "USD",                        # Пользователь платит 50 USD
         "to_currency": currency.upper(),          # А платёж произойдёт, например, в BTC
         "order_id": order_id,
-        "url_callback": "https://admin.byebyefbi.com/payments/api/crypto/webhook/",
+        "url_callback": "https://admin.anonixvpn.space/payments/api/crypto/webhook/",
         "url_return": "https://t.me/Anonixvpn1Bot",
         "is_payment_multiple": False,
         "lifetime": 900,

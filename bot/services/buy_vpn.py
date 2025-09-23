@@ -1,7 +1,7 @@
 # services/buy_vpn.py
 import httpx
 
-API_URL = "https://admin.byebyefbi.com/vpn"
+API_URL = "https://admin.anonixvpn.space/vpn"
 # API_URL = "http://backend:8000/vpn"
 
 

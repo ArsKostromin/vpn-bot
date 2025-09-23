@@ -1,7 +1,7 @@
 import httpx
 
 
-API_URL = "https://admin.byebyefbi.com"
+API_URL = "https://admin.anonixvpn.space"
 # API_URL = "http://backend:8000"
 
 async def apply_coupon(code: str, telegram_id: int) -> str:
