@@ -20,7 +20,7 @@ inline_main_menu = InlineKeyboardMarkup(
         ],
         [
             
-            InlineKeyboardButton(text="🤝 Как подключить", url="https://arskostromin.github.io/vpnguide/index.html"),
+            InlineKeyboardButton(text="🤝 Как подключить", url="https://guide.anonixvpn.space/"),
             InlineKeyboardButton(text="🆘 Помощь", url="https://t.me/Anonixvpnsupportbot")
         ],
         [
